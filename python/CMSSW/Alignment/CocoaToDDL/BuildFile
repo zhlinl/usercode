@@ -1,0 +1,10 @@
+<use name=CLHEP>
+<use name=Alignment/CocoaUtilities>
+<use name=Alignment/CocoaModel>
+<use name=Alignment/CocoaDDLObjects>
+
+<export>
+ <lib name=AlignmentCocoaToDDL>
+ <use name=Alignment/CocoaUtilities>
+</export>
+
