@@ -36,7 +36,7 @@
 //#include <iostream.h>     
 #include <TLegend.h> 
 #include <TPad.h> 
-#include "/home/zhlinl/work/codes/myStyle.h"
+#include "myStyle.h"
 void pTeta()//int which=0)
 {
 
