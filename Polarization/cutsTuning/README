@@ -1,0 +1,25 @@
+First, you need to create a private TTree including the muon and dimuon cut variables.
+By doing following:
+---------------------------------
+CMSSW_3_8_6
+Onia2MuMu-V6
+	HeavyFlavorAnalysis/Onia2MuMu V00-12-01
+	MuonAnalysis/MuonAssociators V01-10-02
+**USE this macro "JPsiAnalyzerPAT.cc" instead of that one in the Onia2MuMu package
+**SET "applyCuts = cms.bool(False)" to False if it is True, in jpsianalyzerpat_cfg.py
+
+PAT tuples(Nov4ReReco, Run2010B):
+/MuOnia/fat-Run2010B-Nov4ReReco_v1-Onia2MuMu-v6-52b0ce2a29246dfcd7fb39d814d6fb33/USER
+JSON file:
+http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/CMSSW/HeavyFlavorAnalysis/Onia2MuMu/certification/7TeV/Collisions10/Reprocessing/Cert_136033-149442_7TeV_Nov4ReReco_Collisions10_JSON_BPAG.txt?view=log
+----------------------------------
+
+0. "fitPeak.cc" is used to fit the mass distributions.
+
+1. "cutAna.cc" is used to get the "effSig" and "rejBkg" for every cut individually. 
+Need to include the macro "fitPeak.cc" to fit the Jpsi Mass distributions, and get the quantities we need.
+
+2. "cutSBG.cc" to get the S/BG change trend with the CUTs one by one.
+
+3. "effTrackMu.cc" is used to look the dependency on pT and Eta of 
+the tracker muon binary cuts: TMOneStationTight , TMLastStationAngTight
