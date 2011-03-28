@@ -34,14 +34,12 @@
 #include "TLegend.h"
 #include "TStyle.h"
 
-#include "/home/zhlinl/work/codes/fitPeak_.cc"
-//#include "/home/zhlinl/work/codes/myStyle.h"
+#include "fitPeak.cc"
+#include "myStyle.h"
 /*-----------------------------
 This macro is used to get the "effSig" and "rejBkg" for every
 cut individually. Need to include the macro "fitPeak.cc" 
 to fit the Jpsi Mass distributions, and get the quantities we need.
-
-Author : Linlin Zhang
 -------------------------------*/
 using namespace RooFit;
 
