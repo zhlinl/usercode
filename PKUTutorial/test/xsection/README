@@ -1,0 +1,179 @@
+export CVS_RSH='/usr/bin/ssh'
+CVSROOT=:ext:nuno@cmscvs.cern.ch:/cvs_server/repositories/CMSSW
+export CVSROOT
+cvs co -d upsilon UserCode/YZheng/UpsilonAna
+
+cd upsilon/test/xsection/
+
+mkdir figs
+mkdir log
+
+ln -s <the_upsilon data_tree>.root data.root
+ln -s ../maps .
+
+#root -l -b -q makeWeights.C >&log/test_runfitter
+#tail -f log/test_mkwei
+
+./runWei.sh 
+
+root -l -b -q oniafitter.C >& log/test_fitter &
+tail -f log/test_fitter
+
+ls figs/
+
+
+#pt-diff, 1 y-bin
+./runFitSyst.py 1 0  >& log/fitsys_1s_mode0 &
+./runfitsyst.py 2 0  >& log/fitsys_2s_mode0 &
+./runFitSyst.py 3 0  >& log/fitsys_3s_mode0 &
+
+#pt-diff, 2 y-bin
+./runfitsyst.py 1 1  >& log/fitsys_1s_mode1 &
+./runfitsyst.py 2 1  >& log/fitsys_2s_mode1 &
+./runFitSyst.py 3 1  >& log/fitsys_3s_mode1 &
+
+#y-diff, 1 pt bin
+./runFitSyst.py 1 2  >& log/fitsys_1s_mode2 &
+./runFitSyst.py 2 2  >& log/fitsys_2s_mode2 &
+./runFitSyst.py 3 2  >& log/fitsys_3s_mode2 &
+
+#ratios
+./runFitSyst.py 1 3  >& log/fitsys_1s_mode3 &
+./runfitsyst.py 2 3  >& log/fitsys_2s_mode3 &
+./runFitSyst.py 3 3  >& log/fitsys_3s_mode3 &
+
+ps | grep oniafitter.C | grep root | grep -v exe|wc
+ls -1 mode1/fitres_?s_*/xsecdiff*rap0.pdf|wc #74
+ls -1 mode?/fitres_?s_*/xsecdiff*rap0.pdf|wc #296
+
+#this may be needed
+ulimit -n 2000
+
+root -l -b -q xsecresults.C\(1,0,0\) >& log/xsec_1s_y02_mode0 &
+root -l -b -q xsecresults.C\(2,0,0\) >& log/xsec_2s_y02_mode0 &
+root -l -b -q xsecresults.C\(3,0,0\) >& log/xsec_3s_y02_mode0 &
+
+root -l -b -q xsecresults.C\(1,0,1\) >& log/xsec_1s_y01_mode1 &
+root -l -b -q xsecresults.C\(2,0,1\) >& log/xsec_2s_y01_mode1 &
+root -l -b -q xsecresults.C\(3,0,1\) >& log/xsec_3s_y01_mode1 &
+root -l -b -q xsecresults.C\(1,1,1\) >& log/xsec_1s_y12_mode1 &
+root -l -b -q xsecresults.C\(2,1,1\) >& log/xsec_2s_y12_mode1 &
+root -l -b -q xsecresults.C\(3,1,1\) >& log/xsec_3s_y12_mode1 &
+
+root -l -b -q xsecresults.C\(1,0,2\) >& log/xsec_1s_mode2 &
+root -l -b -q xsecresults.C\(2,0,2\) >& log/xsec_2s_mode2 &
+root -l -b -q xsecresults.C\(3,0,2\) >& log/xsec_3s_mode2 &
+
+root -l -b -q xsecresults.C\(1,0,3\) >& log/xsec_1s_mode3 &
+root -l -b -q xsecresults.C\(2,0,3\) >& log/xsec_2s_mode3 &
+root -l -b -q xsecresults.C\(3,0,3\) >& log/xsec_3s_mode3 &
+
+
+root -l -b -q ratio.C
+
+root -l -b -q peakOverlay.C\(true,0\) 
+root -l -b -q peakOverlay.C\(false,1\) 
+root -l -b -q peakOverlay.C\(false,2\) 
+root -l -b -q peakOverlay.C\(false,3\) 
+
+source cp_res.txt
+source cp_figs.txt
+
+
+./harvest.py
+
+
+
+###  --- COPY results to PAPER
+
+### -- Tables
+ 
+#ls summary_polariz_ups?_y1.tex | sed s/"y1.tex"// | awk '{print "cp",$1 "y1.tex paper/" $1 "y12.tex"}'
+
+## tables of results
+cp mode0/summary_polariz_ups1_y0.tex paper/summary_polariz_ups1_y02.tex
+cp mode0/summary_polariz_ups2_y0.tex paper/summary_polariz_ups2_y02.tex
+cp mode0/summary_polariz_ups3_y0.tex paper/summary_polariz_ups3_y02.tex
+
+cp mode1/summary_polariz_ups1_y0.tex paper/summary_polariz_ups1_y01.tex
+cp mode1/summary_polariz_ups2_y0.tex paper/summary_polariz_ups2_y01.tex
+cp mode1/summary_polariz_ups3_y0.tex paper/summary_polariz_ups3_y01.tex
+cp mode1/summary_polariz_ups1_y1.tex paper/summary_polariz_ups1_y12.tex
+cp mode1/summary_polariz_ups2_y1.tex paper/summary_polariz_ups2_y12.tex
+cp mode1/summary_polariz_ups3_y1.tex paper/summary_polariz_ups3_y12.tex
+
+cp mode2/summary_polariz_ups1_y0.tex paper/summary_polariz_ups1_rapdiff.tex
+#cp mode2/summary_polariz_ups2_y0.tex paper/summary_polariz_ups2_rapdiff.tex
+#cp mode2/summary_polariz_ups3_y0.tex paper/summary_polariz_ups3_rapdiff.tex
+
+## tables of systematics 
+cp mode0/syst_table_ups1_y0.tex      paper/syst_table_ups1_y02.tex  
+cp mode0/syst_table_ups2_y0.tex	     paper/syst_table_ups2_y02.tex
+cp mode0/syst_table_ups3_y0.tex	     paper/syst_table_ups3_y02.tex
+
+cp mode1/syst_table_ups1_y0.tex       paper/syst_table_ups1_y01.tex  
+cp mode1/syst_table_ups2_y0.tex       paper/syst_table_ups2_y01.tex
+cp mode1/syst_table_ups3_y0.tex       paper/syst_table_ups3_y01.tex
+cp mode1/syst_table_ups2_y1.tex       paper/syst_table_ups2_y12.tex
+cp mode1/syst_table_ups1_y1.tex       paper/syst_table_ups1_y12.tex
+cp mode1/syst_table_ups3_y1.tex       paper/syst_table_ups3_y12.tex
+
+
+cp mode2/syst_table_ups1_y0.tex      paper/syst_table_ups1_rapdiff.tex  
+#cp mode2/syst_table_ups2_y0.tex      paper/syst_table_ups2_rapdiff.tex
+#cp mode2/syst_table_ups3_y0.tex      paper/syst_table_ups3_rapdiff.tex
+
+cp mode3/xsec_ratio_detailed.tex    paper/xsec_ratio.tex
+
+
+### -- Figures
+
+cp mode0/xsec_overlay.pdf		paper/xsec_overlay.pdf
+cp mode3/xsec_ratio_detailed.pdf 	paper/xsec_ratio.pdf
+
+cp mode2/xsection_1s_y0.pdf 	paper/xsec_rapdiff_1s.pdf
+
+cp mode1/xsec_1s_2ybin.pdf 	paper/xsec_1s_2ybin.pdf
+cp mode1/xsec_2s_2ybin.pdf 	paper/xsec_2s_2ybin.pdf
+cp mode1/xsec_3s_2ybin.pdf 	paper/xsec_3s_2ybin.pdf
+
+## root files
+cp mode0/xsection_1s_y0.root theory/xsection_1s_rap_0_2.root
+cp mode0/xsection_2s_y0.root theory/xsection_2s_rap_0_2.root
+cp mode0/xsection_3s_y0.root theory/xsection_3s_rap_0_2.root
+
+cp mode1/xsection_1s_y0.root theory/xsection_1s_rap_0_1.root
+cp mode1/xsection_2s_y0.root theory/xsection_2s_rap_0_1.root
+cp mode1/xsection_3s_y0.root theory/xsection_3s_rap_0_1.root
+cp mode1/xsection_1s_y1.root theory/xsection_1s_rap_1_2.root
+cp mode1/xsection_2s_y1.root theory/xsection_2s_rap_1_2.root
+cp mode1/xsection_3s_y1.root theory/xsection_3s_rap_1_2.root
+
+cp mode1/xsection_3s_y0.root theory/xsection_3s_rap_0_1.root
+
+cp mode2/xsection_1s_y0.root theory/xsection_1s_rapdiff.root
+
+#theoryPlot1S
+#theoryPlot2S
+#theoryPlot3S
+
+#mass_raw_all
+#mass_raw_barrel
+#RawDataFitBins
+#
+#accept2d
+#accept1d
+#
+#turnOnMuI0
+#turnOnMuI1
+#turnOnMuI2
+#turnOnMuI3
+#turnOnMuI4
+#turnOnMuI5
+#turnOnTrig0
+#turnOnTrig1
+#turnOnTrig2
+#turnOnTrig3
+#turnOnTrig4
+#turnOnTrig5
+

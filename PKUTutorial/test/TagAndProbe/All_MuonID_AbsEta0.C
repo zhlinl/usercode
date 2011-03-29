@@ -1,0 +1,346 @@
+{
+//=========Macro generated from canvas: c1/c1
+//=========  (Thu Sep 30 09:31:18 2010) by ROOT version5.18/00b
+  //gROOT->LoadMacro("tdrStyleModified.C");
+
+
+  gROOT->LoadMacro("setTDRStyle_modified.C");
+  setTDRStyle();
+  
+  TCanvas *c1 = new TCanvas("c1", "c1");//,3,48,800,600);
+  TPaveText *pt = new TPaveText(0.33,0.15,0.45,0.5,"brNDC");
+  TLegend *leg = new TLegend(0.55,0.25,0.93,0.55,NULL,"brNDC");
+
+  //TCanvas *c1 = new TCanvas("c1", "c1",3,48,800,600);
+   c1->SetHighLightColor(2);
+   c1->Range(-0.7692307,-0.165996,22.30769,1.210087);
+   c1->SetFillColor(10);
+   c1->SetBorderMode(0);
+   c1->SetBorderSize(2);
+   c1->SetTickx();
+   c1->SetTicky();
+   c1->SetLeftMargin(0.12);
+   c1->SetTopMargin(0.08);
+   c1->SetBottomMargin(0.1206294);
+   c1->SetFrameLineWidth(2);
+   c1->SetFrameBorderMode(0);
+   c1->SetFrameLineWidth(2);
+   c1->SetFrameBorderMode(0);
+   
+   TH1 *hframe = new TH1F("hframe","",1000,2,20);
+   hframe->SetMinimum(0);
+   hframe->SetMaximum(1.1);
+   hframe->SetDirectory(0);
+   hframe->SetStats(0);
+   hframe->SetLineWidth(2);
+   hframe->SetMarkerStyle(25);
+   hframe->SetMarkerSize(0.7);
+   hframe->GetXaxis()->SetTitle("p_{T}^{#mu} (GeV/c)");
+   hframe->GetXaxis()->SetNdivisions(506);
+   hframe->GetXaxis()->SetLabelFont(42);
+   hframe->GetXaxis()->SetLabelOffset(0.015);
+   hframe->GetXaxis()->SetTitleSize(0.05);
+   hframe->GetXaxis()->SetTitleFont(42);
+   hframe->GetXaxis()->SetTitleOffset(1.1);
+   hframe->GetYaxis()->SetTitle("Efficiency");
+   hframe->GetYaxis()->SetNdivisions(506);
+   hframe->GetYaxis()->SetLabelFont(42);
+   hframe->GetYaxis()->SetLabelOffset(0.015);
+   hframe->GetYaxis()->SetTitleSize(0.05);
+   hframe->GetYaxis()->SetTitleOffset(1.1);
+   hframe->GetYaxis()->SetTitleFont(42);
+   hframe->GetYaxis()->SetRangeUser(0.65,1.02);
+   hframe->GetZaxis()->SetLabelFont(42);
+   hframe->GetZaxis()->SetLabelOffset(0.015);
+   hframe->GetZaxis()->SetTitleSize(0.05);
+   hframe->GetZaxis()->SetTitleOffset(1.1);
+   hframe->GetZaxis()->SetTitleFont(42);
+   hframe->Draw(" ");
+   
+   TGraphAsymmErrors *grae = new TGraphAsymmErrors(7);
+   grae->SetName("fit_eff_unknown_TM__abseta_bin0_pt");
+   grae->SetTitle("");
+   grae->SetFillColor(1);
+   grae->SetLineColor(4);
+   grae->SetLineWidth(2);
+   grae->SetMarkerColor(4);
+   grae->SetMarkerStyle(25);
+   grae->SetMarkerSize(1.0);
+   //grae->SetPoint(0,3.419464,0.5433216);
+   grae->SetPointError(0,0.419464,0.08053603,0.0167439,0.01667167);
+   grae->SetPoint(1,3.732818,0.7954708);
+   grae->SetPointError(1,0.2328183,0.2671817,0.007348274,0.007221014);
+   grae->SetPoint(2,4.237949,0.9218426);
+   grae->SetPointError(2,0.237949,0.262051,0.005881879,0.005652387);
+   grae->SetPoint(3,4.738966,0.957934);
+   grae->SetPointError(3,0.2389658,0.2610342,0.005385431,0.004988826);
+   grae->SetPoint(4,5.447096,0.9764826);
+   grae->SetPointError(4,0.4470955,0.5529045,0.003729073,0.003373148);
+   grae->SetPoint(5,6.801621,0.9891247);
+   grae->SetPointError(5,0.8016207,1.198379,0.002770707,0.002368684);
+   grae->SetPoint(6,10.50251,0.9959742);
+   grae->SetPointError(6,2.502506,39.49749,0.002358684,0.001688718);
+   
+   TH1 *fit_eff_unknown_TM__abseta_bin0_pt1 = new TH1F("fit_eff_unknown_TM__abseta_bin0_pt1","",100,0,54.7);
+   fit_eff_unknown_TM__abseta_bin0_pt1->SetMinimum(0.4794691);
+   fit_eff_unknown_TM__abseta_bin0_pt1->SetMaximum(1.044771);
+   fit_eff_unknown_TM__abseta_bin0_pt1->SetDirectory(0);
+   fit_eff_unknown_TM__abseta_bin0_pt1->SetStats(0);
+   fit_eff_unknown_TM__abseta_bin0_pt1->SetLineWidth(2);
+   fit_eff_unknown_TM__abseta_bin0_pt1->SetMarkerStyle(4);
+   fit_eff_unknown_TM__abseta_bin0_pt1->SetMarkerStyle(25);
+   fit_eff_unknown_TM__abseta_bin0_pt1->SetMarkerSize(1.0);
+   fit_eff_unknown_TM__abseta_bin0_pt1->GetXaxis()->SetTitle("muon p_{T} GeV/c");
+   fit_eff_unknown_TM__abseta_bin0_pt1->GetXaxis()->SetNdivisions(506);
+   fit_eff_unknown_TM__abseta_bin0_pt1->GetXaxis()->SetLabelFont(42);
+   fit_eff_unknown_TM__abseta_bin0_pt1->GetXaxis()->SetLabelOffset(0.015);
+   fit_eff_unknown_TM__abseta_bin0_pt1->GetXaxis()->SetTitleSize(0.05);
+   fit_eff_unknown_TM__abseta_bin0_pt1->GetXaxis()->SetTitleFont(42);
+   fit_eff_unknown_TM__abseta_bin0_pt1->GetYaxis()->SetTitle("#varepsilon");
+   fit_eff_unknown_TM__abseta_bin0_pt1->GetYaxis()->SetNdivisions(506);
+   fit_eff_unknown_TM__abseta_bin0_pt1->GetYaxis()->SetLabelFont(42);
+   fit_eff_unknown_TM__abseta_bin0_pt1->GetYaxis()->SetLabelOffset(0.015);
+   fit_eff_unknown_TM__abseta_bin0_pt1->GetYaxis()->SetTitleSize(0.05);
+   fit_eff_unknown_TM__abseta_bin0_pt1->GetYaxis()->SetTitleOffset(1.1);
+   fit_eff_unknown_TM__abseta_bin0_pt1->GetYaxis()->SetTitleFont(42);
+   fit_eff_unknown_TM__abseta_bin0_pt1->GetZaxis()->SetLabelFont(42);
+   fit_eff_unknown_TM__abseta_bin0_pt1->GetZaxis()->SetLabelOffset(0.015);
+   fit_eff_unknown_TM__abseta_bin0_pt1->GetZaxis()->SetTitleSize(0.05);
+   fit_eff_unknown_TM__abseta_bin0_pt1->GetZaxis()->SetTitleOffset(1.1);
+   fit_eff_unknown_TM__abseta_bin0_pt1->GetZaxis()->SetTitleFont(42);
+   grae->SetHistogram(fit_eff_unknown_TM__abseta_bin0_pt1);
+   
+   grae->GetYaxis()->SetRangeUser(0.6,1.1);
+   grae->Draw("p");
+   
+   grae = new TGraphAsymmErrors(7);
+   grae->SetName("fit_eff_unknown_TM__abseta_bin0_pt");
+   grae->SetTitle("");
+   grae->SetFillColor(1);
+   grae->SetLineWidth(2);
+   grae->SetMarkerStyle(20);
+   //grae->SetPoint(0,3.416941,0.6628313);
+   grae->SetPointError(0,0.4169411,0.08305889,0.03397339,0.03568628);
+   grae->SetPoint(1,3.726634,0.8337069);
+   grae->SetPointError(1,0.2266338,0.2733662,0.01867914,0.01917551);
+   grae->SetPoint(2,4.228952,0.9227169);
+   grae->SetPointError(2,0.2289521,0.2710479,0.02104578,0.02122075);
+   grae->SetPoint(3,4.730699,0.9941755);
+   grae->SetPointError(3,0.2306988,0.2693012,0.02456459,0.005824462);
+   grae->SetPoint(4,5.442571,0.982021);
+   grae->SetPointError(4,0.4425714,0.5574286,0.01912419,0.017979);
+   grae->SetPoint(5,6.816417,0.9999995);
+   grae->SetPointError(5,0.8164168,1.183583,0.01617522,4.542039e-07);
+   grae->SetPoint(6,10.83724,0.9982086);
+   grae->SetPointError(6,2.837236,39.16276,0.02191466,0.001791388);
+   
+   TH1 *fit_eff_unknown_TM__abseta_bin0_pt2 = new TH1F("fit_eff_unknown_TM__abseta_bin0_pt2","",100,0,54.7);
+   fit_eff_unknown_TM__abseta_bin0_pt2->SetMinimum(0.5917437);
+   fit_eff_unknown_TM__abseta_bin0_pt2->SetMaximum(1.037114);
+   fit_eff_unknown_TM__abseta_bin0_pt2->SetDirectory(0);
+   fit_eff_unknown_TM__abseta_bin0_pt2->SetStats(0);
+   fit_eff_unknown_TM__abseta_bin0_pt2->SetLineWidth(2);
+   fit_eff_unknown_TM__abseta_bin0_pt2->SetMarkerStyle(20);
+   fit_eff_unknown_TM__abseta_bin0_pt2->SetMarkerSize(1.0);
+   fit_eff_unknown_TM__abseta_bin0_pt2->GetXaxis()->SetTitle("p_{T} GeV/c");
+   fit_eff_unknown_TM__abseta_bin0_pt2->GetXaxis()->SetNdivisions(506);
+   fit_eff_unknown_TM__abseta_bin0_pt2->GetXaxis()->SetLabelFont(42);
+   fit_eff_unknown_TM__abseta_bin0_pt2->GetXaxis()->SetLabelOffset(0.015);
+   fit_eff_unknown_TM__abseta_bin0_pt2->GetXaxis()->SetTitleSize(0.05);
+   fit_eff_unknown_TM__abseta_bin0_pt2->GetXaxis()->SetTitleFont(42);
+   fit_eff_unknown_TM__abseta_bin0_pt2->GetYaxis()->SetTitle("#varepsilon");
+   fit_eff_unknown_TM__abseta_bin0_pt2->GetYaxis()->SetNdivisions(506);
+   fit_eff_unknown_TM__abseta_bin0_pt2->GetYaxis()->SetLabelFont(42);
+   fit_eff_unknown_TM__abseta_bin0_pt2->GetYaxis()->SetLabelOffset(0.015);
+   fit_eff_unknown_TM__abseta_bin0_pt2->GetYaxis()->SetTitleSize(0.05);
+   fit_eff_unknown_TM__abseta_bin0_pt2->GetYaxis()->SetTitleOffset(1.1);
+   fit_eff_unknown_TM__abseta_bin0_pt2->GetYaxis()->SetTitleFont(42);
+   fit_eff_unknown_TM__abseta_bin0_pt2->GetZaxis()->SetLabelFont(42);
+   fit_eff_unknown_TM__abseta_bin0_pt2->GetZaxis()->SetLabelOffset(0.015);
+   fit_eff_unknown_TM__abseta_bin0_pt2->GetZaxis()->SetTitleSize(0.05);
+   fit_eff_unknown_TM__abseta_bin0_pt2->GetZaxis()->SetTitleOffset(1.1);
+   fit_eff_unknown_TM__abseta_bin0_pt2->GetZaxis()->SetTitleFont(42);
+   grae->SetHistogram(fit_eff_unknown_TM__abseta_bin0_pt2);
+
+   grae->GetYaxis()->SetRangeUser(0.6,1.1);   
+   grae->Draw("p");
+   
+   TGraphAsymmErrors *grae = new TGraphAsymmErrors(7);
+   grae->SetName("cnt_eff_unknown_TM__abseta_bin0_pt__mcTrue");
+   grae->SetTitle("");
+   grae->SetFillColor(1);
+   grae->SetLineColor(2);
+   grae->SetLineWidth(2);
+   grae->SetMarkerColor(2);
+   grae->SetMarkerStyle(26);
+   grae->SetMarkerSize(1.0);
+   //grae->SetPoint(0,3.397148,0.4757982);
+   grae->SetPointError(0,0.397148,0.102852,0.002694935,0.002696333);
+   grae->SetPoint(1,3.75128,0.8018151);
+   grae->SetPointError(1,0.2512798,0.2487202,0.001355927,0.001349033);
+   grae->SetPoint(2,4.248223,0.9251046);
+   grae->SetPointError(2,0.2482228,0.2517772,0.0009030179,0.000893219);
+   grae->SetPoint(3,4.744638,0.9650776);
+   grae->SetPointError(3,0.2446383,0.2553617,0.0006629348,0.0006511765);
+   grae->SetPoint(4,5.466395,0.9840488);
+   grae->SetPointError(4,0.4663947,0.5336053,0.0003647719,0.0003568614);
+   grae->SetPoint(5,6.833495,0.9908446);
+   grae->SetPointError(5,0.833495,1.166505,0.0002763932,0.0002685062);
+   grae->SetPoint(6,10.94487,0.9919943);
+   grae->SetPointError(6,2.944871,39.05513,0.0003129768,0.0003015393);
+   
+   TH1 *cnt_eff_unknown_TM__abseta_bin0_pt__mcTrue1 = new TH1F("cnt_eff_unknown_TM__abseta_bin0_pt__mcTrue1","",100,0,54.7);
+   cnt_eff_unknown_TM__abseta_bin0_pt__mcTrue1->SetMinimum(0.421184);
+   cnt_eff_unknown_TM__abseta_bin0_pt__mcTrue1->SetMaximum(1.044215);
+   cnt_eff_unknown_TM__abseta_bin0_pt__mcTrue1->SetDirectory(0);
+   cnt_eff_unknown_TM__abseta_bin0_pt__mcTrue1->SetStats(0);
+   cnt_eff_unknown_TM__abseta_bin0_pt__mcTrue1->SetLineWidth(2);
+   cnt_eff_unknown_TM__abseta_bin0_pt__mcTrue1->SetMarkerColor(2);
+   cnt_eff_unknown_TM__abseta_bin0_pt__mcTrue1->SetMarkerStyle(26);
+   cnt_eff_unknown_TM__abseta_bin0_pt__mcTrue1->SetMarkerSize(1.0);
+   cnt_eff_unknown_TM__abseta_bin0_pt__mcTrue1->GetXaxis()->SetTitle("muon p_{T} GeV/c");
+   cnt_eff_unknown_TM__abseta_bin0_pt__mcTrue1->GetXaxis()->SetNdivisions(506);
+   cnt_eff_unknown_TM__abseta_bin0_pt__mcTrue1->GetXaxis()->SetLabelFont(42);
+   cnt_eff_unknown_TM__abseta_bin0_pt__mcTrue1->GetXaxis()->SetLabelOffset(0.015);
+   cnt_eff_unknown_TM__abseta_bin0_pt__mcTrue1->GetXaxis()->SetTitleSize(0.05);
+   cnt_eff_unknown_TM__abseta_bin0_pt__mcTrue1->GetXaxis()->SetTitleFont(42);
+   cnt_eff_unknown_TM__abseta_bin0_pt__mcTrue1->GetYaxis()->SetTitle("#varepsilon");
+   cnt_eff_unknown_TM__abseta_bin0_pt__mcTrue1->GetYaxis()->SetNdivisions(506);
+   cnt_eff_unknown_TM__abseta_bin0_pt__mcTrue1->GetYaxis()->SetLabelFont(42);
+   cnt_eff_unknown_TM__abseta_bin0_pt__mcTrue1->GetYaxis()->SetLabelOffset(0.015);
+   cnt_eff_unknown_TM__abseta_bin0_pt__mcTrue1->GetYaxis()->SetTitleSize(0.05);
+   cnt_eff_unknown_TM__abseta_bin0_pt__mcTrue1->GetYaxis()->SetTitleOffset(1.1);
+   cnt_eff_unknown_TM__abseta_bin0_pt__mcTrue1->GetYaxis()->SetTitleFont(42);
+   cnt_eff_unknown_TM__abseta_bin0_pt__mcTrue1->GetZaxis()->SetLabelFont(42);
+   cnt_eff_unknown_TM__abseta_bin0_pt__mcTrue1->GetZaxis()->SetLabelOffset(0.015);
+   cnt_eff_unknown_TM__abseta_bin0_pt__mcTrue1->GetZaxis()->SetTitleSize(0.05);
+   cnt_eff_unknown_TM__abseta_bin0_pt__mcTrue1->GetZaxis()->SetTitleOffset(1.1);
+   cnt_eff_unknown_TM__abseta_bin0_pt__mcTrue1->GetZaxis()->SetTitleFont(42);
+   grae->SetHistogram(cnt_eff_unknown_TM__abseta_bin0_pt__mcTrue1);
+
+   grae->GetYaxis()->SetRangeUser(0.6,1.1);   
+   grae->Draw("p");
+   
+   grae = new TGraphAsymmErrors(7);
+   grae->SetName("cnt_eff_unknown_TM__abseta_bin0_pt__mcTrue");
+   grae->SetTitle("");
+   grae->SetFillColor(1);
+   grae->SetLineColor(3);
+   grae->SetLineWidth(2);
+   grae->SetMarkerColor(3);
+   grae->SetMarkerStyle(24);
+   grae->SetMarkerSize(1.0);
+   //grae->SetPoint(0,3.39285,0.4757162);
+   grae->SetPointError(0,0.3928499,0.1071501,0.004300495,0.004304056);
+   grae->SetPoint(1,3.73063,0.7968142);
+   grae->SetPointError(1,0.2306296,0.2693704,0.002622052,0.002597367);
+   grae->SetPoint(2,4.233841,0.9249249);
+   grae->SetPointError(2,0.2338409,0.2661591,0.002154517,0.002100148);
+   grae->SetPoint(3,4.733006,0.9611001);
+   grae->SetPointError(3,0.2330065,0.2669935,0.001979274,0.001889572);
+   grae->SetPoint(4,5.441994,0.9819938);
+   grae->SetPointError(4,0.4419937,0.5580063,0.001292161,0.00120997);
+   grae->SetPoint(5,6.795546,0.9897895);
+   grae->SetPointError(5,0.7955464,1.204454,0.001138806,0.001030765);
+   grae->SetPoint(6,10.68608,0.9932592);
+   grae->SetPointError(6,2.686083,39.31392,0.001302048,0.001106052);
+   
+   TH1 *cnt_eff_unknown_TM__abseta_bin0_pt__mcTrue2 = new TH1F("cnt_eff_unknown_TM__abseta_bin0_pt__mcTrue2","",100,0,54.7);
+   cnt_eff_unknown_TM__abseta_bin0_pt__mcTrue2->SetMinimum(0.4191208);
+   cnt_eff_unknown_TM__abseta_bin0_pt__mcTrue2->SetMaximum(1.04666);
+   cnt_eff_unknown_TM__abseta_bin0_pt__mcTrue2->SetDirectory(0);
+   cnt_eff_unknown_TM__abseta_bin0_pt__mcTrue2->SetStats(0);
+   cnt_eff_unknown_TM__abseta_bin0_pt__mcTrue2->SetLineWidth(2);
+   cnt_eff_unknown_TM__abseta_bin0_pt__mcTrue2->SetMarkerColor(3);
+   cnt_eff_unknown_TM__abseta_bin0_pt__mcTrue2->SetMarkerStyle(24);
+   cnt_eff_unknown_TM__abseta_bin0_pt__mcTrue2->SetMarkerSize(1.0);
+   cnt_eff_unknown_TM__abseta_bin0_pt__mcTrue2->GetXaxis()->SetTitle("muon p_{T} GeV/c");
+   cnt_eff_unknown_TM__abseta_bin0_pt__mcTrue2->GetXaxis()->SetNdivisions(506);
+   cnt_eff_unknown_TM__abseta_bin0_pt__mcTrue2->GetXaxis()->SetLabelFont(42);
+   cnt_eff_unknown_TM__abseta_bin0_pt__mcTrue2->GetXaxis()->SetLabelOffset(0.015);
+   cnt_eff_unknown_TM__abseta_bin0_pt__mcTrue2->GetXaxis()->SetTitleSize(0.05);
+   cnt_eff_unknown_TM__abseta_bin0_pt__mcTrue2->GetXaxis()->SetTitleFont(42);
+   cnt_eff_unknown_TM__abseta_bin0_pt__mcTrue2->GetYaxis()->SetTitle("#varepsilon");
+   cnt_eff_unknown_TM__abseta_bin0_pt__mcTrue2->GetYaxis()->SetNdivisions(506);
+   cnt_eff_unknown_TM__abseta_bin0_pt__mcTrue2->GetYaxis()->SetLabelFont(42);
+   cnt_eff_unknown_TM__abseta_bin0_pt__mcTrue2->GetYaxis()->SetLabelOffset(0.015);
+   cnt_eff_unknown_TM__abseta_bin0_pt__mcTrue2->GetYaxis()->SetTitleSize(0.05);
+   cnt_eff_unknown_TM__abseta_bin0_pt__mcTrue2->GetYaxis()->SetTitleOffset(1.1);
+   cnt_eff_unknown_TM__abseta_bin0_pt__mcTrue2->GetYaxis()->SetTitleFont(42);
+   cnt_eff_unknown_TM__abseta_bin0_pt__mcTrue2->GetZaxis()->SetLabelFont(42);
+   cnt_eff_unknown_TM__abseta_bin0_pt__mcTrue2->GetZaxis()->SetLabelOffset(0.015);
+   cnt_eff_unknown_TM__abseta_bin0_pt__mcTrue2->GetZaxis()->SetTitleSize(0.05);
+   cnt_eff_unknown_TM__abseta_bin0_pt__mcTrue2->GetZaxis()->SetTitleOffset(1.1);
+   cnt_eff_unknown_TM__abseta_bin0_pt__mcTrue2->GetZaxis()->SetTitleFont(42);
+   grae->SetHistogram(cnt_eff_unknown_TM__abseta_bin0_pt__mcTrue2);
+
+   grae->GetYaxis()->SetRangeUser(0.6,1.1);   
+   grae->Draw("p");
+
+   //TLegend *leg = new TLegend(0.6,0.25,0.85,0.5,NULL,"brNDC");
+   leg->SetBorderSize(0);
+   leg->SetLineColor(1);
+   leg->SetLineStyle(1);
+   leg->SetLineWidth(1);
+   leg->SetFillColor(10);
+   leg->SetFillStyle(1001);
+
+   TLegendEntry *entry=leg->AddEntry("fit_eff_unknown_TM__abseta_bin0_pt2","J/#Psi data T&P","P");
+   entry->SetLineColor(1);
+   entry->SetLineStyle(1);
+   entry->SetLineWidth(1);
+   entry->SetMarkerStyle(20);
+   entry->SetMarkerSize(2);
+
+   TLegendEntry *entry=leg->AddEntry("fit_eff_unknown_TM__abseta_bin0_pt1","J/#Psi MC T&P","P");
+   entry->SetLineColor(1);
+   entry->SetLineStyle(1);
+   entry->SetLineWidth(1);
+   entry->SetMarkerColor(4);
+   entry->SetMarkerStyle(25);
+   entry->SetMarkerSize(2);
+
+   TLegendEntry *entry=leg->AddEntry("cnt_eff_unknown_TM__abseta_bin0_pt__mcTrue1","#Upsilon MC truth","P");
+   entry->SetLineColor(1);
+   entry->SetLineStyle(1);
+   entry->SetLineWidth(1);
+   entry->SetMarkerColor(2);
+   entry->SetMarkerStyle(26);
+   entry->SetMarkerSize(2);
+
+   entry=leg->AddEntry("cnt_eff_unknown_TM__abseta_bin0_pt__mcTrue2","J/#Psi MC truth","P");
+   entry->SetLineColor(1);
+   entry->SetLineStyle(1);
+   entry->SetLineWidth(1);
+   entry->SetMarkerColor(3);
+   entry->SetMarkerStyle(24);
+   entry->SetMarkerSize(2);
+
+   leg->Draw();
+   
+   //TPaveText *pt = new TPaveText(0.6,0.5,0.8,0.7,"brNDC");
+   //TPaveText *pt = new TPaveText(0.6,0.5,0.8,0.7,"brNDC");
+   pt->SetBorderSize(0);
+   pt->SetFillColor(0);
+   pt->SetLineWidth(2);
+   pt->SetTextFont(42);
+   pt->SetTextSize(0.048);
+
+   pt->AddText("CMS");
+   pt->AddText("#sqrt{s} = 7 TeV");
+   pt->AddText("L = 3 pb^{-1}");
+   pt->AddText("| #eta^{#mu} | < 0.4");
+   pt->AddText("");
+   pt->AddText(0.95,0.15,"(a)");
+
+   pt->Draw();
+   c1->Modified();
+   c1->cd();
+   c1->SetSelected(c1);
+
+  c1->SaveAs("DATA_vs_MC_MuonID_AbsEta0.pdf");
+  c1->SaveAs("DATA_vs_MC_MuonID_AbsEta0.gif");
+  c1->SaveAs("DATA_vs_MC_MuonID_AbsEta0.eps");
+  
+}
+
