@@ -319,9 +319,9 @@ void cutAna( int CT )
 		
 		if(k==0)
 		{
-			cout<<"======total matched Entries in Pt<6GeV && 0<|y|<2.1 : "<<nData<<" ======"<<endl;
+			cout<<"======total matched Entries in Pt>6GeV && 0<|y|<2.1 : "<<nData<<" ======"<<endl;
 			cout<<"======selected trigger path========: "<<"HLT_Mu0_TkMu0_OST_Jpsi_Tight_v2"<<"========"<<endl;
-			outTxt<<"======total matched Entries in Pt<6GeV && 0<|y|<2.1 : "<<nData<<" ======"<<endl;
+			outTxt<<"======total matched Entries in Pt>6GeV && 0<|y|<2.1 : "<<nData<<" ======"<<endl;
 			outTxt<<"======selected trigger path========: "<<"HLT_Mu0_TkMu0_OST_Jpsi_Tight_v2"<<"========"<<endl;
 		}
 
