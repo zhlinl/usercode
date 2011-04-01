@@ -252,11 +252,6 @@ void cutAna( int CT )
 		for(int i=0; i<nBin; i++)
 		{
 			data[i]->reset();
-			/*for(int j=0; j<nBin; j++)
-			{
-				data[i][j]->reset();
-			}
-			*/
 		}
 
 
