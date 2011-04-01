@@ -212,11 +212,11 @@ vector<double> fitPeak(RooRealVar x, Int_t whichBkg=0,const Int_t nPeak=1, TH1* 
 		x.setRange("sig1",(double)x.getMin(),low1);
 		x.setRange("sig2",high1,(double)x.getMax());
 
-		RooAbsReal* frac0=model->createIntegral(x,NormSet(x),Range("sig0"));
-		RooAbsReal* frac1=model->createIntegral(x,NormSet(x),Range("sig1"));
-		RooAbsReal* frac2=model->createIntegral(x,NormSet(x),Range("sig2"));
-		RooAbsReal* igPeak=peak[0]->createIntegral(x,NormSet(x),Range("sig0"));
-		RooAbsReal* igBkg=bkg->createIntegral(x,NormSet(x),Range("sig0"));
+		RooRealVar* frac0=model->createIntegral(x,NormSet(x),Range("sig0"));
+		RooRealVar* frac1=model->createIntegral(x,NormSet(x),Range("sig1"));
+		RooRealVar* frac2=model->createIntegral(x,NormSet(x),Range("sig2"));
+		RooRealVar* igPeak=peak[0]->createIntegral(x,NormSet(x),Range("sig0"));
+		RooRealVar* igBkg=bkg->createIntegral(x,NormSet(x),Range("sig0"));
 		double ratioPeak=(double)areaPeak[0]->getVal()*(double)igPeak->getVal();
 		double ratioBkg=(double)areaBkg->getVal()*(double)igBkg->getVal();
 		double ratioSB0, ratioSB1;
