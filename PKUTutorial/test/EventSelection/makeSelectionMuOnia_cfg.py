@@ -2,7 +2,7 @@ import FWCore.ParameterSet.Config as cms
 
 process = cms.Process("SELECTION")
 
-from YZheng.UpsilonAna.selection_cff import *
+from zhlinl.UpsilonAna.selection_cff import *
 selection(process, GlobalTag="FT_R_38X_V14A::All", MC=False, SelectionTrigger="hltL1DoubleMuOpenTightL1Filtered")
 
 process.source.fileNames = cms.untracked.vstring(
