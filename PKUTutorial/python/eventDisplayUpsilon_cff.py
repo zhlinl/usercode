@@ -1,6 +1,6 @@
 import FWCore.ParameterSet.Config as cms
 
-from YZheng.UpsilonAna.selection_cff import SELECTIONCUT
+from zhlinl.UpsilonAna.selection_cff import SELECTIONCUT
 
 filterUpsilon = cms.EDFilter("ProbeTreeProducer",
     src = cms.InputTag("onia2MuMuPatTrkTrk"),
@@ -10,7 +10,7 @@ filterUpsilon = cms.EDFilter("ProbeTreeProducer",
     flags = cms.PSet(),
 )
 
-from YZheng.UpsilonAna.selection_cff import detailedDimuonTree as detailedUpsilonTree
+from zhlinl.UpsilonAna.selection_cff import detailedDimuonTree as detailedUpsilonTree
 
 eventDisplayUpsilonPath = cms.Path(filterUpsilon * detailedUpsilonTree)
 

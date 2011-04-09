@@ -1,6 +1,6 @@
 import FWCore.ParameterSet.Config as cms
 
-from YZheng.UpsilonAna.selection_cff import SELECTIONCUT
+from zhlinl.UpsilonAna.selection_cff import SELECTIONCUT
 
 filterJpsi = cms.EDFilter("ProbeTreeProducer",
     src = cms.InputTag("onia2MuMuPatTrkTrk"),
@@ -10,7 +10,7 @@ filterJpsi = cms.EDFilter("ProbeTreeProducer",
     flags = cms.PSet(),
 )
 
-from YZheng.UpsilonAna.selection_cff import detailedDimuonTree as detailedJpsiTree
+from zhlinl.UpsilonAna.selection_cff import detailedDimuonTree as detailedJpsiTree
 
 eventDisplayJpsiPath = cms.Path(filterJpsi * detailedJpsiTree)
 
