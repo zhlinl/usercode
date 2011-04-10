@@ -28,7 +28,7 @@
 #include "FWCore/Framework/interface/EDProducer.h"
 #include "FWCore/Framework/interface/ESHandle.h"
 
-#include "MRudolph/UpsAcc/interface/DimuonTree.h"
+#include "UpsAcc/interface/DimuonTree.h"
 
 using namespace edm;
 using namespace reco;
