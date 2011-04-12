@@ -87,21 +87,21 @@ void xsecresults(int ipeak=1, int irap=0, int anamode = 0) {
   setTDRStyle();
 
   vector <TString>  sources, sysname,sysnameT;
-  sources.push_back("Acc");      sysname.push_back("acceptance");     sysnameT.push_back("$A$");      
-  //sources.push_back("Emuid");    sysname.push_back("muon id eff");    sysnameT.push_back("$\\varepsilon_{\\rm{muid}}$");
-  //sources.push_back("Etrig");    sysname.push_back("trigger eff");    sysnameT.push_back("$\\varepsilon_{\\rm{trig}}$");    
-  sources.push_back("Etreco");   sysname.push_back("trig+muid eff");  sysnameT.push_back("$\\varepsilon_{\\rm{trig,id}}$");    
-  sources.push_back("ptscale");  sysname.push_back("pt scale");	      sysnameT.push_back("$S_{p}$");  
-  sources.push_back("ptspec");   sysname.push_back("pt spectrum");    sysnameT.push_back("$A_{p_{T}}$");
-  sources.push_back("vtxpos");   sysname.push_back("luminous region");sysnameT.push_back("$A_{\\rm vtx}$");
-  sources.push_back("nofsr");    sysname.push_back("fsr");	      sysnameT.push_back("$A_{\\rm fsr}$");    
-  sources.push_back("mctrue");   sysname.push_back("tnp bias");	      sysnameT.push_back("t\\&p");
-  sources.push_back("tnpmcUps"); sysname.push_back("tnp jpsi/ups");   sysnameT.push_back("$\\varepsilon_{J\/\\psi,\\Upsilon}$"); 
-  sources.push_back("linear812");sysname.push_back("linear bg 8-12"); sysnameT.push_back("{\\sc bg}");
-  sources.push_back("ptreso");   sysname.push_back("pt resolution");  sysnameT.push_back("$\\sigma_{p}$");   
-  //sources.push_back("floatmscale");   sysname.push_back("mscale");  sysnameT.push_back("$M_{\\rm scale}$");    
-  //sources.push_back("floatMDiff");   sysname.push_back("mdiff");  sysnameT.push_back("$pdf_{\\Delta m}$");    
-  sources.push_back("Etrk");     sysname.push_back("tracking eff");   sysnameT.push_back("$\\varepsilon_{\\rm{trk}}$");
+  //sources.push_back("Acc");      sysname.push_back("acceptance");     sysnameT.push_back("$A$");      
+  ////sources.push_back("Emuid");    sysname.push_back("muon id eff");    sysnameT.push_back("$\\varepsilon_{\\rm{muid}}$");
+  ////sources.push_back("Etrig");    sysname.push_back("trigger eff");    sysnameT.push_back("$\\varepsilon_{\\rm{trig}}$");    
+  //sources.push_back("Etreco");   sysname.push_back("trig+muid eff");  sysnameT.push_back("$\\varepsilon_{\\rm{trig,id}}$");    
+  //sources.push_back("ptscale");  sysname.push_back("pt scale");	      sysnameT.push_back("$S_{p}$");  
+  //sources.push_back("ptspec");   sysname.push_back("pt spectrum");    sysnameT.push_back("$A_{p_{T}}$");
+  //sources.push_back("vtxpos");   sysname.push_back("luminous region");sysnameT.push_back("$A_{\\rm vtx}$");
+  //sources.push_back("nofsr");    sysname.push_back("fsr");	      sysnameT.push_back("$A_{\\rm fsr}$");    
+  //sources.push_back("mctrue");   sysname.push_back("tnp bias");	      sysnameT.push_back("t\\&p");
+  //sources.push_back("tnpmcUps"); sysname.push_back("tnp jpsi/ups");   sysnameT.push_back("$\\varepsilon_{J\/\\psi,\\Upsilon}$"); 
+  //sources.push_back("linear812");sysname.push_back("linear bg 8-12"); sysnameT.push_back("{\\sc bg}");
+  //sources.push_back("ptreso");   sysname.push_back("pt resolution");  sysnameT.push_back("$\\sigma_{p}$");   
+  ////sources.push_back("floatmscale");   sysname.push_back("mscale");  sysnameT.push_back("$M_{\\rm scale}$");    
+  ////sources.push_back("floatMDiff");   sysname.push_back("mdiff");  sysnameT.push_back("$pdf_{\\Delta m}$");    
+  //sources.push_back("Etrk");     sysname.push_back("tracking eff");   sysnameT.push_back("$\\varepsilon_{\\rm{trk}}$");
 
   TString hilo   ("Acc Etrk Emuid Etrig Etreco ptscale ptreso");
 
