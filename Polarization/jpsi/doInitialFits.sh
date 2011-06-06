@@ -1,0 +1,6 @@
+#!/bin/bash
+./extractFSRShape /Users/lindseygray/jpsi_workdir/Spring10/promptJpsi/TTree_pol_Mu0Track0Jpsi_MCprompt.root
+./extractPromptLifetimeShape /Users/lindseygray/jpsi_workdir/Spring10/promptJpsi/TTree_pol_Mu0Track0Jpsi_MCprompt.root --perEventErrors
+./extractNonPromptLifetimeShape /Users/lindseygray/jpsi_workdir/Spring10/nonPromptJpsi/TTree_pol_Mu0Track0Jpsi_B0ToJPsiMuMu.root /Users/lindseygray/jpsi_workdir/Spring10/nonPromptJpsi/TTree_pol_Mu0Track0Jpsi_BsToJPsiMuMu.root /Users/lindseygray/jpsi_workdir/Spring10/nonPromptJpsi/TTree_pol_Mu0Track0Jpsi_BpToJPsiMuMu.root /Users/lindseygray/jpsi_workdir/Spring10/nonPromptJpsi/TTree_pol_Mu0Track0Jpsi_LambdaBToJPsiMuMu.root --perEventErrors
+./extractBackgroundShapes /Users/lindseygray/jpsi_workdir/data/TTree_pol_data_Run2010A-PromptReco-v4_v3_RooDataSet_JSON_01Oct2010.root --perEventErrors --newTTree
+./injectAcceptanceMaps accHistos_P_all_HLT_Mu0Track0Jpsi_6Oct2010.root accHistos_NP_all_HLT_Mu0Track0Jpsi_6Oct2010.root
