@@ -29,9 +29,9 @@ if [ $pT_ -eq 8 ] && [ $rap_ -eq 1 ]; then
 continue
 fi
 
-#python polarizationFit.py 	--workspaceName=pola${dataType}_rap${rap_}_pt${pT_} ${dirstruct}tree${dataType}.root --treeName=data --fitFrame=${scen} --testBin=${rap_},${pT_} --acceptanceMap=${geomAccPR},${geomAccNP} --efficiencyMap=${recoEffPR},${recoEffNP},${trigEffPR},${trigEffNP} #>& ${project}log_Fit_${dataType}_rap${rap_}_pt${pT_} &
+python polarizationFit.py 	--workspaceName=pola${dataType}_rap${rap_}_pt${pT_} ${dirstruct}tree${dataType}.root --treeName=data --fitFrame=${scen} --testBin=${rap_},${pT_} --acceptanceMap=${geomAccPR},${geomAccNP} --efficiencyMap=${recoEffPR},${recoEffNP},${trigEffPR},${trigEffNP} #>& ${project}log_Fit_${dataType}_rap${rap_}_pt${pT_} &
 
-cp ${project}pola${dataType}_rap${rap_}_pt${pT_}.root ${dirstruct}pola${dataType}_rap${rap_}_pt${pT_}.root
+#cp ${project}pola${dataType}_rap${rap_}_pt${pT_}.root ${dirstruct}pola${dataType}_rap${rap_}_pt${pT_}.root
 python polarizationFitSimple.py 	--workspaceName=pola${dataType}_rap${rap_}_pt${pT_} --fitFrame=${scen} --testBin=${rap_},${pT_} --acceptanceMap=${geomAccPR},${geomAccNP} --recoEfficiencyMap=${recoEffPR},${recoEffNP} --trigEfficiencyMap=${trigEffPR},${trigEffNP} --lambdaPhiSub=${sub}
 #--noNonPrompt
 ### old verison fit ###
@@ -41,10 +41,10 @@ cp ${dirstruct}pola${dataType}_rap${rap_}_pt${pT_}-${scen}.root ${dirstruct}pola
 python makePolPlots.py pola${dataType}_rap${rap_}_pt${pT_}-${scen}_test.root --plotPol --testBin=${rap_},${pT_} 
 #--pedagogical
 
-#mv ${dirstruct}pola${dataType}_rap${rap_}_pt${pT_}.root ${project}
+mv ${dirstruct}pola${dataType}_rap${rap_}_pt${pT_}.root ${project}
 mv ${dirstruct}pola${dataType}_rap${rap_}_pt${pT_}-${scen}.root ${project}${sub}/
 mv ${dirstruct}pola${dataType}_rap${rap_}_pt${pT_}-${scen}_test.root ${project}${sub}/
-rm pola${dataType}_rap${rap_}_pt${pT_}.root
+#rm pola${dataType}_rap${rap_}_pt${pT_}.root
 
 done
 done
