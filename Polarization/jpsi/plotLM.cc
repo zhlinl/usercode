@@ -49,16 +49,14 @@ void plotLM(int rapBin=2, int ptBin=8) {
 
 	char path[100];
 	char scen[4]="CS";
-	char dataType[10]="Run2010B";
+	char dataType[10]="Run2010AB";
 	int nbins=50;
 	sprintf(path,Form("pic/%s",dataType));
 
 	gSystem->mkdir(path,kTRUE);
 
 	char inName[200];
-	sprintf(inName,
-		 	Form("/afs/ihep.ac.cn/users/z/zhangll/workspace/work/polarization/Polarization/project/polaRun2010A_rap%d_pt%d.root",rapBin,ptBin));
-	sprintf(inName, Form("/afs/ihep.ac.cn/users/z/zhangll/workspace/work/polarization/Polarization/project/%s/%s/pola%s_rap%d_pt%d-%s_test.root",dataType,scen,dataType,rapBin,ptBin,scen)); cout<<"inName: "<<inName<<endl;
+	sprintf(inName, Form("/afs/ihep.ac.cn/users/z/zhangll/workspace/work/polarization/Polarization/project/%s/%s/pola%s_rap%d_pt%d.root",dataType,scen,dataType,rapBin,ptBin)); cout<<"inName: "<<inName<<endl;
 	TFile *inFile=new TFile(inName,"R");
 	if(!inFile) return;
 	RooWorkspace *ws=(RooWorkspace *)inFile->Get(Form("pola%s_rap%d_pt%d",dataType,rapBin,ptBin));
