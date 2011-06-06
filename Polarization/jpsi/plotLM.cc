@@ -51,9 +51,9 @@ void plotLM(int rapBin=2, int ptBin=8) {
 	char scen[4]="CS";
 	char dataType[10]="Run2010B";
 	int nbins=50;
-	sprintf(path,Form("picML/%s",dataType));
+	sprintf(path,Form("pic/%s",dataType));
 
-	//gSystem->mkdir(path);
+	gSystem->mkdir(path,kTRUE);
 
 	char inName[200];
 	sprintf(inName,

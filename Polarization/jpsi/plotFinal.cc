@@ -37,8 +37,8 @@ void plotFinal(char *dataType="Run2010AB",char *scen="CS",char sub[20]="lambda_p
 	//char *test="lambda_tilde";
 	char test[20];
 	sprintf(test,"lambda_tilde");
-	sprintf(path,Form("picLM/%s/%s/total",dataType,sub));
-	gSystem->mkdir(path);
+	sprintf(path,Form("pic/%s/%s/total",dataType,sub));
+	gSystem->mkdir(path,kTRUE);
 	//char dataType[10];
 	//char scen[5];
 	TGraphAsymmErrors *bFrac_pt[NRaps];

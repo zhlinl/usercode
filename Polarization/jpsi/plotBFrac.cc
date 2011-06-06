@@ -15,8 +15,8 @@ void plotBFrac(){
 
 	char path[100];
 	int nbins=50;
-	sprintf(path,"picLM/Run2010A");
-	//gSystem->mkdir(path);
+	sprintf(path,"pic/Run2010A");
+	gSystem->mkdir(path,kTRUE);
 
 	for(int rapBin=0;rapBin<NRaps;rapBin++){
 	for(int ptBin=0;ptBin<jpsi::jpsi::kNbPTBins[rapBin+1];ptBin++){

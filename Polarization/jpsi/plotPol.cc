@@ -42,8 +42,8 @@ void plotPol(char *dataType="Run2010AB",char *scen="CS",char *sub="lambda_phi"){
 	double lamdaTheta=0,lamdaPhi=0,lThtilde=0,f=0;
 	//sprintf(scen,"HX");
 	//sprintf(dataType,"Run2010A");
-	sprintf(path,Form("picLM/%s/%s",dataType,sub));
-	gSystem->mkdir(path);
+	sprintf(path,Form("pic/%s/%s",dataType,sub));
+	gSystem->mkdir(path,kTRUE);
 	TH1F *hist_bFrac_pt[NRaps];
 	TGraphAsymmErrors *graphThis;
 	TCanvas *cv[NRaps][11];
