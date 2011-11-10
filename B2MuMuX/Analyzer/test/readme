@@ -1,0 +1,18 @@
+The main aim of this program is to select the Exotica qqbar state.
+
+Based on the aim change the value.
+TriMuRECO=cms.bool(False), # Tri-Muon selection not used for Exotica qqbar state selection
+OniaTrackRECO=cms.bool(True), # Onia plus track selection
+OniaDiTrackRECO=cms.bool(True), # Onia plus two track selection
+
+To run the program you can do like this.
+
+scram project CMSSW CMSSW_4_2_8  #(or newer)
+cd CMSSW_4_2_8/src/
+cvs co -r V01-15-01 MuonAnalysis/MuonAssociators #(when you have this package, don't need this step)
+cvs co -r HEAD -d B2MuMuX UserCode/zhlinl/B2MuMuX
+scram b
+cmsRun B2MuMuX_data_Run2011A_Prompt.py (change the source root file)
+
+Other parameter you want to change you need read the program or inform me.
+Thank you use the program.
