@@ -13,7 +13,7 @@ Implementation:
 //
 // Original Author:  Linlin, Zhang 
 //         Created:  Tue Nov. 7 2011
-// $Id: Analyzer.h,v 1.4 2011/11/07 20:18:52 zhlinl Exp $
+// $Id: Analyzer.cc,v 1.1 2011/11/10 10:38:22 zhlinl Exp $
 //
 
 
@@ -527,7 +527,7 @@ Analyzer::OniaTrack(const pat::CompositeCandidate* aCand,const edm::Event& iEven
 		pvtx.SetXYZ(thePrimaryV.position().x(),thePrimaryV.position().y(),0);
 		TVector3 vdiff = vtx - pvtx;
 		//--pt--
-		TVector3 pperp(LV_P.Px(),LV_P.Px(),0);
+		TVector3 pperp(LV_P.Px(),LV_P.Py(),0);
 		AlgebraicVector vpperp(3);
 		vpperp[0] = pperp.x();
 		vpperp[1] = pperp.y();
@@ -713,7 +713,7 @@ Analyzer::OniaMu(const pat::CompositeCandidate* aCand,const edm::Event& iEvent, 
 		pvtx.SetXYZ(thePrimaryV.position().x(),thePrimaryV.position().y(),0);
 		TVector3 vdiff = vtx - pvtx;
 		//--pt--
-		TVector3 pperp(LV_P.Px(),LV_P.Px(),0);
+		TVector3 pperp(LV_P.Px(),LV_P.Py(),0);
 		AlgebraicVector vpperp(3);
 		vpperp[0] = pperp.x();
 		vpperp[1] = pperp.y();
@@ -937,7 +937,7 @@ Analyzer::OniaDitrack(const pat::CompositeCandidate* aCand, const edm::Event& iE
 			pvtx.SetXYZ(thePrimaryV.position().x(),thePrimaryV.position().y(),0);
 			TVector3 vdiff = vtx - pvtx;
 			//--pt--
-			TVector3 pperp(LV_P.Px(),LV_P.Px(),0);
+			TVector3 pperp(LV_P.Px(),LV_P.Py(),0);
 			AlgebraicVector vpperp(3);
 			vpperp[0] = pperp.x();
 			vpperp[1] = pperp.y();
