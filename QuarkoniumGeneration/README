@@ -1,0 +1,16 @@
+Simulation of a quarkonium gun with realistic pT distributions and realistic trigger conditions for the 1E33, 1p4E33, 2E33, and 3E33 trigger menus in 2011; rapidity is generated flat.
+
+1. To setup the needed environment, follow the instructions:
+https://espace.cern.ch/cms-quarkonia/onia-polarization/Generating%20Events/Detector%20simulation%20for%201E33.aspx
+
+mydecays.dec contains jpsi forced decay, and should replace GeneratorInterface/EvtGenInterface/data/mydecays.dec for jpsi generation
+
+2. In a dedicated class ("FlatRapidMeasuredPtGunProducer") a realistic (i.e. measured) pT distribution has been inserted and can be used in the following way:
+
+a) Copy FlatRapidMeasuredPtGunProducer.cc and FlatRapidMeasuredPtGunProducer.h to IOMC/ParticleGuns/src and IOMC/ParticleGuns/interface, respectively
+Ups(1S,2S,3S) have different pT shape; to steer the correct simulation, we add one variable, called "Resonance". This selects the correct pT shape for  the given resonance. 
+The meaning is the following
+Resonance=1,2,3 mean Upsilon 1S, 2S, 3S
+b) Replace IOMC/ParticleGuns/src/SealModule.cc with new SealModule.cc
+c) execute upsilon0-50_2S_pgun_GEN-RECO_MeasuredPt.py and upsilon0-50_3S_pgun_GEN-RECO_MeasuredPt.py to perform the generation
+
