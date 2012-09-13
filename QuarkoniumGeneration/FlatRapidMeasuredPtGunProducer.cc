@@ -1,6 +1,6 @@
 /*
- *  $Date: 2009/05/25 13:00:58 $
- *  $Revision: 1.5 $
+ *  $Date: 2012/03/22 13:10:56 $
+ *  $Revision: 1.1 $
  *  \author Jean-Roch Vlimant
  */
 
@@ -51,23 +51,39 @@ FlatRapidMeasuredPtGunProducer::~FlatRapidMeasuredPtGunProducer()
 }
 
 double FlatRapidMeasuredPtGunProducer::getRandom(double MinPt, double MaxPt){
+
+	//realistic pT distribution function
 	TF1 *fPT = new TF1("fPT", "[0]*x*pow(1.+(1./([1]-2.))*x*x/[2],-[1])", MinPt, MaxPt);
-	//int resonance=2;
+
 	if(fResonance == 1){
-		fPT->FixParameter(0, 0.1);//Ups(1S) from BPH-11-001
+		fPT->FixParameter(0, 0.1); //Ups(1S) from BPH-11-001
 		fPT->FixParameter(1, 3.46);//Ups(1S) from BPH-11-001
 		fPT->FixParameter(2, 47.3);//Ups(1S) from BPH-11-001
 	}
 	else if(fResonance == 2){
-		fPT->FixParameter(0, 0.1);//Ups(2S) from BPH-11-001
+		fPT->FixParameter(0, 0.1); //Ups(2S) from BPH-11-001
 		fPT->FixParameter(1, 3.27);//Ups(2S) from BPH-11-001
 		fPT->FixParameter(2, 65.7);//Ups(2S) from BPH-11-001
 	}
-	else if(fResonance ==3 ){
-		fPT->FixParameter(0, 0.1);
-		fPT->FixParameter(1, 3.05);
-		fPT->FixParameter(2, 80.5);
+	else if(fResonance == 3){
+		fPT->FixParameter(0, 0.1); //Ups(3S)
+		fPT->FixParameter(1, 3.05);//Ups(3S)
+		fPT->FixParameter(2, 80.5);//Ups(3S)
 	}
+	else if(fResonance == 0){
+		fPT->FixParameter(0, 0.1); //Jpsi
+		fPT->FixParameter(1, 3.69);//Jpsi
+		fPT->FixParameter(2, 12.0);//Jpsi
+	}
+	else if(fResonance == 4){
+		fPT->FixParameter(0, 0.1); //Psi'
+		fPT->FixParameter(1, 3.71);//Psi'
+		fPT->FixParameter(2, 19.54);//Psi'
+	}
+	else{
+		return fRandomGenerator->fire(MinPt, MaxPt); //flat pT 
+	}
+
 	return fPT->GetRandom();
 }
 
@@ -112,7 +128,7 @@ void FlatRapidMeasuredPtGunProducer::produce(Event &e, const EventSetup& es)
 		//double pt = fRandomGenerator->fire(fMinPt,fMaxPt);
 		double pt = getRandom(fMinPt,fMaxPt);
 
-		double y    = fRandomGenerator->fire(fMinRapidity, fMaxRapidity) ;
+		double y  = fRandomGenerator->fire(fMinRapidity, fMaxRapidity) ;
 
 		double phi    = fRandomGenerator->fire(fMinPhi, fMaxPhi) ;
 		int PartID = fPartIDs[ip] ;
