@@ -3,7 +3,7 @@ Simulation of a quarkonium gun with realistic pT distributions and realistic tri
 1. To setup the needed environment, follow the instructions:
 https://espace.cern.ch/cms-quarkonia/onia-polarization/Generating%20Events/Detector%20simulation%20for%201E33.aspx
 
-mydecays.dec contains jpsi forced decay, and should replace GeneratorInterface/EvtGenInterface/data/mydecays.dec for jpsi generation
+mydecays.dec contains jpsi(psi') forced decay, and should replace GeneratorInterface/EvtGenInterface/data/mydecays.dec for jpsi(psi') generation
 
 2. In a dedicated class ("FlatRapidMeasuredPtGunProducer") a realistic (i.e. measured) pT distribution has been inserted and can be used in the following way:
 
