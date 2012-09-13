@@ -4,6 +4,12 @@ Decay MyJpsi
 1.000   mu+  mu-       PHOTOS VLL;
 Enddecay
 
+Alias      Mypsi2S  psi(2S)
+ChargeConj Mypsi2S  Mypsi2S
+Decay Mypsi2S
+1.000  mu+   mu-       PHOTOS VLL;
+Enddecay
+
 Alias      MyUpsilon  Upsilon
 ChargeConj MyUpsilon  MyUpsilon
 Decay MyUpsilon
