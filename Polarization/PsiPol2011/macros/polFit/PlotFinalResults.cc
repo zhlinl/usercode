@@ -217,6 +217,8 @@ int main(int argc, char** argv) {
 	if(ShiftInX) DeltaXminOVERALL=0.9999;
 	bool ShiftXminOVERALL=true;
 
+	double PlotpTMin = 7., PlotpTMax = 72.;
+
 	int OneSigColor=416;
 	int TwoSigColor=400;//858,898
 	int ThreeSigColor=423;//423
@@ -894,7 +896,8 @@ int main(int argc, char** argv) {
 
 
 			TH1F *plotHisto = new TH1F;
-			if(!PlotMatt) plotHisto = plotCanvas->DrawFrame(onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL,yMin,onia::pTRange[rapBin][ptBinMax],yMax);
+			//if(!PlotMatt) plotHisto = plotCanvas->DrawFrame(onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL,yMin,onia::pTRange[rapBin][ptBinMax],yMax);
+			if(!PlotMatt) plotHisto = plotCanvas->DrawFrame(PlotpTMin-DeltaXminOVERALL,yMin,PlotpTMax,yMax); //to be consistant for Psi 1S and 2S
 			if(PlotMatt) plotHisto = plotCanvas->DrawFrame(0.,yMin,onia::pTRange[rapBin][ptBinMax],yMax);
 			if(PlotVsComp) plotHisto = plotCanvas->DrawFrame(10.1,yMin,10.7,yMax);
 			plotHisto->SetXTitle("#it{p}_{T} [GeV]");
@@ -1306,7 +1309,8 @@ int main(int argc, char** argv) {
 				}
 
 
-				TLine* extreme0 = new TLine( onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL, 0, onia::pTRange[rapBin][ptBinMax] ,0);
+				//TLine* extreme0 = new TLine( onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL, 0, onia::pTRange[rapBin][ptBinMax] ,0);
+				TLine* extreme0 = new TLine( PlotpTMin-DeltaXminOVERALL, 0, PlotpTMax ,0);
 				extreme0->SetLineWidth( 2 );
 				extreme0->SetLineStyle( 1 );
 				extreme0->SetLineColor( kBlack );
@@ -1362,7 +1366,8 @@ int main(int argc, char** argv) {
 				plotCanvas->SetRightMargin(0.05);
 				plotCanvas->SetTopMargin(0.05);
 
-				TLine* extreme0 = new TLine( 0, 0, onia::pTRange[rapBin][ptBinMax] ,0);
+				//TLine* extreme0 = new TLine( 0, 0, onia::pTRange[rapBin][ptBinMax] ,0);
+				TLine* extreme0 = new TLine( 0, 0, PlotpTMax ,0);
 				extreme0->SetLineWidth( 2 );
 				extreme0->SetLineStyle( 2 );
 				extreme0->SetLineColor( kBlack );
@@ -1454,7 +1459,8 @@ int main(int argc, char** argv) {
 			} //PlotMatt&&PlotMattForICHEP
 
 			if(CompareSyst){
-				TLine* extreme0 = new TLine( onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL, 0, onia::pTRange[rapBin][ptBinMax] ,0);
+				//TLine* extreme0 = new TLine( onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL, 0, onia::pTRange[rapBin][ptBinMax] ,0);
+				TLine* extreme0 = new TLine( PlotpTMin-DeltaXminOVERALL, 0, PlotpTMax ,0);
 				extreme0->SetLineWidth( 2 );
 				extreme0->SetLineStyle( 1 );
 				extreme0->SetLineColor( kBlack );
@@ -1468,8 +1474,9 @@ int main(int argc, char** argv) {
 				TGraphAsymmErrors *fitGraph = new TGraphAsymmErrors(nBinspT,ptCentre_,lmean,0,0,fit_lmean_errlow,fit_lmean_errhigh);
 				//  TGraphErrors *fitGraph = new TGraphErrors(nBinspT,ptCentre_,lmean,0,fit_lmean_errmean);
 
-				double pTmaxPlot=50;//72.;
-				double pTminPlot=10;//6. ;
+				double pTmaxPlot=72.; //50;
+				//double pTminPlot=6.;  //10;
+				double pTminPlot=7.;  //10;
 
 				double FontSize=0.0215;
 				double xText=15;
@@ -1613,8 +1620,9 @@ int main(int argc, char** argv) {
 				}
 
 
-				double pTmaxPlot=50;
-				double pTminPlot=10;
+				double pTmaxPlot=72.; //50;
+				//double pTminPlot=6.;  //10;
+				double pTminPlot=7.;  //10;
 
 				double FontSize=0.0215;
 				double xText=15;
@@ -1853,7 +1861,8 @@ int main(int argc, char** argv) {
 				 */
 
 
-				TLine* extreme0 = new TLine( onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL, 0, onia::pTRange[rapBin][ptBinMax] ,0);
+				//TLine* extreme0 = new TLine( onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL, 0, onia::pTRange[rapBin][ptBinMax] ,0);
+				TLine* extreme0 = new TLine( PlotpTMin-DeltaXminOVERALL, 0, PlotpTMax ,0);
 				extreme0->SetLineWidth( 2 );
 				extreme0->SetLineStyle( 1 );
 				extreme0->SetLineColor( kBlack );
@@ -1958,14 +1967,16 @@ int main(int argc, char** argv) {
 
 				}
 
-				TLine* extreme0 = new TLine( onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL, 0, onia::pTRange[rapBin][ptBinMax] ,0);
+				//TLine* extreme0 = new TLine( onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL, 0, onia::pTRange[rapBin][ptBinMax] ,0);
+				TLine* extreme0 = new TLine( PlotpTMin-DeltaXminOVERALL, 0, PlotpTMax ,0);
 				extreme0->SetLineWidth( 2 );
 				extreme0->SetLineStyle( 1 );
 				extreme0->SetLineColor( kBlack );
 				extreme0->Draw( "same" );
 
-				double pTmaxPlot=50;
-				double pTminPlot=10;
+				double pTmaxPlot=72.; //50;
+				//double pTminPlot=6.;  //10;
+				double pTminPlot=7.;  //10;
 
 				double FontSize=0.0215;
 				double xText=15;
@@ -2235,7 +2246,8 @@ int main(int argc, char** argv) {
 
 				}
 
-				TLine* extreme0 = new TLine( onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL, 0, onia::pTRange[rapBin][ptBinMax] ,0);
+				//TLine* extreme0 = new TLine( onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL, 0, onia::pTRange[rapBin][ptBinMax] ,0);
+				TLine* extreme0 = new TLine( PlotpTMin-DeltaXminOVERALL, 0, PlotpTMax ,0);
 				extreme0->SetLineWidth( 1 );
 				extreme0->SetLineStyle( 2 );
 				extreme0->SetLineColor( kBlack );
@@ -2276,14 +2288,16 @@ int main(int argc, char** argv) {
 				sprintf(texTex,"      |#it{y}| < 1.2");
 				if(nState>3) sprintf(texTex,"      |#it{y}| < 1.8");
 			}
-			TLatex *text = new TLatex(onia::pTRange[rapBin][ptBinMax]*0.8,yMin+(yMax-yMin)*0.066,texTex);
+			//TLatex *text = new TLatex(onia::pTRange[rapBin][ptBinMax]*0.8,yMin+(yMax-yMin)*0.066,texTex);
+			TLatex *text = new TLatex(PlotpTMax*0.8,yMin+(yMax-yMin)*0.066,texTex);
 			text->SetTextSize(0.035);
 			if(!SteerIndividuals&&!PlotMattForICHEP&&!PlotVsComp) text->Draw( "same" );
 
 			if(PlotBG0plots){
 				char texTex2[200];
 				sprintf(texTex2,"      |c#tau/#sigma_{c#tau}| < 2");
-				TLatex *text2 = new TLatex(onia::pTRange[rapBin][ptBinMax]*0.7,yMin+(yMax-yMin)*0.122,texTex2);
+				//TLatex *text2 = new TLatex(onia::pTRange[rapBin][ptBinMax]*0.7,yMin+(yMax-yMin)*0.122,texTex2);
+				TLatex *text2 = new TLatex(PlotpTMax*0.7,yMin+(yMax-yMin)*0.122,texTex2);
 				text2->SetTextSize(0.05);
 				text2->Draw( "same" );
 			} 
@@ -2296,34 +2310,40 @@ int main(int argc, char** argv) {
 				char text[200];
 				sprintf(text,"CMS preliminary");
 				cout<<text<<endl;
-				TLatex *CentralsText1 = new TLatex(11.5-DeltaXminOVERALL,yMin+(yMax-yMin)*0.76,text);
+				//TLatex *CentralsText1 = new TLatex(11.5-DeltaXminOVERALL,yMin+(yMax-yMin)*0.76,text);
+				TLatex *CentralsText1 = new TLatex(PlotpTMin+(PlotpTMax-PlotpTMin)*0.02-DeltaXminOVERALL,yMin+(yMax-yMin)*0.76,text);
 				CentralsText1->SetTextSize(CentralsFontSize*1.25);
 				if(DrawPreliminary) CentralsText1->Draw( "same" );
 				sprintf(text,"L_{int} = 4.9 fb^{-1}");
 				cout<<text<<endl;
-				TLatex *CentralsText2 = new TLatex(11.5-DeltaXminOVERALL,yMin+(yMax-yMin)*0.935,text);
+				//TLatex *CentralsText2 = new TLatex(11.5-DeltaXminOVERALL,yMin+(yMax-yMin)*0.935,text);
+				TLatex *CentralsText2 = new TLatex(PlotpTMin+(PlotpTMax-PlotpTMin)*0.02-DeltaXminOVERALL,yMin+(yMax-yMin)*0.935,text);
 				CentralsText2->SetTextSize(CentralsFontSize);
 				CentralsText2->Draw( "same" );
 				sprintf(text,"pp    #sqrt{s} = 7 TeV");
 				cout<<text<<endl;
-				TLatex *CentralsText3 = new TLatex(11.5-DeltaXminOVERALL,yMin+(yMax-yMin)*0.875,text);
+				//TLatex *CentralsText3 = new TLatex(11.5-DeltaXminOVERALL,yMin+(yMax-yMin)*0.875,text);
+				TLatex *CentralsText3 = new TLatex(PlotpTMin+(PlotpTMax-PlotpTMin)*0.02-DeltaXminOVERALL,yMin+(yMax-yMin)*0.875,text);
 				CentralsText3->SetTextSize(CentralsFontSize);
 				CentralsText3->Draw( "same" );
 
 
-				TLine* extreme0 = new TLine( onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL, 0, onia::pTRange[rapBin][ptBinMax] ,0);
+				//TLine* extreme0 = new TLine( onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL, 0, onia::pTRange[rapBin][ptBinMax] ,0);
+				TLine* extreme0 = new TLine( PlotpTMin-DeltaXminOVERALL, 0, PlotpTMax ,0);
 				extreme0->SetLineWidth( 1 );
 				extreme0->SetLineStyle( 2 );
 				extreme0->SetLineColor( kBlack );
 				extreme0->Draw( "same" );
 
-				TLine* extreme1 = new TLine( onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL, 1, onia::pTRange[rapBin][ptBinMax] , 1);
+				//TLine* extreme1 = new TLine( onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL, 1, onia::pTRange[rapBin][ptBinMax] , 1);
+				TLine* extreme1 = new TLine( PlotpTMin-DeltaXminOVERALL, 1, PlotpTMax , 1);
 				extreme1->SetLineWidth( 1 );
 				extreme1->SetLineStyle( 2 );
 				extreme1->SetLineColor( kBlack );
 				if(iLam==1||iLam==7||iLam==13) extreme1->Draw( "same" );
 
-				TLine* extreme2 = new TLine( onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL, -1, onia::pTRange[rapBin][ptBinMax] ,-1);
+				//TLine* extreme2 = new TLine( onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL, -1, onia::pTRange[rapBin][ptBinMax] ,-1);
+				TLine* extreme2 = new TLine( PlotpTMin-DeltaXminOVERALL, -1, PlotpTMax ,-1);
 				extreme2->SetLineWidth( 1 );
 				extreme2->SetLineStyle( 2 );
 				extreme2->SetLineColor( kBlack );
@@ -2628,19 +2648,22 @@ int main(int argc, char** argv) {
 
 						if(PlotFinalData&&DrawLatexStuff){
 
-							TLine* extreme0MP = new TLine( onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL, 0, onia::pTRange[rapBin][ptBinMax] ,0);
+							//TLine* extreme0MP = new TLine( onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL, 0, onia::pTRange[rapBin][ptBinMax] ,0);
+							TLine* extreme0MP = new TLine( PlotpTMin-DeltaXminOVERALL, 0, PlotpTMax ,0);
 							extreme0MP->SetLineWidth( 1 );
 							extreme0MP->SetLineStyle( 2 );
 							extreme0MP->SetLineColor( kBlack );
 							extreme0MP->Draw( "same" );
 
-							TLine* extreme1MP = new TLine( onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL, 1, onia::pTRange[rapBin][ptBinMax] , 1);
+							//TLine* extreme1MP = new TLine( onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL, 1, onia::pTRange[rapBin][ptBinMax] , 1);
+							TLine* extreme1MP = new TLine( PlotpTMin-DeltaXminOVERALL, 1, PlotpTMax, 1);
 							extreme1MP->SetLineWidth( 1 );
 							extreme1MP->SetLineStyle( 2 );
 							extreme1MP->SetLineColor( kBlack );
 							if(iLam==1||iLam==7||iLam==13) extreme1MP->Draw( "same" );
 
-							TLine* extreme2MP = new TLine( onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL, -1, onia::pTRange[rapBin][ptBinMax] ,-1);
+							//TLine* extreme2MP = new TLine( onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL, -1, onia::pTRange[rapBin][ptBinMax] ,-1);
+							TLine* extreme2MP = new TLine( PlotpTMin-DeltaXminOVERALL, -1, PlotpTMax ,-1);
 							extreme2MP->SetLineWidth( 1 );
 							extreme2MP->SetLineStyle( 2 );
 							extreme2MP->SetLineColor( kBlack );
@@ -3134,19 +3157,22 @@ int main(int argc, char** argv) {
 
 							if(PlotFinalData&&DrawLatexStuff){
 
-								TLine* extreme0MP = new TLine( onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL, 0, onia::pTRange[rapBin][ptBinMax] ,0);
+								//TLine* extreme0MP = new TLine( onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL, 0, onia::pTRange[rapBin][ptBinMax] ,0);
+								TLine* extreme0MP = new TLine( PlotpTMin-DeltaXminOVERALL, 0, PlotpTMax ,0);
 								extreme0MP->SetLineWidth( 1 );
 								extreme0MP->SetLineStyle( 2 );
 								extreme0MP->SetLineColor( kBlack );
 								extreme0MP->Draw( "same" );
 
-								TLine* extreme1MP = new TLine( onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL, 1, onia::pTRange[rapBin][ptBinMax] , 1);
+								//TLine* extreme1MP = new TLine( onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL, 1, onia::pTRange[rapBin][ptBinMax] , 1);
+								TLine* extreme1MP = new TLine( PlotpTMin-DeltaXminOVERALL, 1, PlotpTMax , 1);
 								extreme1MP->SetLineWidth( 1 );
 								extreme1MP->SetLineStyle( 2 );
 								extreme1MP->SetLineColor( kBlack );
 								if(iLam==1||iLam==7||iLam==13) extreme1MP->Draw( "same" );
 
-								TLine* extreme2MP = new TLine( onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL, -1, onia::pTRange[rapBin][ptBinMax] ,-1);
+								//TLine* extreme2MP = new TLine( onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL, -1, onia::pTRange[rapBin][ptBinMax] ,-1);
+								TLine* extreme2MP = new TLine( PlotpTMin-DeltaXminOVERALL, -1, PlotpTMax ,-1);
 								extreme2MP->SetLineWidth( 1 );
 								extreme2MP->SetLineStyle( 2 );
 								extreme2MP->SetLineColor( kBlack );
@@ -3687,19 +3713,22 @@ int main(int argc, char** argv) {
 
 							if(PlotFinalData&&DrawLatexStuff){
 
-								TLine* extreme0MP = new TLine( onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL, 0, onia::pTRange[rapBin][ptBinMax] ,0);
+								//TLine* extreme0MP = new TLine( onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL, 0, onia::pTRange[rapBin][ptBinMax] ,0);
+								TLine* extreme0MP = new TLine( PlotpTMin-DeltaXminOVERALL, 0, PlotpTMax ,0);
 								extreme0MP->SetLineWidth( 1 );
 								extreme0MP->SetLineStyle( 2 );
 								extreme0MP->SetLineColor( kBlack );
 								extreme0MP->Draw( "same" );
 
-								TLine* extreme1MP = new TLine( onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL, 1, onia::pTRange[rapBin][ptBinMax] , 1);
+								//TLine* extreme1MP = new TLine( onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL, 1, onia::pTRange[rapBin][ptBinMax] , 1);
+								TLine* extreme1MP = new TLine( PlotpTMin-DeltaXminOVERALL, 1, PlotpTMax , 1);
 								extreme1MP->SetLineWidth( 1 );
 								extreme1MP->SetLineStyle( 2 );
 								extreme1MP->SetLineColor( kBlack );
 								//						if(iLam==1||iLam==7||iLam==13) extreme1MP->Draw( "same" );
 
-								TLine* extreme2MP = new TLine( onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL, -1, onia::pTRange[rapBin][ptBinMax] ,-1);
+								//TLine* extreme2MP = new TLine( onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL, -1, onia::pTRange[rapBin][ptBinMax] ,-1);
+								TLine* extreme2MP = new TLine( PlotpTMin-DeltaXminOVERALL, -1, PlotpTMax ,-1);
 								extreme2MP->SetLineWidth( 1 );
 								extreme2MP->SetLineStyle( 2 );
 								extreme2MP->SetLineColor( kBlack );
@@ -4450,19 +4479,22 @@ int main(int argc, char** argv) {
 
 								if(PlotFinalData&&DrawLatexStuff){
 
-									TLine* extreme0MP = new TLine( onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL, 0, onia::pTRange[rapBin][ptBinMax] ,0);
+									//TLine* extreme0MP = new TLine( onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL, 0, onia::pTRange[rapBin][ptBinMax] ,0);
+									TLine* extreme0MP = new TLine( PlotpTMin-DeltaXminOVERALL, 0, PlotpTMax ,0);
 									extreme0MP->SetLineWidth( 1 );
 									extreme0MP->SetLineStyle( 2 );
 									extreme0MP->SetLineColor( kBlack );
 									extreme0MP->Draw( "same" );
 
-									TLine* extreme1MP = new TLine( onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL, 1, onia::pTRange[rapBin][ptBinMax] , 1);
+									//TLine* extreme1MP = new TLine( onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL, 1, onia::pTRange[rapBin][ptBinMax] , 1);
+									TLine* extreme1MP = new TLine( PlotpTMin-DeltaXminOVERALL, 1, PlotpTMax , 1);
 									extreme1MP->SetLineWidth( 1 );
 									extreme1MP->SetLineStyle( 2 );
 									extreme1MP->SetLineColor( kBlack );
 									if(iLam==1||iLam==7||iLam==13) extreme1MP->Draw( "same" );
 
-									TLine* extreme2MP = new TLine( onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL, -1, onia::pTRange[rapBin][ptBinMax] ,-1);
+									//TLine* extreme2MP = new TLine( onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL, -1, onia::pTRange[rapBin][ptBinMax] ,-1);
+									TLine* extreme2MP = new TLine( PlotpTMin-DeltaXminOVERALL, -1, PlotpTMax ,-1);
 									extreme2MP->SetLineWidth( 1 );
 									extreme2MP->SetLineStyle( 2 );
 									extreme2MP->SetLineColor( kBlack );
