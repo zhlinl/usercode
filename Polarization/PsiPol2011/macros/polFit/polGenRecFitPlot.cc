@@ -373,7 +373,8 @@ int main(int argc, char** argv) {
 	int nTotalFits = nSkipGen+nGenerations;
 
 	seconds = time (NULL); time_1=seconds;
-	sprintf(dirstruct,"%s/Generation%d",rapptstruct,iGen+nSkipGen); if(!RealData) gSystem->mkdir(dirstruct);
+	//sprintf(dirstruct,"%s/Generation%d",rapptstruct,iGen+nSkipGen); if(!RealData) gSystem->mkdir(dirstruct);
+	sprintf(dirstruct,"%s/Generation%d",rapptstruct,iGen); if(!RealData) gSystem->mkdir(dirstruct);
 	OutputDirectory=dirstruct;
 	if(RealData) OutputDirectory=basestruct;
 
@@ -386,7 +387,8 @@ int main(int argc, char** argv) {
 	if(fit)polFit(nSample,FidCuts, nEff, nDileptonEff, nRhoFactor, OutputDirectory, realdatadir, TreeBinID, TreeBinID_dataFile, RealData, effDir, MCeff, MCDileptoneff, iRap, iPt, NewAccCalc, MPValgo, useAmapApproach, nAmap, nDenominatorAmap);
 	if(plot)polPlot(OutputDirectory, TreeBinID, RealData, MPValgo, scalePlots, nTotalFits, nState, ptlow, pthigh, raplow, raphigh);
 
-	sprintf(dirstruct,"%s/Generation%d",rapptstruct,iGen+nSkipGen);
+	//sprintf(dirstruct,"%s/Generation%d",rapptstruct,iGen+nSkipGen);
+	sprintf(dirstruct,"%s/Generation%d",rapptstruct,iGen);
 	if(deletePseudoData){
 		sprintf(tmpfilename,"%s/genData.root",dirstruct);			gSystem->Unlink(tmpfilename);
 		sprintf(tmpfilename,"%s/data.root",dirstruct);				gSystem->Unlink(tmpfilename);
