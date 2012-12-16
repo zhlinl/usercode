@@ -5,16 +5,19 @@ batchType='bsub -q 1nd' #'qsub -q cmsq'
 
 workPath=$PWD
 nSigma=3.00
-originFile=runDataFitsJob
+#originFile=runDataFitsJob
+originFile=runToyMCJob
 
-batchDir=${workPath}/batchJob/noRhoFactor
+#jobType=noRhoFactor
+jobType=ToyMC
+batchDir=${workPath}/batchJob/${jobType}
 mkdir -p ${batchDir}
 mkdir -p ${batchDir}/logfile
 
 cp ${originFile}.sh ${batchDir}/${originFile}.sh
 cd ${batchDir}
 
-for nState in 4 5;do
+for nState in 4;do
 
 ##############
 ##### 1S #####
@@ -23,7 +26,8 @@ if [ $nState -eq 4 ]
 then
 for rapBin in 1 2; do 
 for ptBin in 1 2 3 4 5 6 7 8 9 10 11 12; do 
-for nSkipGen in 0 1 2 3 4 5 6 7 8 9; do
+for nSkipGen in 0; do
+#for nSkipGen in 0 1 2 3 4 5 6 7 8 9; do
 JobID=Psi$[nState-3]S_${nSigma}Sigma_12Dec2012
 cp ${originFile}.sh ${originFile}_Psi$[nState-3]S_${rapBin}rap_${ptBin}pt_${nSkipGen}.sh
 chmod 755 ${originFile}_Psi$[nState-3]S_${rapBin}rap_${ptBin}pt_${nSkipGen}.sh
@@ -60,7 +64,8 @@ if [ $nState -eq 5 ]
 then
 for rapBin in 1 2 3; do 
 for ptBin in 2 3 4 5 6; do 
-for nSkipGen in 0 1 2 3 4 5 6 7 8 9; do
+for nSkipGen in 0; do
+#for nSkipGen in 0 1 2 3 4 5 6 7 8 9; do
 cp ${originFile}.sh ${originFile}_Psi$[nState-3]S_${rapBin}rap_${ptBin}pt_${nSkipGen}.sh
 chmod 755 ${originFile}_Psi$[nState-3]S_${rapBin}rap_${ptBin}pt_${nSkipGen}.sh
 sed "s:HOMEDIR:${workPath}:g"   -i ${originFile}_Psi$[nState-3]S_${rapBin}rap_${ptBin}pt_${nSkipGen}.sh

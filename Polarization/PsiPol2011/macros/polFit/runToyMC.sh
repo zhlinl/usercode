@@ -2,7 +2,7 @@
 
 ########## INPUTS ##########
 
-nState=4
+nState=5
 
 JobID=ToyMC_Psi$[nState-3]S_13Dec2012
 
@@ -11,8 +11,8 @@ nGenerations=2
 
 rapBinMin=1
 rapBinMax=1
-ptBinMin=12
-ptBinMax=12
+ptBinMin=6
+ptBinMax=6
 
 polScenSig=3
 polScenBkg=3
