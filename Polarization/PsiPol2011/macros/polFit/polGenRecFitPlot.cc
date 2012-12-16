@@ -339,7 +339,6 @@ int main(int argc, char** argv) {
 		cout<<"f_BG: "<<f_BG<<endl;
 
 		if(dataFile->Get("isBGdistribution")==NULL){
-			cout<<"debug001"<<endl;
 			OutputDirectory=rapptstruct;
 			polGen(raplow,raphigh,ptlow,pthigh,mass_signal_peak,mass_signal_sigma,n_sigmas_signal,numEvCheck,f_BG,lambda_theta_sig_,lambda_phi_sig_,lambda_thetaphi_sig_,lambda_theta_bkg_,lambda_phi_bkg_,lambda_thetaphi_bkg_,frameSig,frameBkg,-999,OutputDirectory);
 			if(rec)polRec(raplow,raphigh,ptlow,pthigh,mass_signal_peak,mass_signal_sigma,n_sigmas_signal,nRecEff,nRecDileptonEff,nRecRhoFactor,FidCuts,OutputDirectory, true, effDir, MCReceff, MCDileptonReceff, iRap, iPt, useAmapApproach, nAmap, nDenominatorAmap);
@@ -347,8 +346,6 @@ int main(int argc, char** argv) {
 			sprintf(tmpfilename,"%s/GenResults.root",rapptstruct);		gSystem->Unlink(tmpfilename);
 		}
 
-		cout<<"debug---"<<endl;
-	  return 0;
 		sprintf(tmpfilename,"%s/data.root",rapptstruct);
 		dataFile = new TFile(tmpfilename, "READ");
 		TH1D* isBG_distribution = (TH1D*)dataFile->Get("isBGdistribution");
@@ -384,7 +381,6 @@ int main(int argc, char** argv) {
 	cout<<"OutputDirectory: "<<OutputDirectory<<endl;
 	cout<<"basestruct: "<<basestruct<<endl;
 
-	cout<<"debug002"<<endl;
 	if(gen)polGen(raplow,raphigh,ptlow,pthigh,mass_signal_peak,mass_signal_sigma,n_sigmas_signal,n_events,f_BG,lambda_theta_sig_,lambda_phi_sig_,lambda_thetaphi_sig_,lambda_theta_bkg_,lambda_phi_bkg_,lambda_thetaphi_bkg_,frameSig,frameBkg,iGen,OutputDirectory);
 	if(rec)polRec(raplow,raphigh,ptlow,pthigh,mass_signal_peak,mass_signal_sigma,n_sigmas_signal,nRecEff,nRecDileptonEff,nRecRhoFactor,FidCuts,OutputDirectory, false, effDir, MCReceff, MCDileptonReceff, iRap, iPt, useAmapApproach, nAmap, nDenominatorAmap);
 	if(fit)polFit(nSample,FidCuts, nEff, nDileptonEff, nRhoFactor, OutputDirectory, realdatadir, TreeBinID, TreeBinID_dataFile, RealData, effDir, MCeff, MCDileptoneff, iRap, iPt, NewAccCalc, MPValgo, useAmapApproach, nAmap, nDenominatorAmap);

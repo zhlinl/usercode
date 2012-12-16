@@ -68,7 +68,6 @@ void polRec(double rapdilepton_min = 1,
 	if(MCeff) sprintf(EffType,"hEff_MC_central");
 	else sprintf(EffType,"hEff_DATA_central");
 	cout<<"EffFile: "<<EffFile<<endl;
-	cout<<"EffType: "<<EffType<<endl;
 
 	TFile *fInEff = new TFile(EffFile);
 	TH1* hEff=(TH1*) fInEff->Get(EffType);
@@ -454,6 +453,7 @@ void polRec(double rapdilepton_min = 1,
 		double RhoFactor = EvaluateRhoFactor( costh_RhoFactor, phi_RhoFactor, nRhoFactor, fInRhoFactor, rap, pT);
 
 		double epsilon = effP*effN;
+
 
 		if(!useAmapApproach) epsilon = epsilon*DileptonEff*RhoFactor;
 

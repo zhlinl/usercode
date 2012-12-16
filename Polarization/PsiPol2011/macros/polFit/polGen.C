@@ -234,7 +234,6 @@ void polGen(double rapdilepton_min = 1,
        lambda_thetaphi = lambda_thetaphi_bkg;
        HX_is_natural = HX_is_natural_bkg;
        PX_is_natural = PX_is_natural_bkg;
-			 cout<<"debug--004"<<endl;
     }
 
 
@@ -499,9 +498,13 @@ void polGen(double rapdilepton_min = 1,
   GenResults->Fill();
 
 
+	//GenResultFile->cd(); //Linlin
+	//GenResults->Write(); //Linlin
   GenResultFile->Write();
   GenResultFile->Close();
 
+	//hfileout->cd(); //Linlin
+	//genData->Write(); //Linlin
   hfileout->Write();
   hfileout->Close();
 

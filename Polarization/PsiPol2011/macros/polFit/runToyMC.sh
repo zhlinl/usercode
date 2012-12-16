@@ -4,11 +4,10 @@
 
 nState=4
 
-#JobID=Toy_TowardsPRL_Aug03_AmapsTest_1030t32104o105
 JobID=ToyMC_Psi$[nState-3]S_13Dec2012
 
 #nGenerations=50
-nGenerations=1
+nGenerations=2
 
 rapBinMin=1
 rapBinMax=1
@@ -47,8 +46,8 @@ UseMCDileptonReceff=true
 nRecRhoFactor=1
 
 gen=true
-rec=false
-fit=false
+rec=true
+fit=true
 plot=false
 deletePseudoData=true
 
@@ -106,9 +105,9 @@ plot=${plot}
 
 if [ ${nGen_} -eq 1 ]
 then
-#plot=true
-plot=false
+plot=true
 fi
+
 
 cp polGenRecFitPlot polGenRecFitPlot_rap${rap_}_pt${pT_}_Gen${nGen_}
 ./polGenRecFitPlot_rap${rap_}_pt${pT_}_Gen${nGen_} ${nGen_}ThisGen ${JobID}=JobID ${storagedir}=storagedir ${basedir}=basedir ${nGenerations}nGenerations ${polScenSig}polScenSig ${frameSig}frameSig ${polScenBkg}polScenBkg ${frameBkg}frameBkg ${rap_}rapBinMin ${rap_}rapBinMax ${pT_}ptBinMin ${pT_}ptBinMax ${nEff}nEff ${nDileptonEff}nDiEff ${nEffRec}nRecEff ${nDileptonEffRec}nRecDiEff ${FidCuts}FidCuts ${nSample}nSample ${ConstEvents}ConstEvents ${nSkipGen}nSkipGen UseConstEv=${UseConstEv} gen=${gen} rec=${rec} fit=${fit} plot=${plot} UseDifferingEff=${UseDifferingEff} UseMCeff=${UseMCeff} UseMCReceff=${UseMCReceff} UseMCDileptoneff=${UseMCDileptoneff} UseMCDileptonReceff=${UseMCDileptonReceff}  ${nRhoFactor}nRhoFactor ${nRecRhoFactor}nRecRhoFactor ${MPValgo}MPValgo ${nSigma}nSigma ${nState}nState NewAccCalc=${NewAccCalc} deletePseudoData=${deletePseudoData} useAmapApproach=${useAmapApproach} ${nAmap}nAmap ${nDenominatorAmap}nDenominatorAmap
@@ -121,6 +120,7 @@ pT_=$[pT_+1]
 done
 rap_=$[rap_+1]
 done
+
 
 #rm polGen.C 
 #rm polRec.C 
