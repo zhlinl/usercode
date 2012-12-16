@@ -1,7 +1,7 @@
 #!/bin/sh
 source /afs/cern.ch/user/z/zhlinl/rootset.sh
 
-#### following will be changed by "launchFit" ####
+#### following will be changed by "launchFit.sh" ####
 # HOMEDIR
 # NState 
 # RapBinMin
