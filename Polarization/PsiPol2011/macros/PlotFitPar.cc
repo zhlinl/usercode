@@ -80,7 +80,7 @@ int main(int argc, char* argv[]){
 	if(nState==4)
 		PlotBFrac_1S(nState);
 	if(nState==5)
-		PlotBFrac_1S(nState);
+		PlotBFrac_2S(nState);
 
 	double nSigma=2.5;
 	if(nState==4) nSigma=2.5;
