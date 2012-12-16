@@ -11,8 +11,8 @@ nGenerations=2
 
 rapBinMin=1
 rapBinMax=1
-ptBinMin=5
-ptBinMax=5
+ptBinMin=12
+ptBinMax=12
 
 polScenSig=3
 polScenBkg=3
@@ -58,6 +58,8 @@ NewAccCalc=false
 
 ########################################
 
+homedir=/afs/cern.ch/user/z/zhlinl/work/polarization/Psi/PsiPol2011/macros/polFit
+cd ${homedir}
 cd ..
 cd ..
 basedir=$PWD
@@ -98,7 +100,8 @@ do
 
 nGen_=${nSkipGen}
 nGen_=$[nGen_+1]
-while [ $nGen_ -le ${nGenerations} ]
+nMaxGen=$[nGenerations+nSkipGen]
+while [ $nGen_ -le $nMaxGen ]
 do
 
 plot=${plot}
@@ -112,7 +115,6 @@ fi
 cp polGenRecFitPlot polGenRecFitPlot_rap${rap_}_pt${pT_}_Gen${nGen_}
 ./polGenRecFitPlot_rap${rap_}_pt${pT_}_Gen${nGen_} ${nGen_}ThisGen ${JobID}=JobID ${storagedir}=storagedir ${basedir}=basedir ${nGenerations}nGenerations ${polScenSig}polScenSig ${frameSig}frameSig ${polScenBkg}polScenBkg ${frameBkg}frameBkg ${rap_}rapBinMin ${rap_}rapBinMax ${pT_}ptBinMin ${pT_}ptBinMax ${nEff}nEff ${nDileptonEff}nDiEff ${nEffRec}nRecEff ${nDileptonEffRec}nRecDiEff ${FidCuts}FidCuts ${nSample}nSample ${ConstEvents}ConstEvents ${nSkipGen}nSkipGen UseConstEv=${UseConstEv} gen=${gen} rec=${rec} fit=${fit} plot=${plot} UseDifferingEff=${UseDifferingEff} UseMCeff=${UseMCeff} UseMCReceff=${UseMCReceff} UseMCDileptoneff=${UseMCDileptoneff} UseMCDileptonReceff=${UseMCDileptonReceff}  ${nRhoFactor}nRhoFactor ${nRecRhoFactor}nRecRhoFactor ${MPValgo}MPValgo ${nSigma}nSigma ${nState}nState NewAccCalc=${NewAccCalc} deletePseudoData=${deletePseudoData} useAmapApproach=${useAmapApproach} ${nAmap}nAmap ${nDenominatorAmap}nDenominatorAmap
 rm polGenRecFitPlot_rap${rap_}_pt${pT_}_Gen${nGen_}
-rm polGenRecFitPlot
 
 nGen_=$[nGen_+1]
 done
