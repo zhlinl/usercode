@@ -236,6 +236,7 @@ void PlotRapPt(int ptBinMin, int ptBinMax, int rapBin, double yMin, double yMax,
 	char texTex[200];
 	if(rapBin==1) sprintf(texTex,"      |y| < 0.6");
 	if(rapBin==2) sprintf(texTex,"0.6 < |y| < 1.2");
+	if(rapBin==3) sprintf(texTex,"1.2 < |y| < 1.8");
 	TLatex *text = new TLatex(onia::pTRange[rapBin][ptBinMax]*0.22,yMin+(yMax-yMin)*0.1,texTex);
 	text->SetTextSize(0.035);
 	text->Draw( "same" );
@@ -248,7 +249,7 @@ void PlotRapPt(int ptBinMin, int ptBinMax, int rapBin, double yMin, double yMax,
 
 	if(SaveGraph){
 		char outfilename[200];
-		sprintf(outfilename,"%s/TGraphResults_Psi%dS_temp.root",GraphFolder,nState);cout<<outfilename<<endl;
+		sprintf(outfilename,"%s/TGraphResults_Psi%dS_temp.root",GraphFolder,nState-3);cout<<outfilename<<endl;
 		TFile *outfile = new TFile(outfilename,"UPDATE");
 
 		outfile->cd();
@@ -381,6 +382,7 @@ void PlotComparisonRapPt(int ptBinMin, int ptBinMax, int rapBin, double yMin, do
 	char texTex[200];
 	if(rapBin==1) sprintf(texTex,"      |y| < 0.6");
 	if(rapBin==2) sprintf(texTex,"0.6 < |y| < 1.2");
+	if(rapBin==3) sprintf(texTex,"1.2 < |y| < 1.8");
 	TLatex *text = new TLatex(onia::pTRange[rapBin][ptBinMax]*0.22,yMin+(yMax-yMin)*0.1,texTex);
 	text->SetTextSize(0.035);
 	text->Draw( "same" );
