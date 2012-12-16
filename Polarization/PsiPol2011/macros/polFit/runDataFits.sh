@@ -1,7 +1,7 @@
 #!/bin/sh
 source /afs/cern.ch/user/z/zhlinl/rootset.sh
 
-homedir=/afs/cern.ch/user/z/zhlinl/work/polarization/Psi/Framework/macros/polFit
+homedir=$PWD
 cd ${homedir}
 cd ..
 cd ..
