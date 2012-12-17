@@ -217,7 +217,7 @@ int main(int argc, char** argv) {
 	if(ShiftInX) DeltaXminOVERALL=0.9999;
 	bool ShiftXminOVERALL=true;
 
-	double PlotpTMin = 7., PlotpTMax = 72.;
+	double PlotpTMin = 6., PlotpTMax = 72.;
 
 	int OneSigColor=416;
 	int TwoSigColor=400;//858,898
@@ -1475,8 +1475,7 @@ int main(int argc, char** argv) {
 				//  TGraphErrors *fitGraph = new TGraphErrors(nBinspT,ptCentre_,lmean,0,fit_lmean_errmean);
 
 				double pTmaxPlot=72.; //50;
-				//double pTminPlot=6.;  //10;
-				double pTminPlot=7.;  //10;
+				double pTminPlot=6.;  //10;
 
 				double FontSize=0.0215;
 				double xText=15;
@@ -1621,8 +1620,7 @@ int main(int argc, char** argv) {
 
 
 				double pTmaxPlot=72.; //50;
-				//double pTminPlot=6.;  //10;
-				double pTminPlot=7.;  //10;
+				double pTminPlot=6.;  //10;
 
 				double FontSize=0.0215;
 				double xText=15;
@@ -1975,8 +1973,7 @@ int main(int argc, char** argv) {
 				extreme0->Draw( "same" );
 
 				double pTmaxPlot=72.; //50;
-				//double pTminPlot=6.;  //10;
-				double pTminPlot=7.;  //10;
+				double pTminPlot=6.;  //10;
 
 				double FontSize=0.0215;
 				double xText=15;
@@ -2728,15 +2725,15 @@ int main(int argc, char** argv) {
 						MPXlabeltext->SetTextColor(kBlack);
 						if(iPanel==nPanels) MPXlabeltext->Draw( "same" );
 
-						if(iLam==3&&rapBin==2){  sprintf(filename,"%s/FinalResultsCS_OLD_Psi%dS.pdf",FigDir,nState);
+						if(iLam==3&&rapBin==2){  sprintf(filename,"%s/FinalResultsCS_OLD_Psi%dS.pdf",FigDir,nState-3);
 							if(PlotFinalData) MPcanvasCS->SaveAs(filename);
 							MPcanvasCS->Close();
 						}
-						if(iLam==9&&rapBin==2){  sprintf(filename,"%s/FinalResultsHX_OLD_Psi%dS.pdf",FigDir,nState);
+						if(iLam==9&&rapBin==2){  sprintf(filename,"%s/FinalResultsHX_OLD_Psi%dS.pdf",FigDir,nState-3);
 							if(PlotFinalData) MPcanvasHX->SaveAs(filename);
 							MPcanvasHX->Close();
 						}
-						if(iLam==15&&rapBin==2){  sprintf(filename,"%s/FinalResultsPX_OLD_Psi%dS.pdf",FigDir,nState);
+						if(iLam==15&&rapBin==2){  sprintf(filename,"%s/FinalResultsPX_OLD_Psi%dS.pdf",FigDir,nState-3);
 							if(PlotFinalData) MPcanvasPX->SaveAs(filename);
 							MPcanvasPX->Close();
 						}
