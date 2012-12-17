@@ -357,7 +357,7 @@ void polRec(double rapdilepton_min = 1,
 	const int nbinmass =  7;
 
 	TH2D* background_costhphiPX = new TH2D( "background_costhphiPHX", "", nbinth,    -1.,    1.,
-			nbinph,   180.,  180.  );
+			nbinph,   -180.,  180.  );
 	TH3D* background_pTrapMass  = new TH3D( "background_pTrapMass",   "", nbinpT,   pTdilepton_min,  pTdilepton_max,
 			nbinrap,  rapdilepton_min, rapdilepton_max,
 			nbinmass, mass_min,        mass_max         );
