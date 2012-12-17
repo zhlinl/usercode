@@ -375,15 +375,19 @@ double singleLeptonEfficiency( double& pT, double& eta, int nEff, TFile* fInEff,
 		sprintf(EffType,"totEff_MCTRUTH_pT_eta");
 
 
-		/*		  int binX = hEvalEff->GetXaxis()->FindBin(TMath::Abs(eta));
-						int binY = hEvalEff->GetYaxis()->FindBin(pT);
+		
+		int binX = hEvalEff->GetXaxis()->FindBin(TMath::Abs(eta));
+		int binY = hEvalEff->GetYaxis()->FindBin(pT);
 
-						double effHist = hEvalEff->GetBinContent(binX, binY);
-		//		  cout<<"HistEff "<<eff<<endl;
-		 */
+		eff = hEvalEff->GetBinContent(binX, binY);
+		//cout<<"HistEff "<<eff<<endl;
+		
+		 
+		/*
 		Int_t globalBin = TEff->FindFixBin(TMath::Abs(eta), pT);
 		eff = TEff->GetEfficiency(globalBin);
-
+		//cout<<"HistEff: "<<eff<<endl;
+		*/
 
 		return eff;
 	}
