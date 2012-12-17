@@ -4,7 +4,7 @@ cd ..
 cd ..
 basedir=$PWD
 cd macros/polFit
-storagedir=`more storagedir`/ToyMC #please define the directory storagedir in the file macros/polFit/storagedir
+#storagedir=`more storagedir`/ToyMC #please define the directory storagedir in the file macros/polFit/storagedir
 storagedir=${basedir}/Psi/ToyMC
 
 ########## INPUTS ##########
@@ -18,12 +18,12 @@ echo ${JobID}
 
 if [ $nState -eq 4 ]
 then
-ptBinMin=1
+ptBinMin=4
 ptBinMax=12
 fi
 if [ $nState -eq 5 ]
 then
-ptBinMin=2
+ptBinMin=1
 ptBinMax=6
 fi
 
@@ -33,7 +33,7 @@ for polScenSig in 3;do
 frameBkg=1
 for polScenBkg in 3;do
 
-nGenerations=10
+nGenerations=50
 
 MPValgo=3 		#1...mean,2...gauss,3...gauss-loop with chi2<2
 additionalName=MPV${MPValgo}
@@ -79,7 +79,7 @@ mv ${ScenDir}/TGraphResults_${TreeID}_temp.root ${ScenDir}/TGraphResults_${TreeI
 
 cp ${basedir}/latex/PullSummaryResults_Psi$[nState-3]S.tex ${ScenDir}/PullSummaryResults_${ScenDir}.tex
 cp ${basedir}/latex/ParameterSummaryResults_Psi$[nState-3]S.tex ${ScenDir}/ParameterSummaryResults_${ScenDir}.tex
-cp ${basedir}/latex/ToyResults_Psi$[nState-3]S.tex ${ScenDir}/ToyResults_${ScenDir}.tex
+cp ${basedir}/latex/ToyResults.tex ${ScenDir}/ToyResults_${ScenDir}.tex
 
 pdflatex ToyNumericalResults_${ScenDir}.tex
 mv ToyNumericalResults_${ScenDir}.pdf ${basedir}/macros/polFit/FiguresToyMC/${JobID}/${ScenDir}/ToyNumericalResults_${ScenDir}_${additionalName}.pdf

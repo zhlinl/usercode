@@ -2,12 +2,12 @@
 
 ########## INPUTS ##########
 
-nState=5
+nState=4
 
-JobID=ToyMC_Psi$[nState-3]S_13Dec2012
+JobID=ToyMC_Psi$[nState-3]S_17Dec2012
 
 #nGenerations=50
-nGenerations=2
+nGenerations=1
 
 rapBinMin=1
 rapBinMax=1
