@@ -374,10 +374,8 @@ double singleLeptonEfficiency( double& pT, double& eta, int nEff, TFile* fInEff,
 	if(nEff==105 || nEff==106){
 		sprintf(EffType,"totEff_MCTRUTH_pT_eta");
 
-
 		int binX = hEvalEff->GetXaxis()->FindBin(TMath::Abs(eta));
 		int binY = hEvalEff->GetYaxis()->FindBin(pT);
-
 		eff = hEvalEff->GetBinContent(binX, binY);
 		//cout<<"HistEff "<<eff<<endl;
 		
