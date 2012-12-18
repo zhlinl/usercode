@@ -2301,7 +2301,8 @@ int main(int argc, char** argv) {
 
 
 
-			if(PlotFinalData&&DrawLatexStuff&&!PlotMattForICHEP){
+			//if(PlotFinalData&&DrawLatexStuff&&!PlotMattForICHEP){
+			if(PlotFinalData&&!PlotMattForICHEP){
 				cout<<"DRAW CMS preliminary Latex"<<endl;
 				double CentralsFontSize=0.035;
 				char text[200];
@@ -2316,13 +2317,13 @@ int main(int argc, char** argv) {
 				//TLatex *CentralsText2 = new TLatex(11.5-DeltaXminOVERALL,yMin+(yMax-yMin)*0.935,text);
 				TLatex *CentralsText2 = new TLatex(PlotpTMin+(PlotpTMax-PlotpTMin)*0.02-DeltaXminOVERALL,yMin+(yMax-yMin)*0.935,text);
 				CentralsText2->SetTextSize(CentralsFontSize);
-				CentralsText2->Draw( "same" );
+				if(DrawLatexStuff) CentralsText2->Draw( "same" );
 				sprintf(text,"pp    #sqrt{s} = 7 TeV");
 				cout<<text<<endl;
 				//TLatex *CentralsText3 = new TLatex(11.5-DeltaXminOVERALL,yMin+(yMax-yMin)*0.875,text);
 				TLatex *CentralsText3 = new TLatex(PlotpTMin+(PlotpTMax-PlotpTMin)*0.02-DeltaXminOVERALL,yMin+(yMax-yMin)*0.875,text);
 				CentralsText3->SetTextSize(CentralsFontSize);
-				CentralsText3->Draw( "same" );
+				if(DrawLatexStuff) CentralsText3->Draw( "same" );
 
 
 				//TLine* extreme0 = new TLine( onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL, 0, onia::pTRange[rapBin][ptBinMax] ,0);

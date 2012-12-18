@@ -204,9 +204,9 @@ void PlotRapPt(int ptBinMin, int ptBinMax, int rapBin, double yMin, double yMax,
 	for(int ptBin = ptBinMin; ptBin < ptBinMax+1; ptBin++) {
 		double mean_pT=0;
 		if(RealData){
-			char filename [500];
-			sprintf(filename,"%s/data_%s_rap%d_pT%d.root",realdatadir,TreeID,rapBin,ptBin);
-			TFile* dataFile = new TFile(filename,"R");
+			char rootFilename [500];
+			sprintf(rootFilename,"%s/data_%s_rap%d_pT%d.root",realdatadir,TreeID,rapBin,ptBin);
+			TFile* dataFile = new TFile(rootFilename,"R");
 			if(!dataFile) cout<<"error"<<endl;
 			TH1D* hist_mean_pT = (TH1D*)dataFile->Get("mean_pT");
 			if(!hist_mean_pT) cout<<"error"<<endl;
@@ -318,9 +318,9 @@ void PlotComparisonRapPt(int ptBinMin, int ptBinMax, int rapBin, double yMin, do
 	for(int ptBin = ptBinMin; ptBin < ptBinMax+1; ptBin++) {
 		double mean_pT=0;
 		if(RealData){
-			char filename [500];
-			sprintf(filename,"%s/data_%s_rap%d_pT%d.root",realdatadir,TreeID,rapBin,ptBin);
-			TFile* dataFile = new TFile(filename,"R");
+			char rootFilename [500];
+			sprintf(rootFilename,"%s/data_%s_rap%d_pT%d.root",realdatadir,TreeID,rapBin,ptBin);
+			TFile* dataFile = new TFile(rootFilename,"R");
 			if(!dataFile) cout<<"error"<<endl;
 			TH1D* hist_mean_pT = (TH1D*)dataFile->Get("mean_pT");
 			if(!hist_mean_pT) cout<<"error"<<endl;

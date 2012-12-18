@@ -4,15 +4,15 @@
 
 nState=4
 
-JobID=ToyMC_Psi$[nState-3]S_17Dec2012
+JobID=ToyMC_Psi$[nState-3]S_13Dec2012
 
 #nGenerations=50
 nGenerations=1
 
 rapBinMin=1
 rapBinMax=1
-ptBinMin=6
-ptBinMax=6
+ptBinMin=1
+ptBinMax=1
 
 polScenSig=3
 polScenBkg=3
@@ -35,7 +35,7 @@ nSample=10000
 nSkipGen=0
 
 #GENERATION SETTINGS
-ConstEvents=15000
+ConstEvents=50000
 UseConstEv=false #if false, the number of events is taken from ToyMC.h
 
 UseDifferingEff=false #if false, the next five lines do not matter
