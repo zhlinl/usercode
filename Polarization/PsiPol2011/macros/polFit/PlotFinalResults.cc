@@ -905,8 +905,8 @@ int main(int argc, char** argv) {
 			plotHisto->SetYTitle(axislabel);
 			plotHisto->GetYaxis()->SetTitleOffset(1.5);
 
-			//TLegend* plotcompLegend=new TLegend(0.13,0.12,0.6,0.3);
-			TLegend* plotcompLegend=new TLegend(0.13,0.12,0.6,0.2);
+			TLegend* plotcompLegend=new TLegend(0.13,0.12,0.6,0.3);
+			//TLegend* plotcompLegend=new TLegend(0.13,0.12,0.6,0.2);
 			plotcompLegend->SetFillColor(0);
 			//		plotcompLegend->SetTextFont(72);
 			plotcompLegend->SetTextSize(0.04);

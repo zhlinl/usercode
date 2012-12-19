@@ -14,7 +14,14 @@ datadir_Start=${basedir}/macros/DataFiles
 #Take Care of Mean pT in ToyMC.h
 NSigma=3.00 #needed in 2 decimal accuracy (x.yz)
 
-for nState in 4;do
+for nState in 5;do
+
+cp ../../interface/rootIncludes.inc               rootIncludes.inc
+cp ../../interface/commonVar_Psi$[nState-3]S.h    commonVar.h
+cp ../../interface/ToyMC_Psi$[nState-3]S.h        ToyMC.h
+cp ../../interface/effsAndCuts_Psi$[nState-3]S.h  effsAndCuts.h
+touch polRapPtPlot.cc
+make
 
 #for JobID in Psi$[nState-3]S_${NSigma}Sigma_11Dec2012; do
 for JobID in Psi$[nState-3]S_${NSigma}Sigma_11Dec2012_noRhoFactor; do
@@ -73,31 +80,31 @@ mkdir ${Jobdir}/Figures/${TreeID}/Figures
 mkdir ${basedir}/macros/polFit/FiguresData/${JobID}
 mkdir ${basedir}/macros/polFit/FiguresData/${JobID}/${TreeID}
 
-cp ${basedir}/macros/polFit/polGenRecFitPlot.cc ${Jobdir}/polGenRecFitPlot.cc
-cp ${basedir}/macros/polFit/polRapPtPlot.cc ${Jobdir}/polRapPtPlot.cc
-cp ${basedir}/macros/polFit/PlotFinalResults.cc ${storagedir}/${JobID}/PlotFinalResults.cc
-cp ${basedir}/macros/polFit/Makefile ${Jobdir}/Makefile
-cp ${basedir}/macros/polFit/polGen.C ${Jobdir}/polGen.C
-cp ${basedir}/macros/polFit/polRec.C ${Jobdir}/polRec.C
-cp ${basedir}/macros/polFit/polFit.C ${Jobdir}/polFit.C
-cp ${basedir}/macros/polFit/polPlot.C ${Jobdir}/polPlot.C
+#cp ${basedir}/macros/polFit/polGenRecFitPlot.cc ${Jobdir}/polGenRecFitPlot.cc
+#cp ${basedir}/macros/polFit/polRapPtPlot.cc ${Jobdir}/polRapPtPlot.cc
+#cp ${basedir}/macros/polFit/PlotFinalResults.cc ${Jobdir}/PlotFinalResults.cc
+#cp ${basedir}/macros/polFit/Makefile ${Jobdir}/Makefile
+#cp ${basedir}/macros/polFit/polGen.C ${Jobdir}/polGen.C
+#cp ${basedir}/macros/polFit/polRec.C ${Jobdir}/polRec.C
+#cp ${basedir}/macros/polFit/polFit.C ${Jobdir}/polFit.C
+#cp ${basedir}/macros/polFit/polPlot.C ${Jobdir}/polPlot.C
+#
+#cp ../../interface/rootIncludes.inc ${Jobdir}/rootIncludes.inc
+#cp ../../interface/commonVar_Psi$[nState-3]S.h ${Jobdir}/commonVar.h
+#cp ../../interface/ToyMC_Psi$[nState-3]S.h ${Jobdir}/ToyMC.h
+#cp ../../interface/effsAndCuts_Psi$[nState-3]S.h ${Jobdir}/effsAndCuts.h
 
-cp ../../interface/rootIncludes.inc ${Jobdir}/rootIncludes.inc
-cp ../../interface/commonVar_Psi$[nState-3]S.h ${Jobdir}/commonVar.h
-cp ../../interface/ToyMC_Psi$[nState-3]S.h ${Jobdir}/ToyMC.h
-cp ../../interface/effsAndCuts_Psi$[nState-3]S.h ${Jobdir}/effsAndCuts.h
-
-cd ${Jobdir}
-touch polRapPtPlot.cc
-make
-
-cp polRapPtPlot polRapPtPlot_${TreeID}
+#cd ${Jobdir}
+#touch polRapPtPlot.cc
+#make
+#cp ${basedir}/macros/polFit/polRapPtPlot polRapPtPlot_${TreeID}
 
 echo 'copy finished'
 
 for nSigma in 3 2 1;do #3 2 1
 
 cd ${Jobdir}
+cp ${basedir}/macros/polFit/polRapPtPlot polRapPtPlot_${TreeID}
 
 ./polRapPtPlot_${TreeID} ${nSigma}nSigma ${ptBinMin}ptBinMin ${ptBinMax}ptBinMax ${rapBinMin}rapBinMin ${rapBinMax}rapBinMax ${frameSig}frameSig ${polScenSig}polScen ${MPValgo}MPValgo ${nGenerations}nGenerations ${TreeID}=TreeID realdata ${Jobdir}=dirstruct ${nState}nState ${datadir}=realdatadir
 
@@ -159,5 +166,6 @@ rm polRapPtPlot_${TreeID}
 rm IndividualFitResults.tex
 rm *.aux
 rm *.log
-
+cd ${basedir}/macros/polFit
+rm polRapPtPlot
 done

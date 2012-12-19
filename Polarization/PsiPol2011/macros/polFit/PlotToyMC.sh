@@ -9,31 +9,38 @@ storagedir=${basedir}/Psi/ToyMC
 
 ########## INPUTS ##########
 
-nState=5
+for nState in 4; do
 
-for JobID in ToyMC_Psi$[nState-3]S_13Dec2012; do
+cp ../../interface/rootIncludes.inc               rootIncludes.inc
+cp ../../interface/commonVar_Psi$[nState-3]S.h    commonVar.h
+cp ../../interface/ToyMC_Psi$[nState-3]S.h        ToyMC.h
+cp ../../interface/effsAndCuts_Psi$[nState-3]S.h  effsAndCuts.h
+touch polRapPtPlot.cc
+make
+
+for JobID in ToyMC_Psi$[nState-3]S_13Dec2012_100K; do
 
 echo ${JobID}
 
 
 if [ $nState -eq 4 ]
 then
-ptBinMin=4
+ptBinMin=1
 ptBinMax=12
 fi
 if [ $nState -eq 5 ]
 then
-ptBinMin=1
+ptBinMin=2
 ptBinMax=6
 fi
 
-frameSig=1
-for polScenSig in 3;do
+frameSig=3
+for polScenSig in 4;do
 
-frameBkg=1
+frameBkg=3
 for polScenBkg in 3;do
 
-nGenerations=50
+nGenerations=30
 
 MPValgo=3 		#1...mean,2...gauss,3...gauss-loop with chi2<2
 additionalName=MPV${MPValgo}
@@ -59,14 +66,6 @@ ScenDir=Sig_frame${frameSig}scen${polScenSig}_Bkg_frame${frameBkg}scen${polScenB
 mkdir ${basedir}/macros/polFit/FiguresToyMC
 mkdir ${basedir}/macros/polFit/FiguresToyMC/${JobID}
 mkdir ${basedir}/macros/polFit/FiguresToyMC/${JobID}/${ScenDir}
-
-cp ../../interface/rootIncludes.inc rootIncludes.inc
-cp ../../interface/commonVar_Psi$[nState-3]S.h commonVar.h
-cp ../../interface/ToyMC_Psi$[nState-3]S.h ToyMC.h
-cp ../../interface/effsAndCuts_Psi$[nState-3]S.h effsAndCuts.h
-
-touch polRapPtPlot.cc
-make
 
 cd ${storagedir}/${JobID}
 mkdir ${ScenDir}
@@ -117,4 +116,8 @@ rm polRapPtPlot
 
 done
 done
+done
+
+cd ${basedir}/macros/polFit
+rm polRapPtPlot
 done
