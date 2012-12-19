@@ -85,8 +85,8 @@ int main(int argc, char* argv[]){
 	double nSigma=2.5;
 	if(nState==4) nSigma=2.5;
 	if(nState==5) nSigma=2.0;
-	evaluateCtauCut(nSigma, nState, 0, doCtauUncer);
-	evaluateCtauCut(nSigma, nState, 1, doCtauUncer);
+	//evaluateCtauCut(nSigma, nState, 0, doCtauUncer);
+	//evaluateCtauCut(nSigma, nState, 1, doCtauUncer);
 
 	return 0;
 }
@@ -355,8 +355,8 @@ void PlotMassPar(int  nState){
 	gStyle->SetStatBorderSize(1);
 	gStyle->SetLabelFont(22,"X");    
 	gStyle->SetLabelFont(22,"Y");    
-	gStyle->SetTitleXOffset(1.5);    
-	gStyle->SetTitleYOffset(1.0);    
+	gStyle->SetTitleXOffset(1.2);    
+	gStyle->SetTitleYOffset(1.2);    
 	gStyle->SetHistLineWidth(2);     
 	gStyle->SetStatX(0.9);           
 	gStyle->SetStatY(0.9);           
@@ -368,6 +368,7 @@ void PlotMassPar(int  nState){
 
 	Xmin = 6.;    Xmax = 72.;
 	Ymin = 3.085; Ymax = 3.095;
+  if(nState==5) Ymin = 3.674; Ymax = 3.685;
 
 	graph_mean[0]->SetTitle("");
 	graph_mean[0]->GetXaxis()->SetTitle("p_{T} (GeV)");
@@ -1178,13 +1179,15 @@ void PlotLifePar(int  nState) {
 	gStyle->SetStatBorderSize(1);
 	gStyle->SetLabelFont(22,"X");  
 	gStyle->SetLabelFont(22,"Y");  
-	gStyle->SetTitleXOffset(1.5);  
-	gStyle->SetTitleYOffset(1.5);  
+	gStyle->SetTitleXOffset(1.2);  
+	gStyle->SetTitleYOffset(1.2);  
 	gStyle->SetHistLineWidth(2);   
 	gStyle->SetStatX(0.9);         
 	gStyle->SetStatY(0.9);         
 	gStyle->SetTitleX(0.15);       
 	gStyle->SetTitleY(0.96);       
+
+	double Xmin = 6., Xmax = 72.;
 
 	for(int rapBin = 1; rapBin < RapBins+1; rapBin++){
 
@@ -1194,6 +1197,7 @@ void PlotLifePar(int  nState) {
 		graph_promptMean[0][rapBin-1]->GetXaxis()->SetTitle("p_{T} (GeV)");
 		graph_promptMean[0][rapBin-1]->GetYaxis()->SetTitle("prompt Mean (mm)");
 		graph_promptMean[0][rapBin-1]->GetYaxis()->SetRangeUser(-0.015, 0.015);
+		graph_promptMean[0][rapBin-1]->GetXaxis()->SetLimits(Xmin, Xmax);
 		graph_promptMean[0][rapBin-1]->SetMarkerStyle(onia::marker_rapForPTBins[2]);
 		graph_promptMean[0][rapBin-1]->SetMarkerColor(onia::colour_rapForPTBins[2]);
 		graph_promptMean[0][rapBin-1]->SetLineColor(onia::colour_rapForPTBins[2]);
@@ -1209,6 +1213,7 @@ void PlotLifePar(int  nState) {
 		graph_promptCtRe[0][rapBin-1]->GetXaxis()->SetTitle("p_{T} (GeV)");
 		graph_promptCtRe[0][rapBin-1]->GetYaxis()->SetTitle("prompt Resolution (mm)");
 		graph_promptCtRe[0][rapBin-1]->GetYaxis()->SetRangeUser(0.0,2.0);
+		graph_promptCtRe[0][rapBin-1]->GetXaxis()->SetLimits(Xmin, Xmax);
 		graph_promptCtRe[0][rapBin-1]->SetMarkerStyle(onia::marker_rapForPTBins[2]);
 		graph_promptCtRe[0][rapBin-1]->SetMarkerColor(onia::colour_rapForPTBins[2]);
 		graph_promptCtRe[0][rapBin-1]->SetLineColor(onia::colour_rapForPTBins[2]);
@@ -1223,8 +1228,8 @@ void PlotLifePar(int  nState) {
 		graph_promptCtRe2[0][rapBin-1]->SetTitle("");
 		graph_promptCtRe2[0][rapBin-1]->GetXaxis()->SetTitle("p_{T} (GeV)");
 		graph_promptCtRe2[0][rapBin-1]->GetYaxis()->SetTitle("prompt Resolution2 (mm)");
-
 		graph_promptCtRe2[0][rapBin-1]->GetYaxis()->SetRangeUser(-1.0,6.0);
+		graph_promptCtRe2[0][rapBin-1]->GetXaxis()->SetLimits(Xmin, Xmax);
 		graph_promptCtRe2[0][rapBin-1]->SetMarkerStyle(onia::marker_rapForPTBins[2]);
 		graph_promptCtRe2[0][rapBin-1]->SetMarkerColor(onia::colour_rapForPTBins[2]);
 		graph_promptCtRe2[0][rapBin-1]->SetLineColor(onia::colour_rapForPTBins[2]);
@@ -1240,6 +1245,7 @@ void PlotLifePar(int  nState) {
 		graph_promptCtReWei[0][rapBin-1]->GetXaxis()->SetTitle("p_{T} (GeV)");
 		graph_promptCtReWei[0][rapBin-1]->GetYaxis()->SetTitle("prompt effective resolution (mm)");
 		graph_promptCtReWei[0][rapBin-1]->GetYaxis()->SetRangeUser(-1.0,6.0);
+		graph_promptCtReWei[0][rapBin-1]->GetXaxis()->SetLimits(Xmin, Xmax);
 		graph_promptCtReWei[0][rapBin-1]->SetMarkerStyle(onia::marker_rapForPTBins[2]);
 		graph_promptCtReWei[0][rapBin-1]->SetMarkerColor(onia::colour_rapForPTBins[2]);
 		graph_promptCtReWei[0][rapBin-1]->SetLineColor(onia::colour_rapForPTBins[2]);
@@ -1255,6 +1261,7 @@ void PlotLifePar(int  nState) {
 		graph_fracGauss2[0][rapBin-1]->GetXaxis()->SetTitle("p_{T} (GeV)");
 		graph_fracGauss2[0][rapBin-1]->GetYaxis()->SetTitle("fraction of 2nd Gauss ");
 		graph_fracGauss2[0][rapBin-1]->GetYaxis()->SetRangeUser(-0.1,0.6);
+		graph_fracGauss2[0][rapBin-1]->GetXaxis()->SetLimits(Xmin, Xmax);
 		graph_fracGauss2[0][rapBin-1]->SetMarkerStyle(onia::marker_rapForPTBins[2]);
 		graph_fracGauss2[0][rapBin-1]->SetMarkerColor(onia::colour_rapForPTBins[2]);
 		graph_fracGauss2[0][rapBin-1]->SetLineColor(onia::colour_rapForPTBins[2]);
@@ -1271,6 +1278,7 @@ void PlotLifePar(int  nState) {
 		graph_bkgTauSSDR[0][rapBin-1]->GetXaxis()->SetTitle("p_{T} (GeV)");
 		graph_bkgTauSSDR[0][rapBin-1]->GetYaxis()->SetTitle("Tau of SSR ");
 		graph_bkgTauSSDR[0][rapBin-1]->GetYaxis()->SetRangeUser(0.25,0.55);
+		graph_bkgTauSSDR[0][rapBin-1]->GetXaxis()->SetLimits(Xmin, Xmax);
 		graph_bkgTauSSDR[0][rapBin-1]->SetMarkerStyle(onia::marker_rapForPTBins[2]);
 		graph_bkgTauSSDR[0][rapBin-1]->SetMarkerColor(onia::colour_rapForPTBins[2]);
 		graph_bkgTauSSDR[0][rapBin-1]->SetLineColor(onia::colour_rapForPTBins[2]);
@@ -1286,6 +1294,7 @@ void PlotLifePar(int  nState) {
 		graph_bkgTauSSDL[0][rapBin-1]->GetXaxis()->SetTitle("p_{T} (GeV)");
 		graph_bkgTauSSDL[0][rapBin-1]->GetYaxis()->SetTitle("Tau of SSL");
 		graph_bkgTauSSDL[0][rapBin-1]->GetYaxis()->SetRangeUser(-.05,.25);
+		graph_bkgTauSSDL[0][rapBin-1]->GetXaxis()->SetLimits(Xmin, Xmax);
 		graph_bkgTauSSDL[0][rapBin-1]->SetMarkerStyle(onia::marker_rapForPTBins[2]);
 		graph_bkgTauSSDL[0][rapBin-1]->SetMarkerColor(onia::colour_rapForPTBins[2]);
 		graph_bkgTauSSDL[0][rapBin-1]->SetLineColor(onia::colour_rapForPTBins[2]);
@@ -1301,6 +1310,7 @@ void PlotLifePar(int  nState) {
 		graph_bkgTauDSD[0][rapBin-1]->GetXaxis()->SetTitle("p_{T} (GeV)");
 		graph_bkgTauDSD[0][rapBin-1]->GetYaxis()->SetTitle("Tau of DS");
 		graph_bkgTauDSD[0][rapBin-1]->GetYaxis()->SetRangeUser(-0.01,0.04);
+		graph_bkgTauDSD[0][rapBin-1]->GetXaxis()->SetLimits(Xmin, Xmax);
 		graph_bkgTauDSD[0][rapBin-1]->SetMarkerStyle(onia::marker_rapForPTBins[2]);
 		graph_bkgTauDSD[0][rapBin-1]->SetMarkerColor(onia::colour_rapForPTBins[2]);
 		graph_bkgTauDSD[0][rapBin-1]->SetLineColor(onia::colour_rapForPTBins[2]);
@@ -1317,6 +1327,7 @@ void PlotLifePar(int  nState) {
 		graph_fracBkgSSDL_SBL[0][rapBin-1]->GetXaxis()->SetTitle("p_{T} (GeV)");
 		graph_fracBkgSSDL_SBL[0][rapBin-1]->GetYaxis()->SetTitle("fraction of SSL");
 		graph_fracBkgSSDL_SBL[0][rapBin-1]->GetYaxis()->SetRangeUser(-0.05,0.15);
+		graph_fracBkgSSDL_SBL[0][rapBin-1]->GetXaxis()->SetLimits(Xmin, Xmax);
 		graph_fracBkgSSDL_SBL[0][rapBin-1]->SetMarkerStyle(onia::marker_rapForPTBins[2]);
 		graph_fracBkgSSDL_SBL[0][rapBin-1]->SetMarkerColor(onia::colour_rapForPTBins[2]);
 		graph_fracBkgSSDL_SBL[0][rapBin-1]->SetLineColor(onia::colour_rapForPTBins[2]);
@@ -1331,6 +1342,7 @@ void PlotLifePar(int  nState) {
 		graph_fracBkgSSDR_SBL[0][rapBin-1]->SetTitle("");
 		graph_fracBkgSSDR_SBL[0][rapBin-1]->GetXaxis()->SetTitle("p_{T} (GeV)");
 		graph_fracBkgSSDR_SBL[0][rapBin-1]->GetYaxis()->SetTitle("fraction of SSR");
+		graph_fracBkgSSDR_SBL[0][rapBin-1]->GetXaxis()->SetLimits(Xmin, Xmax);
 		if(nState==4)graph_fracBkgSSDR_SBL[0][rapBin-1]->GetYaxis()->SetRangeUser(0.4,0.9);
 		if(nState==5)graph_fracBkgSSDR_SBL[0][rapBin-1]->GetYaxis()->SetRangeUser(0.1,1.0);
 		graph_fracBkgSSDR_SBL[0][rapBin-1]->SetMarkerStyle(onia::marker_rapForPTBins[2]);
@@ -1347,6 +1359,7 @@ void PlotLifePar(int  nState) {
 		graph_fracBkgDSD_SBL[0][rapBin-1]->SetTitle("");
 		graph_fracBkgDSD_SBL[0][rapBin-1]->GetXaxis()->SetTitle("p_{T} (GeV)");
 		graph_fracBkgDSD_SBL[0][rapBin-1]->GetYaxis()->SetTitle("fraction of DS");
+		graph_fracBkgDSD_SBL[0][rapBin-1]->GetXaxis()->SetLimits(Xmin, Xmax);
 		if(nState==4) graph_fracBkgDSD_SBL[0][rapBin-1]->GetYaxis()->SetRangeUser(0.1,0.7);
 		if(nState==5) graph_fracBkgDSD_SBL[0][rapBin-1]->GetYaxis()->SetRangeUser(0.2,1.0);
 		graph_fracBkgDSD_SBL[0][rapBin-1]->SetMarkerStyle(onia::marker_rapForPTBins[2]);
@@ -1364,6 +1377,7 @@ void PlotLifePar(int  nState) {
 		graph_ratioLD_SBL[0][rapBin-1]->GetXaxis()->SetTitle("p_{T} (GeV)");
 		graph_ratioLD_SBL[0][rapBin-1]->GetYaxis()->SetTitle("ratio fraction of SSL/DS");
 		graph_ratioLD_SBL[0][rapBin-1]->GetYaxis()->SetRangeUser(-0.1,0.9);
+		graph_ratioLD_SBL[0][rapBin-1]->GetXaxis()->SetLimits(Xmin, Xmax);
 		graph_ratioLD_SBL[0][rapBin-1]->SetMarkerStyle(onia::marker_rapForPTBins[2]);
 		graph_ratioLD_SBL[0][rapBin-1]->SetMarkerColor(onia::colour_rapForPTBins[2]);
 		graph_ratioLD_SBL[0][rapBin-1]->SetLineColor(onia::colour_rapForPTBins[2]);
@@ -1376,7 +1390,8 @@ void PlotLifePar(int  nState) {
 		c1->SaveAs(Form("%s/ratioLD_rap%d.pdf",savePath.str().c_str(),rapBin));
 	}
 
-	double blX = 0.6, blY = 0.75, trX = 0.84, trY = 0.84;
+	//double blX = 0.6, blY = 0.75, trX = 0.84, trY = 0.84;
+	double blX = 0.65, blY = 0.75, trX = 0.86, trY = 0.86;
 	if(nState==5) blY = 0.65;
 	TLegend* LifetimeLegendLR_2rap=new TLegend(blX,blY,trX,trY);
 	LifetimeLegendLR_2rap->SetFillColor(kWhite);
@@ -1738,7 +1753,7 @@ void PlotBFrac_1S(int nState){
 	gStyle->SetStatBorderSize(1);
 	gStyle->SetLabelFont(22,"X");  
 	gStyle->SetLabelFont(22,"Y");  
-	gStyle->SetTitleXOffset(1.5);  
+	gStyle->SetTitleXOffset(1.2);  
 	gStyle->SetTitleYOffset(1.0);  
 	gStyle->SetHistLineWidth(2);   
 	gStyle->SetStatX(0.9);         
@@ -2207,7 +2222,7 @@ void PlotBFrac_2S(int nState){
 	gStyle->SetStatBorderSize(1);
 	gStyle->SetLabelFont(22,"X");  
 	gStyle->SetLabelFont(22,"Y");  
-	gStyle->SetTitleXOffset(1.5);  
+	gStyle->SetTitleXOffset(1.2);  
 	gStyle->SetTitleYOffset(1.0);  
 	gStyle->SetHistLineWidth(2);   
 	gStyle->SetStatX(0.9);         
@@ -3351,7 +3366,7 @@ void plotEval(double nSigma, int nState, int type){
 	gStyle->SetStatBorderSize(1);
 	gStyle->SetLabelFont(22,"X");   
 	gStyle->SetLabelFont(22,"Y");   
-	gStyle->SetTitleXOffset(1.5);   
+	gStyle->SetTitleXOffset(1.2);   
 	gStyle->SetTitleYOffset(1.0);   
 	gStyle->SetHistLineWidth(2);    
 	gStyle->SetStatX(0.9);          
