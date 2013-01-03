@@ -751,7 +751,7 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 	cout<<"nBinsPhiBG: "<<nBinsPhiBG<<endl;
 	cout<<"nBinsCosthBG: "<<nBinsCosthBG<<endl;
 
-	//loop agian with new binning
+	//loop again with new binning
 	for(int iFrame = 0; iFrame < onia::kNbFrames; iFrame++){
 		//book the 2D (cosTheta, phi) histos for the L and R mass sideband
 		std::stringstream nameL, nameR, nameNP, nameBGinNPL, nameBGinNPR, title;
