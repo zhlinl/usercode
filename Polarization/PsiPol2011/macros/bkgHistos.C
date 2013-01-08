@@ -71,7 +71,7 @@ TH2D* ReSetBin(TH2D* hist, int nBinX, int nBinY, const std::stringstream& name, 
 }
 
 //---------------------------------------------------------------------------------------------------------------
-void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, bool MC, bool f_BG_zero, bool doCtauUncer){
+void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, bool MC, bool doCtauUncer, bool PolLSB, bool PolRSB, bool PolNP){
 
 	const std::string
 		datafilename = "tmpFiles/selEvents_data.root",
@@ -169,11 +169,6 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 	pTBorder->Write();
 	yBorder->Write();
 
-	///////// CPU consuming plots? ///////
-	//////// Dimuon mass plots? /////////
-	/////// pT distribution plots? ////////
-	/////// mass vs pT, vs rap, vs mean pT, vs mean rap ///////
-
 	// set branches
 	intree->SetBranchAddress("lepP", &lepP);
 	intree->SetBranchAddress("lepN", &lepN);
@@ -206,7 +201,8 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 	RooRealVar *bkgLambda = ws->var("bkgLambda");
 	RooRealVar *CBalpha = ws->var("CBalpha");
 	RooRealVar *CBn = ws->var("CBn");
-	RooRealVar* ct = ws->var("Jpsict");
+	RooRealVar *ct = ws->var("Jpsict");
+	RooRealVar *cterr = ws->var("JpsictErr");
 
 	// pdf
 	RooAbsPdf *bkgMass = (RooAbsPdf*)ws->pdf("bkgMassShape");
@@ -234,8 +230,8 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 	std::cout << "-------------------------------------------------------------\n" <<
 		"left  sideband: mass window " << massMinL  << " < M < " << massMaxL  << " GeV\n" <<
 		"right sideband: mass window " << massMinR  << " < M < " << massMaxR  << " GeV\n" <<
-		"signal  region: mass window " << massMaxL  << " < M < " << massMinR  << " GeV\n" <<
-		//"signal  region: mass window " << massMinSR << " < M < " << massMaxSR << " GeV\n" <<
+		//"signal  region: mass window " << massMaxL  << " < M < " << massMinR  << " GeV\n" <<
+		"signal  region: mass window " << massMinSR  << " < M < " << massMaxSR  << " GeV\n" <<
 		"-------------------------------------------------------------\n" << std::endl;
 
 	// LIFETIME FIT
@@ -243,10 +239,10 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 	std::stringstream dataBin, data, cutSR;
 	dataBin << "data_rap" << rapBin << "_pt" << ptBin << "_SR";
 	data    << "data_rap" << rapBin << "_pt" << ptBin;
-	//cutSR   << "JpsiMass > "<<massMinSR<<" && JpsiMass < "<<massMaxSR;
-	cutSR   << "JpsiMass > "<<massMaxL<<" && JpsiMass < "<<massMinR;
+	//cutSR   << "JpsiMass > "<<massMaxL<<" && JpsiMass < "<<massMinR;
+	cutSR   << "JpsiMass > " << massMinSR << " && JpsiMass < " << massMaxSR;
 
-	RooAbsData* Data    = ws->data(   data.str().c_str());
+	RooAbsData* Data    = ws->data(data.str().c_str());
 	RooDataSet *binData = (RooDataSet*)Data->reduce(
 			Cut(cutSR.str().c_str()),
 			Name(dataBin.str().c_str()),
@@ -259,11 +255,11 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 	ws->loadSnapshot(snapshotname.str().c_str());
 
 	// get parameters for calculating fraction of left sideband
-	RooRealVar *mean_ws=(RooRealVar*)ws->var("MeanSR");
+	RooRealVar *mean_ws = (RooRealVar*)ws->var("MeanSR");
 	double mean = mean_ws->getVal();
-	RooRealVar *mean_LSB_ws=(RooRealVar*)ws->var("MeanSBL");
+	RooRealVar *mean_LSB_ws = (RooRealVar*)ws->var("MeanSBL");
 	double mean_LSB = mean_LSB_ws->getVal();
-	RooRealVar *mean_RSB_ws=(RooRealVar*)ws->var("MeanSBR");
+	RooRealVar *mean_RSB_ws = (RooRealVar*)ws->var("MeanSBR");
 	double mean_RSB = mean_RSB_ws->getVal();
 	double fracLSB = 1 - (mean - mean_LSB)/(mean_RSB - mean_LSB);
 
@@ -300,19 +296,18 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 	else
 		NumEvt = maxEvt;
 
-	RooRealVar Jpsict(*ws->var("Jpsict"));
-	RooRealVar JpsictErr(*ws->var("JpsictErr"));
-	RooDataSet *dataJpsictErr = (RooDataSet*)Data->reduce(SelectVars(RooArgSet(JpsictErr)),
+	RooDataSet *dataJpsictErr = (RooDataSet*)Data->reduce(SelectVars(RooArgSet(*cterr)),
 			EventRange(0,NumEvt),Name("dataJpsictErr"));
 
 	double meanPt = getMeanPt(rapBin,ptBin,infilename.c_str());
+
 	// define sigma of prompt p.d.f., got from fit the trend
 	//define function y = a + b * pT
 	double a = 0.073, b = 0.0027;
 	//proper decay length
 	double L_decay = a + b * meanPt;
 	//pseudo-proper decay length
-	double l_pdecay =0., scale = 0.;
+	double l_pdecay = 0., scale = 0.;
 	if(nState==4) l_pdecay = L_decay * mass / meanPt ;
 	if(nState==5) {
 		if(rapBin == 1) scale = 1.21; //1.20
@@ -320,12 +315,12 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 		if(rapBin ==3) scale = 1.31;  //1.43
 		l_pdecay = scale * L_decay * 3.092 / meanPt ;
 	}
-	std::cout<<"l_pdecay: "<<l_pdecay<<std::endl;
+	std::cout << "l_pdecay: " << l_pdecay << std::endl;
 
 	double nSigma = 0.;
 	if(nState==4) nSigma = 2.5;
 	if(nState==5) nSigma = 2.0;
-	cout<<"nSigma: "<<nSigma<<endl;
+	std::cout << "nSigma: " << nSigma << std::endl;
 
 	double ctauCut = nSigma*l_pdecay;
 	double ctCutMinPR = -ctauCut, ctCutMaxPR = ctauCut;
@@ -333,13 +328,9 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 
 	// calculate fractions in prompt signal region
 	vector<double> InteRltsPR = calculateInte(ws,dataJpsictErr,ctCutMinPR,ctCutMaxPR);
-	double IntePRinPR = InteRltsPR[0];
-	double InteNPinPR = InteRltsPR[1];
-	double InteBGinPR = InteRltsPR[2];
-
-	double fPinP  = IntePRinPR;
-	double fNPinP = InteNPinPR;
-	double fBGinP = InteBGinPR;
+	double fPinP  = InteRltsPR[0];
+	double fNPinP = InteRltsPR[1];
+	double fBGinP = InteRltsPR[2];
 
 	std::cout << "-------------------------------------------------------------\n" <<
 		"ctau cut at " << ctauCut << "\n" <<
@@ -351,143 +342,153 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 	//------------------------------------------------------------------------------------------------
 	// calculate fractions in non prompt signal region
 	vector<double> InteRltsNP = calculateInte(ws,dataJpsictErr,ctCutMinNP,ctCutMaxNP);
-	double IntePRinNP = InteRltsNP[0];
-	double InteNPinNP = InteRltsNP[1];
-	double InteBGinNP = InteRltsNP[2];
+	double fPbkg  = InteRltsNP[0];
+	double fNPbkg = InteRltsNP[1];
+	double fBGbkg = InteRltsNP[2];
 
-	double fPbkg = IntePRinNP;
-	double fNPbkg = InteNPinNP;
-	double fBGbkg = InteBGinNP;
+	double fBGinNP = 0;  // comb. background fraction in high ctau signal region
+	double fP      = 0;  // prompt fraction in prompt signal region
+	double fNPB    = 0;  // non prompt background events in prompt region
+	double fBGsig  = 0;  // background in prompt signal region
+	double fTBGsig = 0;  // total background fraction
 
-	double fBGinNP = fBGbkg*fBkg/(fBGbkg*fBkg + fNPbkg*fNP1 + fPbkg*fP1);  // comb. background fraction in high ctau signal region
-	double fP      =   fPinP*fP1/(fNPinP*fNP1 + fPinP*fP1 + fBGinP*fBkg);  // prompt fraction in prompt signal region
-	double fNPB    = fNPinP*fNP1/(fNPinP*fNP1 + fPinP*fP1 + fBGinP*fBkg);  // non prompt background events in prompt region
-	double fBGsig  = fBGinP*fBkg/(fNPinP*fNP1 + fPinP*fP1 + fBGinP*fBkg);  // background in prompt signal region
-	double fTBGsig =  fNPB + fBGsig;
+	// for MC set fractions to 0.001 except prompt fraction
+	if(MC || PolLSB || PolRSB){
+		fBGinNP = 0.001;
+		fP      = 0.999;
+		fNPB    = 0.001;
+		fBGsig  = 0.001;
+		fTBGsig = 0.001;
+	}
+	// use real fractions for data
+	else{
+		fBGinNP = fBGbkg*fBkg/(fBGbkg*fBkg + fNPbkg*fNP1 + fPbkg*fP1);
+		fP      =   fPinP*fP1/(fNPinP*fNP1 + fPinP*fP1 + fBGinP*fBkg);
+		fNPB    = fNPinP*fNP1/(fNPinP*fNP1 + fPinP*fP1 + fBGinP*fBkg);
+		fBGsig  = fBGinP*fBkg/(fNPinP*fNP1 + fPinP*fP1 + fBGinP*fBkg);
+		fTBGsig =  fNPB + fBGsig;
+		// in case of measuring non prompt polarization
+		if(PolNP){
+			fTBGsig = fBGinNP;
+		}
+	}
 
 	//------------------------------------------------------------------------------------------------
 	// evaluate error on non-prompt fraction
-	double fPerr=0., fNPerr=0., fBGerr=0.;
+	double fPerr = 0., fNPerr = 0., fBGerr = 0.;
+	if(!MC && !PolLSB && !PolRSB && !PolNP){
+		if(doCtauUncer){
+			int nEvents = 200;
+			if(nState==4) nEvents = 100;
+			double promptFrac = 0, nonpromptFrac = 0, bkgFrac = 0;
 
-	if(doCtauUncer){
-		int nEvents = 200;
-		if(nState==4) nEvents = 100;
-		double promptFrac = 0, nonpromptFrac = 0, bkgFrac = 0;
+			RooRealVar* bkgTauDSD = (RooRealVar*)ws->var("bkgTauDSD");
+			RooRealVar* bkgTauFD = (RooRealVar*)ws->var("bkgTauFD");
+			RooRealVar* bkgTauSSD_SBL = (RooRealVar*)ws->var("bkgTauSSD_SBL");
+			RooRealVar* bkgTauSSD_SBR = (RooRealVar*)ws->var("bkgTauSSD_SBR");
+			RooRealVar* fBkgDSD_SBL = (RooRealVar*)ws->var("fBkgDSD_SBL");
+			RooRealVar* fBkgDSD_SBR = (RooRealVar*)ws->var("fBkgDSD_SBR");
+			RooRealVar* fBkgSSDR_SBL = (RooRealVar*)ws->var("fBkgSSDR_SBL");
+			RooRealVar* fBkgSSDR_SBR = (RooRealVar*)ws->var("fBkgSSDR_SBR");
+			RooRealVar* fPrompt = (RooRealVar*)ws->var("fPrompt");
+			RooRealVar* fBKG = (RooRealVar*)ws->var("fBkg");
+			RooRealVar* fracGauss2 = (RooRealVar*)ws->var("fracGauss2");
+			RooRealVar* nonPromptTau = (RooRealVar*)ws->var("nonPromptTau");
+			RooArgSet *paraVars = new RooArgSet(*bkgTauDSD,*bkgTauFD,*bkgTauSSD_SBL,*bkgTauSSD_SBR,
+					*fBkgDSD_SBL,*fBkgDSD_SBR, *fBkgSSDR_SBL,*fBkgSSDR_SBR,
+					*nonPromptTau);
+			paraVars->add(RooArgSet(*fPrompt,*fBKG,*fracGauss2));
 
-		RooRealVar* bkgTauDSD = (RooRealVar*)ws->var("bkgTauDSD");
-		RooRealVar* bkgTauFD = (RooRealVar*)ws->var("bkgTauFD");
-		RooRealVar* bkgTauSSD_SBL = (RooRealVar*)ws->var("bkgTauSSD_SBL");
-		RooRealVar* bkgTauSSD_SBR = (RooRealVar*)ws->var("bkgTauSSD_SBR");
-		RooRealVar* fBkgDSD_SBL = (RooRealVar*)ws->var("fBkgDSD_SBL");
-		RooRealVar* fBkgDSD_SBR = (RooRealVar*)ws->var("fBkgDSD_SBR");
-		RooRealVar* fBkgSSDR_SBL = (RooRealVar*)ws->var("fBkgSSDR_SBL");
-		RooRealVar* fBkgSSDR_SBR = (RooRealVar*)ws->var("fBkgSSDR_SBR");
-		RooRealVar* fPrompt = (RooRealVar*)ws->var("fPrompt");
-		RooRealVar* fBKG = (RooRealVar*)ws->var("fBkg");
-		RooRealVar* fracGauss2 = (RooRealVar*)ws->var("fracGauss2");
-		RooRealVar* nonPromptTau = (RooRealVar*)ws->var("nonPromptTau");
-		RooArgSet *paraVars = new RooArgSet(*bkgTauDSD,*bkgTauFD,*bkgTauSSD_SBL,*bkgTauSSD_SBR,
-				*fBkgDSD_SBL,*fBkgDSD_SBR, *fBkgSSDR_SBL,*fBkgSSDR_SBR,
-				*nonPromptTau);
-		paraVars->add(RooArgSet(*fPrompt,*fBKG,*fracGauss2));
+			// create Hesse pdf and generate dataset
+			RooAbsPdf *multiVarPdf = (RooAbsPdf*)result->createHessePdf(*paraVars);
+			RooDataSet *multiVarData = (RooDataSet*)multiVarPdf->generate(*paraVars,nEvents);
 
-		// create Hesse pdf and generate dataset
-		RooAbsPdf *multiVarPdf = (RooAbsPdf*)result->createHessePdf(*paraVars);
-		RooDataSet *multiVarData = (RooDataSet*)multiVarPdf->generate(*paraVars,nEvents);
+			TH1D* histPFracDist = new TH1D();
+			TH1D* histNPFracDist = new TH1D();
+			TH1D* histBGFracDist = new TH1D();
 
-		TH1D* histPFracDist = new TH1D();
-		TH1D* histNPFracDist = new TH1D();
-		TH1D* histBGFracDist = new TH1D();
+			double IntePR=0., InteNP=0., InteBG=0.;
+			double fracP1=0., fracNP1=0., fracBkg=0.;
+			for(int n = 0; n < nEvents; n++) {
+				if(n%40==0) std::cout << (double)n/nEvents*100 << "%" << std::endl;
+				RooArgSet* args = (RooArgSet*)multiVarData->get(n);
 
-		double IntePR=0., InteNP=0., InteBG=0.;
-		double fracP1=0., fracNP1=0., fracBkg=0.;
-		for(int n = 0; n < nEvents; n++) {
-			if(n%40==0) std::cout << (double)n/nEvents*100 << "%" << std::endl;
-			RooArgSet* args = (RooArgSet*)multiVarData->get(n);
+				double bkgTauFD_ = ((RooRealVar*)args->find("bkgTauFD"))->getVal();
+				ws->var("bkgTauFD")->setVal(bkgTauFD_);
+				double bkgTauSSD_SBL_ = ((RooRealVar*)args->find("bkgTauSSD_SBL"))->getVal();
+				ws->var("bkgTauSSD_SBL")->setVal(bkgTauSSD_SBL_);
+				double bkgTauSSD_SBR_ = ((RooRealVar*)args->find("bkgTauSSD_SBR"))->getVal();
+				ws->var("bkgTauSSD_SBR")->setVal(bkgTauSSD_SBR_);
+				double fBkgDSD_SBL_ = ((RooRealVar*)args->find("fBkgDSD_SBL"))->getVal();
+				ws->var("fBkgDSD_SBL")->setVal(fBkgDSD_SBL_);
+				double fBkgDSD_SBR_ = ((RooRealVar*)args->find("fBkgDSD_SBR"))->getVal();
+				ws->var("fBkgDSD_SBR")->setVal(fBkgDSD_SBR_);
+				if(!(nState==4 && ptBin > 7)){
+					double fBkgSSDR_SBL_ = ((RooRealVar*)args->find("fBkgSSDR_SBL"))->getVal();
+					ws->var("fBkgSSDR_SBL")->setVal(fBkgSSDR_SBL_);
+					double fBkgSSDR_SBR_ = ((RooRealVar*)args->find("fBkgSSDR_SBR"))->getVal();
+					ws->var("fBkgSSDR_SBR")->setVal(fBkgSSDR_SBR_);
+				}
+				double fPrompt_ = ((RooRealVar*)args->find("fPrompt"))->getVal();
+				ws->var("fPrompt")->setVal(fPrompt_);
+				double fBkg_ = ((RooRealVar*)args->find("fBkg"))->getVal();
+				ws->var("fBkg")->setVal(fBkg_);
+				double nonPromptTau_ = ((RooRealVar*)args->find("nonPromptTau"))->getVal();
+				ws->var("nonPromptTau")->setVal(nonPromptTau_);
+				double bkgTauDSD_ = ((RooRealVar*)args->find("bkgTauDSD"))->getVal();
+				ws->var("bkgTauDSD")->setVal(bkgTauDSD_);
+				double fracGauss2_ = ((RooRealVar*)args->find("fracGauss2"))->getVal();
+				ws->var("fracGauss2")->setVal(fracGauss2_);
 
-			double bkgTauFD_ = ((RooRealVar*)args->find("bkgTauFD"))->getVal();
-			ws->var("bkgTauFD")->setVal(bkgTauFD_);
-			double bkgTauSSD_SBL_ = ((RooRealVar*)args->find("bkgTauSSD_SBL"))->getVal();
-			ws->var("bkgTauSSD_SBL")->setVal(bkgTauSSD_SBL_);
-			double bkgTauSSD_SBR_ = ((RooRealVar*)args->find("bkgTauSSD_SBR"))->getVal();
-			ws->var("bkgTauSSD_SBR")->setVal(bkgTauSSD_SBR_);
-			double fBkgDSD_SBL_ = ((RooRealVar*)args->find("fBkgDSD_SBL"))->getVal();
-			ws->var("fBkgDSD_SBL")->setVal(fBkgDSD_SBL_);
-			double fBkgDSD_SBR_ = ((RooRealVar*)args->find("fBkgDSD_SBR"))->getVal();
-			ws->var("fBkgDSD_SBR")->setVal(fBkgDSD_SBR_);
-			if(!(nState==4 && ptBin > 7)){
-				double fBkgSSDR_SBL_ = ((RooRealVar*)args->find("fBkgSSDR_SBL"))->getVal();
-				ws->var("fBkgSSDR_SBL")->setVal(fBkgSSDR_SBL_);
-				double fBkgSSDR_SBR_ = ((RooRealVar*)args->find("fBkgSSDR_SBR"))->getVal();
-				ws->var("fBkgSSDR_SBR")->setVal(fBkgSSDR_SBR_);
+				fracP1 = fPrompt_; fracBkg = fBkg_; fracNP1 =  1.-fracP1-fracBkg;
+				vector<double> InteRltsTemp = calculateInte(ws,dataJpsictErr,ctCutMinPR,ctCutMaxPR);
+				IntePR    = InteRltsTemp[0];
+				InteNP    = InteRltsTemp[1];
+				InteBG    = InteRltsTemp[2];
+
+				promptFrac    = IntePR * fracP1;
+				nonpromptFrac = InteNP * fracNP1;
+				bkgFrac       = InteBG * fracBkg;
+
+				histPFracDist->Fill(promptFrac);
+				histNPFracDist->Fill(nonpromptFrac);
+				histBGFracDist->Fill(bkgFrac);
 			}
-			double fPrompt_ = ((RooRealVar*)args->find("fPrompt"))->getVal();
-			ws->var("fPrompt")->setVal(fPrompt_);
-			double fBkg_ = ((RooRealVar*)args->find("fBkg"))->getVal();
-			ws->var("fBkg")->setVal(fBkg_);
-			double nonPromptTau_ = ((RooRealVar*)args->find("nonPromptTau"))->getVal();
-			ws->var("nonPromptTau")->setVal(nonPromptTau_);
-			double bkgTauDSD_ = ((RooRealVar*)args->find("bkgTauDSD"))->getVal();
-			ws->var("bkgTauDSD")->setVal(bkgTauDSD_);
-			double fracGauss2_ = ((RooRealVar*)args->find("fracGauss2"))->getVal();
-			ws->var("fracGauss2")->setVal(fracGauss2_);
 
-			fracP1 = fPrompt_; fracBkg = fBkg_; fracNP1 =  1.-fracP1-fracBkg;
-			vector<double> InteRltsTemp = calculateInte(ws,dataJpsictErr,ctCutMinPR,ctCutMaxPR);
-			IntePR    = InteRltsTemp[0];
-			InteNP    = InteRltsTemp[1];
-			InteBG    = InteRltsTemp[2];
+			fPerr  = histPFracDist->GetRMS() /(fNPinP*fNP1 + fPinP*fP1 + fBGinP*fBkg);
+			fNPerr = histNPFracDist->GetRMS()/(fNPinP*fNP1 + fPinP*fP1 + fBGinP*fBkg);
+			fBGerr = histBGFracDist->GetRMS()/(fNPinP*fNP1 + fPinP*fP1 + fBGinP*fBkg);
+		} // doCtauUncer
+	} // if(!MC && ...)
 
-			promptFrac    = IntePR * fracP1;
-			nonpromptFrac = InteNP * fracNP1;
-			bkgFrac       = InteBG * fracBkg;
-
-			histPFracDist->Fill(promptFrac);
-			histNPFracDist->Fill(nonpromptFrac);
-			histBGFracDist->Fill(bkgFrac);
-		}
-
-		fPerr  = histPFracDist->GetRMS() /(fNPinP*fNP1 + fPinP*fP1 + fBGinP*fBkg);
-		fNPerr = histNPFracDist->GetRMS()/(fNPinP*fNP1 + fPinP*fP1 + fBGinP*fBkg);
-		fBGerr = histBGFracDist->GetRMS()/(fNPinP*fNP1 + fPinP*fP1 + fBGinP*fBkg);
-	}
+	// calculate error on total background fraction
 	double fTBGerr = TMath::Sqrt(TMath::Power(fNPerr,2) + TMath::Power(fBGerr,2));
 
 	output->cd();
+
 	//------------------------------------------------------------------------------------------------
 	// fill histogram with combinatorial background fraction
 	std::stringstream bkgname;
 	bkgname << ";;fraction of comb. BG in " << onia::nSigMass << "  sigma window, prompt region";
 	TH1D* hFracBG = new TH1D("comb_background_fraction", bkgname.str().c_str(), 1, 0., 1.);
-	if(MC == false && f_BG_zero == false){
-		hFracBG->SetBinContent(1, fBGsig);
-		hFracBG->SetBinError(1, fBGerr);
-	}
-	// for MC set background fraction to 0.001
-	if(MC == true || f_BG_zero == true)  hFracBG->SetBinContent(1, 0.001);
+	hFracBG->SetBinContent(1, fBGsig);
+	hFracBG->SetBinError(1, fBGerr);
 	hFracBG->Write();
 
 	// fill histogram with non prompt background fraction
 	std::stringstream NPbkgname;
 	NPbkgname << ";;fraction of non prompt BG in " << onia::nSigMass << "  sigma window, prompt region";
 	TH1D* hFracNPBG = new TH1D("nonprompt_background_fraction", NPbkgname.str().c_str(), 1, 0., 1.);
-	if(MC == false && f_BG_zero == false){
-		hFracNPBG->SetBinContent(1, fNPB);
-		hFracNPBG->SetBinError(1, fNPerr);
-	}
-	// for MC set background fraction to 0.001
-	if(MC == true || f_BG_zero == true)  hFracNPBG->SetBinContent(1, 0.001);
+	hFracNPBG->SetBinContent(1, fNPB);
+	hFracNPBG->SetBinError(1, fNPerr);
 	hFracNPBG->Write();
 
 	// fill histogram with total background fraction
 	std::stringstream tbkgname;
 	tbkgname << ";;fraction of total BG in " << onia::nSigMass << "  sigma window, prompt region";
 	TH1D* hFracTBG = new TH1D("background_fraction", tbkgname.str().c_str(), 1, 0., 1.);
-	if(MC == false && f_BG_zero == false){
-		hFracTBG->SetBinContent(1, fTBGsig);
-		hFracTBG->SetBinError(1, fTBGerr);
-	}
-	if(MC == true || f_BG_zero == true)  hFracTBG->SetBinContent(1, 0.001);
+	hFracTBG->SetBinContent(1, fTBGsig);
+	hFracTBG->SetBinError(1, fTBGerr);
 	hFracTBG->Write();
 
 	// fill histogram with prompt fraction
@@ -507,19 +508,25 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 	std::stringstream evtSRname;
 	evtSRname << ";;events in " << onia::nSigMass << "  sigma window";
 	TH1D* hEvtSR = new TH1D("events_SR", evtSRname.str().c_str(), 3, 0., 3.);
-	hEvtSR->SetBinContent(1, nP);
-	hEvtSR->SetBinContent(2, nNP);
-	hEvtSR->SetBinContent(3, nBG);
-	hEvtSR->Write();
+	// fill histogram only for data
+	if(!MC){
+		hEvtSR->SetBinContent(1, nP);
+		hEvtSR->SetBinContent(2, nNP);
+		hEvtSR->SetBinContent(3, nBG);
+		hEvtSR->Write();
+	}
 
 	// fill histogram with events in prompt signal region
 	std::stringstream evtPSRname;
 	evtPSRname << ";;events in " << onia::nSigMass << "  sigma window and low ctau region";
 	TH1D* hEvtPSR = new TH1D("events_promptSR", evtPSRname.str().c_str(), 3, 0., 3.);
-	hEvtPSR->SetBinContent(1, fPinP*nP);
-	hEvtPSR->SetBinContent(2, fNPinP*nNP);
-	hEvtPSR->SetBinContent(3, fBGinP*nBG);
-	hEvtPSR->Write();
+	// fill histogram only for data
+	if(!MC){
+		hEvtPSR->SetBinContent(1, fPinP*nP);
+		hEvtPSR->SetBinContent(2, fNPinP*nNP);
+		hEvtPSR->SetBinContent(3, fBGinP*nBG);
+		hEvtPSR->Write();
+	}
 
 	// fill histogram with weighted sigma
 	TH1D* hsigma = new TH1D("weighted_sigma", ";;weighted #sigma", 1, 0, 1);
@@ -562,101 +569,204 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 	// loop through tree, fill background histos and save data in pt and y bins
 	int index = -1;
 	int n = intree->GetEntries();
+	int MCevents = 0;
 
 	//// for 1S, rap1,pt 1 2 3 4; rap2,pt 1 2 3 4, not use the full statistics
-	//if(nState==4 && ((rapBin==1 && ptBin<5)||(rapBin==2 && ptBin<5))) 
-	//	n = n / (6-ptBin);
+	//if(nState==4 && ((rapBin==1 && ptBin<5)||(rapBin==2 && ptBin<5)))
+	//  n = n / (6-ptBin);
 
 	for(int i = 0; i < n; i++){
 
-		Long64_t iEntry = intree->LoadTree(i);
+		long iEntry = intree->LoadTree(i);
 		intree->GetEntry(iEntry);
 		if(i % 100000 == 0) {std::cout << "entry " << i << " out of " << n << std::endl;}
 
-		if(jpsi->Pt() >= onia::pTRange[rapBin-1][ptBin-1] && 
-				jpsi->Pt() < onia::pTRange[rapBin-1][ptBin] && 
+		// ------------------------- TLorentzVecotrs -------------------------
+		if(jpsi->Pt() >= onia::pTRange[rapBin-1][ptBin-1] &&
+				jpsi->Pt() < onia::pTRange[rapBin-1][ptBin] &&
 				TMath::Abs(jpsi->Rapidity()) >= onia::rapForPTRange[rapBin-1] && 
 				TMath::Abs(jpsi->Rapidity()) < onia::rapForPTRange[rapBin]){
 
-			//store TLorenzVectors of the two muons in the given pT and rap cell
+			//store TLorentzVectors of the two muons in the given pT and rap cell
+			// left sideband
+			if(PolLSB){
+				if(jpsi->M() >= massMinL && jpsi->M() < massMaxL && TMath::Abs(jpsict) < ctauCut){
+					outtree->Fill();
+					pT_PSR->Fill(jpsi->Pt());
+					rap_PSR->Fill(TMath::Abs(jpsi->Rapidity()));
+				}
+			} // PolLSB
+			// right sideband
+			else if(PolRSB){
+				if(jpsi->M() >= massMinR && jpsi->M() <= massMaxR && TMath::Abs(jpsict) < ctauCut){
+					outtree->Fill();
+					pT_PSR->Fill(jpsi->Pt());
+					rap_PSR->Fill(TMath::Abs(jpsi->Rapidity()));
+				}
+			} // PolRSB
+			// for non prompt data
+			else if(PolNP){
+				if(jpsi->M() >= massMinSR && jpsi->M() < massMaxSR && TMath::Abs(jpsict) > ctauCut){
+					outtree->Fill();
+					pT_PSR->Fill(jpsi->Pt());
+					rap_PSR->Fill(TMath::Abs(jpsi->Rapidity()));
+				}
+			} // PolNP
+			// for prompt data and MC
 			//store only events from signal region
-			if(jpsi->M() >= massMaxL && jpsi->M() < massMinR && TMath::Abs(jpsict) < ctauCut){
-				outtree->Fill();
-				pT_PSR->Fill(jpsi->Pt());
-				rap_PSR->Fill(TMath::Abs(jpsi->Rapidity()));
-			}
+			else{
+				if(jpsi->M() >= massMinSR && jpsi->M() < massMaxSR && TMath::Abs(jpsict) < ctauCut){
+					outtree->Fill();
+					pT_PSR->Fill(jpsi->Pt());
+					rap_PSR->Fill(TMath::Abs(jpsi->Rapidity()));
+					if(MC) MCevents++;
+				}
+			} // else
 
-			// store cosTheta and phi distributions of the background
-			// events gets index 0 if it is in the left sideband and 1 if it is in the right one
-			// events with index 2 are from the high ctau non prompt region
-			// events with index 3 and 4 are from the high ctau region from left and right sideband
-			if(jpsi->M() >= massMinL && jpsi->M() < massMaxL && TMath::Abs(jpsict) < ctauCut){
-				index = 0;
-				hBG_pTRapMass_L->Fill(jpsi->Pt(), TMath::Abs(jpsi->Rapidity()), funcBG->GetRandom(massMaxL, massMinR));
+			//---------------------------- mass histograms for background model ------------------------------
+			// for MC: fill mass histograms with random mass from signal region
+			// fill rapidity and pT histograms with all events
+			if(MC || PolLSB || PolRSB){
 				pT_L->Fill(jpsi->Pt());
-				rap_L->Fill(TMath::Abs(jpsi->Rapidity()));
-			}
-			else if(jpsi->M() >= massMinR && jpsi->M() < massMaxR && TMath::Abs(jpsict) < ctauCut){
-				index = 1;
-				hBG_pTRapMass_R->Fill(jpsi->Pt(), TMath::Abs(jpsi->Rapidity()), funcBG->GetRandom(massMaxL, massMinR));
 				pT_R->Fill(jpsi->Pt());
-				rap_R->Fill(TMath::Abs(jpsi->Rapidity()));
-			}
-			else if(jpsi->M() >= massMaxL && jpsi->M() < massMinR && jpsict >= ctCutMinNP){
-				index = 2;
-				hNP_pTRapMass->Fill(jpsi->Pt(), TMath::Abs(jpsi->Rapidity()), funcSig->GetRandom(massMaxL, massMinR));
-				pT_NP->Fill(jpsi->Pt());
-				rap_NP->Fill(TMath::Abs(jpsi->Rapidity()));
-			}
-			else if(jpsi->M() >= massMinL && jpsi->M() < massMaxL && jpsict >= ctCutMinNP){
-				index = 3;
-				hBG_pTRapMass_highct_L->Fill(jpsi->Pt(), TMath::Abs(jpsi->Rapidity()), funcSig->GetRandom(massMaxL, massMinR));
 				pT_highct_L->Fill(jpsi->Pt());
-				rap_highct_L->Fill(TMath::Abs(jpsi->Rapidity()));
-			}
-			else if(jpsi->M() >= massMinR && jpsi->M() < massMaxR && jpsict >= ctCutMinNP){
-				index = 4;
-				hBG_pTRapMass_highct_R->Fill(jpsi->Pt(), TMath::Abs(jpsi->Rapidity()), funcSig->GetRandom(massMaxL, massMinR));
 				pT_highct_R->Fill(jpsi->Pt());
+				pT_NP->Fill(jpsi->Pt());
+				rap_L->Fill(TMath::Abs(jpsi->Rapidity()));
+				rap_R->Fill(TMath::Abs(jpsi->Rapidity()));
+				rap_highct_L->Fill(TMath::Abs(jpsi->Rapidity()));
 				rap_highct_R->Fill(TMath::Abs(jpsi->Rapidity()));
-			}
-			else continue;
+				rap_NP->Fill(TMath::Abs(jpsi->Rapidity()));
+
+				if(MC){
+					hNP_pTRapMass->Fill(jpsi->Pt(), TMath::Abs(jpsi->Rapidity()), gRandom->Uniform(massMinSR, massMaxSR));
+					// split events up to fill in left and right background histograms
+					// not all events are filled to be able to put together background histogram
+					if(i%3==0){
+						hBG_pTRapMass_L->Fill(jpsi->Pt(), TMath::Abs(jpsi->Rapidity()), gRandom->Uniform(massMinSR, massMaxSR));
+						hBG_pTRapMass_highct_L->Fill(jpsi->Pt(), TMath::Abs(jpsi->Rapidity()), gRandom->Uniform(massMinSR, massMaxSR));
+					}
+					else if(i%5==0){
+						hBG_pTRapMass_R->Fill(jpsi->Pt(), TMath::Abs(jpsi->Rapidity()), gRandom->Uniform(massMinSR, massMaxSR));
+						hBG_pTRapMass_highct_R->Fill(jpsi->Pt(), TMath::Abs(jpsi->Rapidity()), gRandom->Uniform(massMinSR, massMaxSR));
+					}
+				}
+
+				else if(PolLSB){
+					hNP_pTRapMass->Fill(jpsi->Pt(), TMath::Abs(jpsi->Rapidity()), gRandom->Uniform(massMinL, massMaxL));
+					if(i%3==0){
+						hBG_pTRapMass_L->Fill(jpsi->Pt(), TMath::Abs(jpsi->Rapidity()), gRandom->Uniform(massMinL, massMaxL));
+						hBG_pTRapMass_highct_L->Fill(jpsi->Pt(), TMath::Abs(jpsi->Rapidity()), gRandom->Uniform(massMinL, massMaxL));
+					}
+					else if(i%5==0){
+						hBG_pTRapMass_R->Fill(jpsi->Pt(), TMath::Abs(jpsi->Rapidity()), gRandom->Uniform(massMinL, massMaxL));
+						hBG_pTRapMass_highct_R->Fill(jpsi->Pt(), TMath::Abs(jpsi->Rapidity()), gRandom->Uniform(massMinL, massMaxL));
+					}
+				}
+
+				else if(PolRSB){
+					hNP_pTRapMass->Fill(jpsi->Pt(), TMath::Abs(jpsi->Rapidity()), gRandom->Uniform(massMinR, massMaxR));
+					if(i%3==0){
+						hBG_pTRapMass_L->Fill(jpsi->Pt(), TMath::Abs(jpsi->Rapidity()), gRandom->Uniform(massMinR, massMaxR));
+						hBG_pTRapMass_highct_L->Fill(jpsi->Pt(), TMath::Abs(jpsi->Rapidity()), gRandom->Uniform(massMinR, massMaxR));
+					}
+					else if(i%5==0){
+						hBG_pTRapMass_R->Fill(jpsi->Pt(), TMath::Abs(jpsi->Rapidity()), gRandom->Uniform(massMinR, massMaxR));
+						hBG_pTRapMass_highct_R->Fill(jpsi->Pt(), TMath::Abs(jpsi->Rapidity()), gRandom->Uniform(massMinR, massMaxR));
+					}
+				}
+			} // if(MC || PolLSB || PolRSB)
+
+			else{
+				// store cosTheta and phi distributions of the background
+				// events gets index 0 if it is in the left sideband and 1 if it is in the right one
+				// events with index 2 are from the high ctau non prompt region
+				// events with index 3 and 4 are from the high ctau region from left and right sideband
+				if(jpsi->M() >= massMinL && jpsi->M() < massMaxL && TMath::Abs(jpsict) < ctauCut){
+					index = 0;
+					hBG_pTRapMass_L->Fill(jpsi->Pt(), TMath::Abs(jpsi->Rapidity()), funcBG->GetRandom(massMinSR, massMaxSR));
+					pT_L->Fill(jpsi->Pt());
+					rap_L->Fill(TMath::Abs(jpsi->Rapidity()));
+				}
+				else if(jpsi->M() >= massMinR && jpsi->M() < massMaxR && TMath::Abs(jpsict) < ctauCut){
+					index = 1;
+					hBG_pTRapMass_R->Fill(jpsi->Pt(), TMath::Abs(jpsi->Rapidity()), funcBG->GetRandom(massMinSR, massMaxSR));
+					pT_R->Fill(jpsi->Pt());
+					rap_R->Fill(TMath::Abs(jpsi->Rapidity()));
+				}
+				else if(jpsi->M() >= massMinSR && jpsi->M() < massMaxSR && jpsict >= ctauCut){
+					index = 2;
+					hNP_pTRapMass->Fill(jpsi->Pt(), TMath::Abs(jpsi->Rapidity()), funcSig->GetRandom(massMinSR, massMaxSR));
+					pT_NP->Fill(jpsi->Pt());
+					rap_NP->Fill(TMath::Abs(jpsi->Rapidity()));
+				}
+				else if(jpsi->M() >= massMinL && jpsi->M() < massMaxL && jpsict >= ctauCut){
+					index = 3;
+					if(PolNP)
+						hBG_pTRapMass_highct_L->Fill(jpsi->Pt(), TMath::Abs(jpsi->Rapidity()), funcBG->GetRandom(massMinSR, massMaxSR));
+					else
+						hBG_pTRapMass_highct_L->Fill(jpsi->Pt(), TMath::Abs(jpsi->Rapidity()), funcSig->GetRandom(massMinSR, massMaxSR));
+					pT_highct_L->Fill(jpsi->Pt());
+					rap_highct_L->Fill(TMath::Abs(jpsi->Rapidity()));
+				}
+				else if(jpsi->M() >= massMinR && jpsi->M() < massMaxR && jpsict >= ctauCut){
+					index = 4;
+					if(PolNP)
+						hBG_pTRapMass_highct_R->Fill(jpsi->Pt(), TMath::Abs(jpsi->Rapidity()), funcBG->GetRandom(massMinSR, massMaxSR));
+					else
+						hBG_pTRapMass_highct_R->Fill(jpsi->Pt(), TMath::Abs(jpsi->Rapidity()), funcSig->GetRandom(massMinSR, massMaxSR));
+					pT_highct_R->Fill(jpsi->Pt());
+					rap_highct_R->Fill(TMath::Abs(jpsi->Rapidity()));
+				}
+				else continue;
+			}// else (filling data histograms)
 
 			calcPol(*lepP, *lepN);
 
 			for(int iFrame = 0; iFrame < onia::kNbFrames; iFrame++){
-				if(MC == false){
-					if(index == 0) hBG_cosThetaPhiL[iFrame]->Fill(thisCosTh[iFrame], thisPhi[iFrame]);
-					if(index == 1) hBG_cosThetaPhiR[iFrame]->Fill(thisCosTh[iFrame], thisPhi[iFrame]);
-					if(index == 2) hNPBG_cosThetaPhi[iFrame]->Fill(thisCosTh[iFrame], thisPhi[iFrame]);
-					if(index == 3) hBGinNP_cosThetaPhiL[iFrame]->Fill(thisCosTh[iFrame], thisPhi[iFrame]);
-					if(index == 4) hBGinNP_cosThetaPhiR[iFrame]->Fill(thisCosTh[iFrame], thisPhi[iFrame]);
+				if(MC || PolLSB || PolRSB){
+					hNPBG_cosThetaPhi[iFrame]->Fill(thisCosTh[iFrame], thisPhi[iFrame]);
+					if(i%3==0){
+						hBG_cosThetaPhiL[iFrame]->Fill(thisCosTh[iFrame], thisPhi[iFrame]);
+						hBGinNP_cosThetaPhiL[iFrame]->Fill(thisCosTh[iFrame], thisPhi[iFrame]);
+					}
+					else if(i%5==0){
+						hBG_cosThetaPhiR[iFrame]->Fill(thisCosTh[iFrame], thisPhi[iFrame]);
+						hBGinNP_cosThetaPhiR[iFrame]->Fill(thisCosTh[iFrame], thisPhi[iFrame]);
+					}
 				}
+				// for data: fill histograms according to the different regions
 				else{
-					hBG_cosThetaPhiL[iFrame]->Fill(thisCosTh[iFrame], thisPhi[iFrame]);
-					hBG_cosThetaPhiR[iFrame]->Fill(thisCosTh[iFrame], thisPhi[iFrame]);
-					hBGinNP_cosThetaPhiL[iFrame]->Fill(thisCosTh[iFrame], thisPhi[iFrame]);
-					hBGinNP_cosThetaPhiR[iFrame]->Fill(thisCosTh[iFrame], thisPhi[iFrame]);
+					if(index == 0) hBG_cosThetaPhiL[iFrame]->Fill(thisCosTh[iFrame], thisPhi[iFrame]);
+					else if(index == 1) hBG_cosThetaPhiR[iFrame]->Fill(thisCosTh[iFrame], thisPhi[iFrame]);
+					else if(index == 2) hNPBG_cosThetaPhi[iFrame]->Fill(thisCosTh[iFrame], thisPhi[iFrame]);
+					else if(index == 3) hBGinNP_cosThetaPhiL[iFrame]->Fill(thisCosTh[iFrame], thisPhi[iFrame]);
+					else if(index == 4) hBGinNP_cosThetaPhiR[iFrame]->Fill(thisCosTh[iFrame], thisPhi[iFrame]);
 				}
-			} // iFrame
 
-			if(MC || f_BG_zero){
-				hBG_pTRapMass_L->Fill(jpsi->Pt(), TMath::Abs(jpsi->Rapidity()), gRandom->Uniform(massMinL, massMaxR));
-				hBG_pTRapMass_R->Fill(jpsi->Pt(), TMath::Abs(jpsi->Rapidity()), gRandom->Uniform(massMinL, massMaxR));
-				hBG_pTRapMass_highct_L->Fill(jpsi->Pt(), TMath::Abs(jpsi->Rapidity()), gRandom->Gaus(massMinL, massMaxR));
-				hBG_pTRapMass_highct_R->Fill(jpsi->Pt(), TMath::Abs(jpsi->Rapidity()), gRandom->Gaus(massMinL, massMaxR));
-			}
+			} // iFrame
 
 		} // if(onia...)
 	} // i
 
+	// fill histograms with number of events for MC
+	if(MC){
+		// number of events in signal region
+		hEvtSR->SetBinContent(1, fP*MCevents);
+		// number of events in prompt signal region (same as in signal region)
+		hEvtPSR->SetBinContent(1, fP*MCevents);
+		hEvtSR->Write();
+		hEvtPSR->Write();
+	}
+
 	//---------------- binning algorithm
 	int nBinsPhi = 16, nBinsCosth = 160;
 	int totalBins=0, filledBins=0;
-	for(int binCosth = 0; binCosth<hBGinNP_cosThetaPhiR[2]->GetNbinsX(); binCosth++){
-		for(int binPhi = 0; binPhi<hBGinNP_cosThetaPhiR[2]->GetNbinsY(); binPhi++){
+	for(int binCosth = 0; binCosth < hBGinNP_cosThetaPhiR[2]->GetNbinsX(); binCosth++){
+		for(int binPhi = 0; binPhi < hBGinNP_cosThetaPhiR[2]->GetNbinsY(); binPhi++){
 			totalBins++;
-			int binContent = hNPBG_cosThetaPhi[2]->GetBinContent(binCosth+1,binPhi+1);//Val: Use here the NP histo (same physical coverage, but better filled, no holes -> better estimate of coverage)
+			//use NP histo (same physical coverage, but better filled, no holes -> better estimate of coverage)
+			int binContent = hNPBG_cosThetaPhi[2]->GetBinContent(binCosth+1,binPhi+1);
 			if(binContent>0) filledBins++;
 		}
 	}
@@ -666,14 +776,20 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 	cout<<"nBinsPhi: "<<nBinsPhi<<endl;
 	cout<<"nBinsCosth: "<<nBinsCosth<<endl;
 
-	int IntBG = hBGinNP_cosThetaPhiR[2]->Integral(); 
-	if(IntBG > hBGinNP_cosThetaPhiL[2]->Integral())
+	// calculate the integral of the lowstatBG histo (calculate all integrals of the 4 BG regions, and use the one with the smallest integral)
+	int IntBG = hBGinNP_cosThetaPhiR[2]->Integral();
+	if(IntBG > hBGinNP_cosThetaPhiL[2]->Integral()){
 		IntBG = hBGinNP_cosThetaPhiL[2]->Integral();
-	if(IntBG > hBG_cosThetaPhiL[2]->Integral())
+		std::cout << "left high ct integral is smaller" << std::endl;
+	}
+	if(IntBG > hBG_cosThetaPhiL[2]->Integral()){
 		IntBG = hBG_cosThetaPhiL[2]->Integral();
-	if(IntBG > hBG_cosThetaPhiR[2]->Integral())
+		std::cout << "left low ct integral is smaller" << std::endl;
+	}
+	if(IntBG > hBG_cosThetaPhiR[2]->Integral()){
 		IntBG = hBG_cosThetaPhiR[2]->Integral();
-	//Val: calculate here the integral of the lowstatBG histo (calculate all integrals of the 4 BG regions, and use the one with the smallest integral). At the moment a few 1S RSB histos have N < 10. This will be solved by this change.
+		std::cout << "right low ct integral is smaller" << std::endl;
+	}
 
 	int IntNPBG = hNPBG_cosThetaPhi[2]->Integral();
 
@@ -682,8 +798,9 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 
 	bool binningDone=false;
 	//average events per-bin cell
-	double Naverge=0;
+	double Naverge = 0;
 	Naverge = (double)IntBG/((double)nBinsPhi*nBinsCosth*coverage/2.);
+	std::cout << "average cell coverage: " << Naverge << std::endl;
 	if(Naverge>10){
 		binningDone=true;
 	}
@@ -789,40 +906,49 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 
 	for(int i = 0; i < n; i++){
 
-		Long64_t iEntry = intree->LoadTree(i);
+		long iEntry = intree->LoadTree(i);
 		intree->GetEntry(iEntry);
 		if(i % 100000 == 0) {std::cout << "entry " << i << " out of " << n << std::endl;}
 
-		if(jpsi->Pt() >= onia::pTRange[rapBin-1][ptBin-1] 
-				&& jpsi->Pt() < onia::pTRange[rapBin-1][ptBin] &&
-				TMath::Abs(jpsi->Rapidity()) >= onia::rapForPTRange[rapBin-1] 
-				&& TMath::Abs(jpsi->Rapidity()) < onia::rapForPTRange[rapBin]){
-			if(jpsi->M() >= massMinL && jpsi->M() < massMaxL && TMath::Abs(jpsict) < ctauCut)
-				index = 0;
-			else if(jpsi->M() >= massMinR && jpsi->M() < massMaxR && TMath::Abs(jpsict) < ctauCut)
-				index = 1;
-			else if(jpsi->M() >= massMaxL && jpsi->M() < massMinR && jpsict >= ctCutMinNP)
-				index = 2;
-			else if(jpsi->M() >= massMinL && jpsi->M() < massMaxL && jpsict >= ctCutMinNP)
-				index = 3;
-			else if(jpsi->M() >= massMinR && jpsi->M() < massMaxR && jpsict >= ctCutMinNP)
-				index = 4;
-			else continue;
+		if(jpsi->Pt() >= onia::pTRange[rapBin-1][ptBin-1] &&
+				jpsi->Pt() < onia::pTRange[rapBin-1][ptBin] &&
+				TMath::Abs(jpsi->Rapidity()) >= onia::rapForPTRange[rapBin-1] &&
+				TMath::Abs(jpsi->Rapidity()) < onia::rapForPTRange[rapBin]){
+
+			if(!MC && !PolLSB && !PolRSB){
+				if(jpsi->M() >= massMinL && jpsi->M() < massMaxL && TMath::Abs(jpsict) < ctauCut)
+					index = 0;
+				else if(jpsi->M() >= massMinR && jpsi->M() <= massMaxR && TMath::Abs(jpsict) < ctauCut)
+					index = 1;
+				else if(jpsi->M() >= massMaxL && jpsi->M() < massMinR && jpsict >= ctauCut)
+					index = 2;
+				else if(jpsi->M() >= massMinL && jpsi->M() < massMaxL && jpsict >= ctauCut)
+					index = 3;
+				else if(jpsi->M() >= massMinR && jpsi->M() <= massMaxR && jpsict >= ctauCut)
+					index = 4;
+				else continue;
+			}
 
 			calcPol(*lepP, *lepN);
+
 			for(int iFrame = 0; iFrame < onia::kNbFrames; iFrame++){
-				if(MC == false){
+				if(MC || PolLSB || PolRSB){
+					hNPBG_cosThetaPhi[iFrame]->Fill(thisCosTh[iFrame], thisPhi[iFrame]);
+					if(i%3==0){
+						hBG_cosThetaPhiL[iFrame]->Fill(thisCosTh[iFrame], thisPhi[iFrame]);
+						hBGinNP_cosThetaPhiL[iFrame]->Fill(thisCosTh[iFrame], thisPhi[iFrame]);
+					}
+					if(i%5==0){
+						hBG_cosThetaPhiR[iFrame]->Fill(thisCosTh[iFrame], thisPhi[iFrame]);
+						hBGinNP_cosThetaPhiR[iFrame]->Fill(thisCosTh[iFrame], thisPhi[iFrame]);
+					}
+				}
+				else{
 					if(index == 0) hBG_cosThetaPhiL[iFrame]->Fill(thisCosTh[iFrame], thisPhi[iFrame]);
 					if(index == 1) hBG_cosThetaPhiR[iFrame]->Fill(thisCosTh[iFrame], thisPhi[iFrame]);
 					if(index == 2) hNPBG_cosThetaPhi[iFrame]->Fill(thisCosTh[iFrame], thisPhi[iFrame]);
 					if(index == 3) hBGinNP_cosThetaPhiL[iFrame]->Fill(thisCosTh[iFrame], thisPhi[iFrame]);
 					if(index == 4) hBGinNP_cosThetaPhiR[iFrame]->Fill(thisCosTh[iFrame], thisPhi[iFrame]);
-				}
-				else{
-					hBG_cosThetaPhiL[iFrame]->Fill(thisCosTh[iFrame], thisPhi[iFrame]);
-					hBG_cosThetaPhiR[iFrame]->Fill(thisCosTh[iFrame], thisPhi[iFrame]);
-					hBGinNP_cosThetaPhiL[iFrame]->Fill(thisCosTh[iFrame], thisPhi[iFrame]);
-					hBGinNP_cosThetaPhiR[iFrame]->Fill(thisCosTh[iFrame], thisPhi[iFrame]);
 				}
 			} // iFrame
 		} // if(onia...)
@@ -834,58 +960,91 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 	//----------------------------------------------------------------------------------------------------
 	// write background histos to file
 	// 3D (pT, |y|, M) histos
+	// add left and right sideband of low ctau region to combinatorial background histogram
 	hBG_pTRapMass_L->Write();
 	hBG_pTRapMass_R->Write();
-	hBG_pTRapMass_L->Scale(fracLSB/hBG_pTRapMass_L->Integral());
-	hBG_pTRapMass_R->Scale((1.-fracLSB)/hBG_pTRapMass_R->Integral());
+	hBG_pTRapMass_L->Scale(fracLSB/(1.*hBG_pTRapMass_L->Integral()));
+	hBG_pTRapMass_R->Scale((1.-fracLSB)/(1.*hBG_pTRapMass_R->Integral()));
 	std::string namepTrapMasslowct = "comb_background_pTrapMass";
 	TH3D* hBG_pTRapMass_lowct = (TH3D*) hBG_pTRapMass_L->Clone(namepTrapMasslowct.c_str());
 	hBG_pTRapMass_lowct->Add(hBG_pTRapMass_R);
 	hBG_pTRapMass_lowct->Write();
 
+	// add left and right sideband of high ctau region to combinatorial background histogram in high ctau region
 	hBG_pTRapMass_highct_L->Write();
 	hBG_pTRapMass_highct_R->Write();
-	hBG_pTRapMass_highct_L->Scale(fracLSB/hBG_pTRapMass_highct_L->Integral());
-	hBG_pTRapMass_highct_R->Scale((1.-fracLSB)/hBG_pTRapMass_highct_R->Integral());
+	hBG_pTRapMass_highct_L->Scale(fracLSB/(1.*hBG_pTRapMass_highct_L->Integral()));
+	hBG_pTRapMass_highct_R->Scale((1.-fracLSB)/(1.*hBG_pTRapMass_highct_R->Integral()));
 	std::string namepTrapMasshighct = "comb_background_highct_pTrapMass";
 	TH3D* hBG_pTRapMass_highct = (TH3D*) hBG_pTRapMass_highct_L->Clone(namepTrapMasshighct.c_str());
 	hBG_pTRapMass_highct->Add(hBG_pTRapMass_highct_R);
 	hBG_pTRapMass_highct->Write();
 
-	hNP_pTRapMass->Scale(1./hNP_pTRapMass->Integral());
-	hBG_pTRapMass_highct->Scale(fBGinNP/hBG_pTRapMass_highct->Integral());
+	// create non prompt background histogram in signal region: (hNP)_norm - fBGinNP * (hBG_highct)_norm
+	hNP_pTRapMass->Scale(1./(1.*hNP_pTRapMass->Integral()));
+	hNP_pTRapMass->Write();
+	hBG_pTRapMass_highct->Scale(fBGinNP/(1.*hBG_pTRapMass_highct->Integral()));
 	std::string namepTrapMassNPS = "NPS_highct_pTrapMass";
 	TH3D* hNPS_pTRapMass = (TH3D*) hNP_pTRapMass->Clone(namepTrapMassNPS.c_str());
-	hNPS_pTRapMass->Add(hBG_pTRapMass_highct, -1);
+	// subtraction (add -1) does not seem to work for 2D histograms
+	// do manual subtraction
+	int nx = hNPS_pTRapMass->GetXaxis()->GetNbins();
+	int ny = hNPS_pTRapMass->GetYaxis()->GetNbins();
+	int nz = hNPS_pTRapMass->GetZaxis()->GetNbins();
+	for (int j = 1; j <= nx; j++){
+		for (int k = 1; k <= ny; k++){
+			for(int l = 1; l <= nz; l++){
+				double c1 = hNPS_pTRapMass->GetBinContent(j,k,l);
+				if (c1 > 0) {
+					double c2 = hBG_pTRapMass_highct->GetBinContent(j,k,l);
+					double c3 = c1 - 1.*c2;
+					if(c3 < 0) c3 = 0;
+					hNPS_pTRapMass->SetBinContent(j,k,l,c3);
+				}
+			}
+		}
+	}
 	hNPS_pTRapMass->Write();
 
-	hBG_pTRapMass_lowct->Scale(fBGsig/hBG_pTRapMass_lowct->Integral());
-	hNPS_pTRapMass->Scale(fNPB/hNPS_pTRapMass->Integral());
+	// create total background
 	std::string namepTrapMass = "background_pTrapMass";
-	TH3D* hBG_pTRapMass = (TH3D*) hNPS_pTRapMass->Clone(namepTrapMass.c_str());
-	hBG_pTRapMass->Add(hBG_pTRapMass_lowct);
-	hBG_pTRapMass->Write();
+	TH3D* hBG_pTRapMass = new TH3D();
+	// for non prompt polarization: total background = high ct background
+	if(PolNP){
+		hBG_pTRapMass = (TH3D*) hBG_pTRapMass_highct->Clone(namepTrapMass.c_str());
+		hBG_pTRapMass->Write();
+	}
+	// add low ct background and non prompt background
+	else{
+		hNPS_pTRapMass->Scale(fNPB/(1.*hNPS_pTRapMass->Integral()));
+		hBG_pTRapMass = (TH3D*) hNPS_pTRapMass->Clone(namepTrapMass.c_str());
+		hBG_pTRapMass_lowct->Scale(fBGsig/(1.*hBG_pTRapMass_lowct->Integral()));
+		hBG_pTRapMass->Add(hBG_pTRapMass_lowct);
+		hBG_pTRapMass->Write();
+	}
 
+	double meanPT = 0;
 	// mean pT histos
-	pT_L->Scale(fracLSB/pT_L->Integral());
-	pT_R->Scale((1.-fracLSB)/pT_R->Integral());
+	pT_L->Scale(fracLSB/(1.*pT_L->Integral()));
+	pT_R->Scale((1.-fracLSB)/(1.*pT_R->Integral()));
 	pT_L->Add(pT_R);
 
-	pT_highct_L->Scale(fracLSB/pT_highct_L->Integral());
-	pT_highct_R->Scale((1.-fracLSB)/pT_highct_R->Integral());
+	pT_highct_L->Scale(fracLSB/(1.*pT_highct_L->Integral()));
+	pT_highct_R->Scale((1.-fracLSB)/(1.*pT_highct_R->Integral()));
 	pT_highct_L->Add(pT_highct_R);
 
-	pT_NP->Scale(1./pT_NP->Integral());
-	pT_highct_L->Scale(fBGinNP/pT_highct_L->Integral());
-	pT_NP->Add(pT_highct_L, -1);
+	pT_NP->Scale(1./(1.*pT_NP->Integral()));
+	pT_highct_L->Scale(fBGinNP/(1.*pT_highct_L->Integral()));
+	pT_NP->Add(pT_highct_L, -1.);
+	if(PolNP) meanPT = pT_NP->GetMean();
 
-	pT_L->Scale(fBGsig/pT_L->Integral());
-	pT_NP->Scale(fNPB/pT_NP->Integral());
+	pT_L->Scale(fBGsig/(1.*pT_L->Integral()));
+	pT_NP->Scale(fNPB/(1.*pT_NP->Integral()));
 	pT_L->Add(pT_NP);
 
-	pT_PSR->Scale(1./pT_PSR->Integral());
-	pT_PSR->Add(pT_L, -1);
-	double meanPT = pT_PSR->GetMean();
+	pT_PSR->Scale(1./(1.*pT_PSR->Integral()));
+	pT_PSR->Add(pT_L, -1.);
+	if(!PolNP) meanPT = pT_PSR->GetMean();
 
 	std::stringstream meanPTname;
 	meanPTname << ";;mean p_{T}";
@@ -894,25 +1053,27 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 	h_meanPT->Write();
 
 	// mean y histos
-	rap_L->Scale(fracLSB/rap_L->Integral());
-	rap_R->Scale((1.-fracLSB)/rap_R->Integral());
+	double meanY = 0;
+	rap_L->Scale(fracLSB/(1.*rap_L->Integral()));
+	rap_R->Scale((1.-fracLSB)/(1.*rap_R->Integral()));
 	rap_L->Add(rap_R);
 
-	rap_highct_L->Scale(fracLSB/rap_highct_L->Integral());
-	rap_highct_R->Scale((1.-fracLSB)/rap_highct_R->Integral());
+	rap_highct_L->Scale(fracLSB/(1.*rap_highct_L->Integral()));
+	rap_highct_R->Scale((1.-fracLSB)/(1.*rap_highct_R->Integral()));
 	rap_highct_L->Add(rap_highct_R);
 
-	rap_NP->Scale(1./rap_NP->Integral());
-	rap_highct_L->Scale(fBGinNP/rap_highct_L->Integral());
-	rap_NP->Add(rap_highct_L, -1);
+	rap_NP->Scale(1./(1.*rap_NP->Integral()));
+	rap_highct_L->Scale(fBGinNP/(1.*rap_highct_L->Integral()));
+	rap_NP->Add(rap_highct_L, -1.);
+	if(PolNP) meanY = rap_NP->GetMean();
 
-	rap_L->Scale(fBGsig/rap_L->Integral());
-	rap_NP->Scale(fNPB/rap_NP->Integral());
+	rap_L->Scale(fBGsig/(1.*rap_L->Integral()));
+	rap_NP->Scale(fNPB/(1.*rap_NP->Integral()));
 	rap_L->Add(rap_NP);
 
-	rap_PSR->Scale(1./rap_PSR->Integral());
-	rap_PSR->Add(rap_L, -1);
-	double meanY = rap_PSR->GetMean();
+	rap_PSR->Scale(1./(1.*rap_PSR->Integral()));
+	rap_PSR->Add(rap_L, -1.);
+	if(!PolNP) meanY = rap_PSR->GetMean();
 
 	std::stringstream meanYname;
 	meanYname << ";;mean |y|";
@@ -951,8 +1112,8 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 
 		// combinatorial background in signal region (prompt region)
 		// combination of left and right sideband
-		hBG_cosThetaPhiL[iFrame]->Scale(fracLSB/hBG_cosThetaPhiL[iFrame]->Integral());
-		hBG_cosThetaPhiR[iFrame]->Scale((1.-fracLSB)/hBG_cosThetaPhiR[iFrame]->Integral());
+		hBG_cosThetaPhiL[iFrame]->Scale(fracLSB/(1.*hBG_cosThetaPhiL[iFrame]->Integral()));
+		hBG_cosThetaPhiR[iFrame]->Scale((1.-fracLSB)/(1.*hBG_cosThetaPhiR[iFrame]->Integral()));
 		std::stringstream name;
 		name << "comb_background_costhphi" << onia::frameLabel[iFrame];
 		hBG_cosThetaPhi[iFrame] = (TH2D *) hBG_cosThetaPhiL[iFrame]->Clone(name.str().c_str());
@@ -961,8 +1122,8 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 
 		// combinatorial background in high ctau region
 		// combination of left and right sideband in high ctau region
-		hBGinNP_cosThetaPhiL[iFrame]->Scale(fracLSB/hBGinNP_cosThetaPhiL[iFrame]->Integral());
-		hBGinNP_cosThetaPhiR[iFrame]->Scale((1.-fracLSB)/hBGinNP_cosThetaPhiR[iFrame]->Integral());
+		hBGinNP_cosThetaPhiL[iFrame]->Scale(fracLSB/(1.*hBGinNP_cosThetaPhiL[iFrame]->Integral()));
+		hBGinNP_cosThetaPhiR[iFrame]->Scale((1.-fracLSB)/(1.*hBGinNP_cosThetaPhiR[iFrame]->Integral()));
 		std::stringstream nameBGinNP;
 		nameBGinNP << "background_NPR_costhphi" << onia::frameLabel[iFrame];
 		hBGinNP_cosThetaPhi[iFrame] = (TH2D *) hBGinNP_cosThetaPhiL[iFrame]->Clone(nameBGinNP.str().c_str());
@@ -971,24 +1132,82 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 
 		// non prompt background in high ctau region
 		// (hNPBG_cosThetaPhi + hBGinNP_cosThetaPhi)_norm - fBGinNP * (hBGinNP_cosThetaPhi)_norm
-		hNPBG_cosThetaPhi[iFrame]->Scale(1./hNPBG_cosThetaPhi[iFrame]->Integral());
-		hBGinNP_cosThetaPhi[iFrame]->Scale(fBGinNP/hBGinNP_cosThetaPhi[iFrame]->Integral());
+		hNPBG_cosThetaPhi[iFrame]->Scale(1./(1.*hNPBG_cosThetaPhi[iFrame]->Integral()));
+		hBGinNP_cosThetaPhi[iFrame]->Scale(fBGinNP/(1.*hBGinNP_cosThetaPhi[iFrame]->Integral()));
 		std::stringstream nameNPS;
 		nameNPS << "background_NPSR_costhphi" << onia::frameLabel[iFrame];
 		hNPS_cosThetaPhi[iFrame] = (TH2D *) hNPBG_cosThetaPhi[iFrame]->Clone(nameNPS.str().c_str());
-		hNPS_cosThetaPhi[iFrame]->Add(hBGinNP_cosThetaPhi[iFrame], -1);
+		// subtraction (add -1.) does not seem to work for 3D histograms
+		// do manual subtraction
+		nx = hNPS_cosThetaPhi[iFrame]->GetXaxis()->GetNbins();
+		ny = hNPS_cosThetaPhi[iFrame]->GetYaxis()->GetNbins();
+		// bins for non prompt histogram is different from bins of background histograms
+		int xBins = nBinsCosthNPBG/nBinsCosthBG;
+		int yBins = nBinsPhiNPBG/nBinsPhiBG;
+		int x = 0;
+		for (int j = 1; j <= nx; j++){
+			if(j%xBins==1) x++;
+			int y = 0;
+			for (int k = 1; k <= ny; k++){
+				if(k%yBins==1) y++;
+				double c1 = hNPS_cosThetaPhi[iFrame]->GetBinContent(j,k);
+				if (c1 > 0) {
+					double c2 = 0;
+					if(xBins == 1 && yBins == 1)
+						c2 = hBGinNP_cosThetaPhi[iFrame]->GetBinContent(j,k);
+					else if(xBins == 1 && yBins != 1)
+						c2 = hBGinNP_cosThetaPhi[iFrame]->GetBinContent(j,y);
+					else if(xBins != 1 && yBins == 1)
+						c2 = hBGinNP_cosThetaPhi[iFrame]->GetBinContent(x,k);
+					else
+						c2 = hBGinNP_cosThetaPhi[iFrame]->GetBinContent(x,y);
+					// value must be above 0, otherwise set 0
+					double c3 = c1 - 1.*c2;
+					if(c3 < 0) c3 = 0;
+					hNPS_cosThetaPhi[iFrame]->SetBinContent(j,k,c3);
+				}
+			} // k
+		} // j
 		hNPS_cosThetaPhi[iFrame]->Write();
 
 		// total background
-		// fNPBG * (hNPS_cosThetaPhi)_norm + fBGsig * (hBG_cosThetaPhi)_norm
-		hBG_cosThetaPhi[iFrame]->Scale(fBGsig/hBG_cosThetaPhi[iFrame]->Integral());
-		hNPS_cosThetaPhi[iFrame]->Scale(fNPB/hNPS_cosThetaPhi[iFrame]->Integral());
 		std::stringstream nameTBG;
 		nameTBG << "background_costhphi" << onia::frameLabel[iFrame];
-		hTBG_cosThetaPhi[iFrame] = (TH2D *) hBG_cosThetaPhi[iFrame]->Clone(nameTBG.str().c_str());
-		hTBG_cosThetaPhi[iFrame]->Add(hNPS_cosThetaPhi[iFrame]);
-		hTBG_cosThetaPhi[iFrame]->Write();
-
+		// for non promp polarization: only use high ctau background
+		if(PolNP){
+			hTBG_cosThetaPhi[iFrame] = (TH2D *) hBGinNP_cosThetaPhi[iFrame]->Clone(nameTBG.str().c_str());
+		}
+		else{
+			// fNPBG * (hNPS_cosThetaPhi)_norm + fBGsig * (hBG_cosThetaPhi)_norm
+			hBG_cosThetaPhi[iFrame]->Scale(fBGsig/(1.*hBG_cosThetaPhi[iFrame]->Integral()));
+			hNPS_cosThetaPhi[iFrame]->Scale(fNPB/(1.*hNPS_cosThetaPhi[iFrame]->Integral()));
+			hTBG_cosThetaPhi[iFrame] = (TH2D *) hNPS_cosThetaPhi[iFrame]->Clone(nameTBG.str().c_str());
+			x = 0;
+			for (int j = 1; j <= nx; j++){
+				if(j%xBins==1) x++;
+				int y = 0;
+				for (int k = 1; k <= ny; k++){
+					if(k%yBins==1) y++;
+					double c1 = hTBG_cosThetaPhi[iFrame]->GetBinContent(j,k);
+					if (c1 > 0) {
+						double c2 = 0;
+						if(xBins == 1 && yBins == 1)
+							c2 = hBGinNP_cosThetaPhi[iFrame]->GetBinContent(j,k);
+						else if(xBins == 1 && yBins != 1)
+							c2 = hBGinNP_cosThetaPhi[iFrame]->GetBinContent(j,y);
+						else if(xBins != 1 && yBins == 1)
+							c2 = hBGinNP_cosThetaPhi[iFrame]->GetBinContent(x,k);
+						else
+							c2 = hBGinNP_cosThetaPhi[iFrame]->GetBinContent(x,y);
+						// value must be above 0, otherwise set 0
+						double c3 = c1 + 1.*c2;
+						if(c3 < 0) c3 = 0;
+						hTBG_cosThetaPhi[iFrame]->SetBinContent(j,k,c3);
+					}
+				} // k
+			} // j
+			hTBG_cosThetaPhi[iFrame]->Write();
+		}
 
 	}// iFrame
 
@@ -998,7 +1217,7 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 
 } // void
 
-
+//-----------------------------------------------------------------------------------------------------------
 vector<double> calculateInte(RooWorkspace *ws, RooDataSet *dataJpsictErr, double ctCutMin, double ctCutMax){
 
 	double ctMin = -2., ctMax = 6.;
@@ -1008,19 +1227,20 @@ vector<double> calculateInte(RooWorkspace *ws, RooDataSet *dataJpsictErr, double
 	RooAbsPdf *NPpdf = (RooAbsPdf*)ws->pdf("nonPromptSSD");
 	RooAbsPdf *BGpdf = (RooAbsPdf*)ws->pdf("backgroundlifetime");
 
-	RooRealVar Jpsict(*ws->var("Jpsict"));
-	RooRealVar JpsictErr(*ws->var("JpsictErr"));
-	Jpsict.setMin(ctMin);   Jpsict.setMax(ctMax);
+	RooRealVar *Jpsict = ws->var("Jpsict");
+	RooRealVar *JpsictErr = ws->var("JpsictErr");
+	Jpsict->setMin(ctMin);
+	Jpsict->setMax(ctMax);
 
-	RooDataSet *genDataPR = PRpdf->generate(Jpsict,ProtoData(*dataJpsictErr));
-	RooDataSet *genDataNP = NPpdf->generate(Jpsict,ProtoData(*dataJpsictErr));
-	RooDataSet *genDataBG = BGpdf->generate(Jpsict,ProtoData(*dataJpsictErr));
+	RooDataSet *genDataPR = PRpdf->generate(*Jpsict,ProtoData(*dataJpsictErr));
+	RooDataSet *genDataNP = NPpdf->generate(*Jpsict,ProtoData(*dataJpsictErr));
+	RooDataSet *genDataBG = BGpdf->generate(*Jpsict,ProtoData(*dataJpsictErr));
 
-	TH2F* histPR2D = (TH2F*)genDataPR->createHistogram("histPR2D",Jpsict,Binning(fineBins),YVar(JpsictErr,Binning(fineBins/10)));
+	TH2F* histPR2D = (TH2F*)genDataPR->createHistogram("histPR2D",*Jpsict,Binning(fineBins),YVar(*JpsictErr,Binning(fineBins/10)));
 	TH1F* histPR   = (TH1F*)histPR2D->ProjectionX();
-	TH2F* histNP2D = (TH2F*)genDataNP->createHistogram("histNP2D",Jpsict,Binning(fineBins),YVar(JpsictErr,Binning(fineBins/10)));
+	TH2F* histNP2D = (TH2F*)genDataNP->createHistogram("histNP2D",*Jpsict,Binning(fineBins),YVar(*JpsictErr,Binning(fineBins/10)));
 	TH1F* histNP   = (TH1F*)histNP2D->ProjectionX();
-	TH2F* histBG2D = (TH2F*)genDataBG->createHistogram("histBG2D",Jpsict,Binning(fineBins),YVar(JpsictErr,Binning(fineBins/10)));
+	TH2F* histBG2D = (TH2F*)genDataBG->createHistogram("histBG2D",*Jpsict,Binning(fineBins),YVar(*JpsictErr,Binning(fineBins/10)));
 	TH1F* histBG   = (TH1F*)histBG2D->ProjectionX();
 
 	histPR->SetLineColor(kRed);
@@ -1030,9 +1250,9 @@ vector<double> calculateInte(RooWorkspace *ws, RooDataSet *dataJpsictErr, double
 	histBG->SetLineColor(kBlack);
 	histBG->SetMarkerColor(kBlack);
 
-	histPR->Scale(1./histPR->Integral());
-	histNP->Scale(1./histNP->Integral());
-	histBG->Scale(1./histBG->Integral());
+	histPR->Scale(1./(1.*histPR->Integral()));
+	histNP->Scale(1./(1.*histNP->Integral()));
+	histBG->Scale(1./(1.*histBG->Integral()));
 
 	int BinLow = 0, BinHigh = 0;
 	bool getLow = false, getHigh = false;
