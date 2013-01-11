@@ -1,5 +1,7 @@
 #!/bin/sh
+source /afs/ihep.ac.cn/users/z/zhangll/workspace/rootset.sh 30
 
+homedir=$PWD
 cd ..
 cd ..
 basedir=$PWD
@@ -18,7 +20,8 @@ cp ../../interface/effsAndCuts_Psi$[nState-3]S.h  effsAndCuts.h
 touch polRapPtPlot.cc
 make
 
-for JobID in ToyMC_Psi$[nState-3]S_13Dec2012_100K; do
+for JobID in ToyMC_Psi$[nState-3]S_13Dec2012_400K; do
+#for JobID in ToyMC_Psi$[nState-3]S_13Dec2012; do
 
 echo ${JobID}
 
@@ -34,13 +37,13 @@ ptBinMin=2
 ptBinMax=6
 fi
 
-frameSig=3
-for polScenSig in 4;do
+frameSig=1
+for polScenSig in 3;do
 
-frameBkg=3
+frameBkg=1
 for polScenBkg in 3;do
 
-nGenerations=30
+nGenerations=15
 
 MPValgo=3 		#1...mean,2...gauss,3...gauss-loop with chi2<2
 additionalName=MPV${MPValgo}

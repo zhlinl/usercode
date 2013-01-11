@@ -1,5 +1,6 @@
 #!/bin/sh
-source /afs/cern.ch/user/z/zhlinl/rootset.sh
+#source /afs/cern.ch/user/z/zhlinl/rootset.sh
+source /afs/ihep.ac.cn/users/z/zhangll/workspace/rootset.sh 30
 
 #### following will be changed by "launchFit.sh" ####
 # HOMEDIR
@@ -19,8 +20,12 @@ source /afs/cern.ch/user/z/zhlinl/rootset.sh
 ########## INPUTS ##########
 
 nState=NState
+NKevent=NKEVENT
 
-JobID=ToyMC_Psi$[nState-3]S_13Dec2012_100K
+#JobID=ToyMC_Psi$[nState-3]S_Eff_pTshift_minus_8Jan2013
+#JobID=ToyMC_Psi$[nState-3]S_13Dec2012_100K
+JobID=ToyMC_Psi$[nState-3]S_10Jan2013
+#JobID=ToyMC_Psi$[nState-3]S_13Dec2012
 
 nGenerations=NFits
 
@@ -35,6 +40,7 @@ frameSig=FrameSig
 frameBkg=FrameBkg
 
 nEff=105 #MC-truth
+#nEff=1062
 UseMCeff=true
 nDileptonEff=1
 UseMCDileptoneff=true
@@ -50,9 +56,8 @@ nSample=10000
 nSkipGen=NSkipGen
 
 #GENERATION SETTINGS
-ConstEvents=100000
+ConstEvents=${NKevent}000
 UseConstEv=USEConstEv #if false, the number of events is taken from ToyMC.h
-
 UseDifferingEff=false #if false, the next five lines do not matter
 nEffRec=1060 #1101
 UseMCReceff=false
