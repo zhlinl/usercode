@@ -160,8 +160,14 @@ void EvaluateEffFileName(int nEff, char EffFileName [200], bool singleLeptonEff)
 		if(nEff==1052) sprintf(EffFileName,"ParametrizedFactDataEff_June14_Run2_Central.root");
 		if(nEff==1053) sprintf(EffFileName,"ParametrizedFactDataEff_June14_Run3_Central.root");
 
-		//if(nEff==1060) sprintf(EffFileName,"ParametrizedFactDataEff_June21_Central.root");//'almost tight'
 		if(nEff==1060) sprintf(EffFileName,"ParametrizedFactDataEff_Dec11_Central.root");//
+		if(nEff==1061) sprintf(EffFileName,"ParametrizedFactDataEff_Dec11_pTshift_plus.root");//
+		if(nEff==1062) sprintf(EffFileName,"ParametrizedFactDataEff_Dec11_pTshift_minus.root");//
+		if(nEff==1063) sprintf(EffFileName,"ParametrizedFactDataEff_Dec11_pTscale_plus.root");//
+		if(nEff==1064) sprintf(EffFileName,"ParametrizedFactDataEff_Dec11_pTscale_minus.root");//
+		if(nEff==1065) sprintf(EffFileName,"ParametrizedFactDataEff_Dec11_effshift_plus.root");//
+		if(nEff==1066) sprintf(EffFileName,"ParametrizedFactDataEff_Dec11_effshift_minus.root");//
+
 		if(nEff==1070) sprintf(EffFileName,"ParametrizedFactDataEff_June25_Central.root");//'mixed'
 		if(nEff==1080) sprintf(EffFileName,"ParametrizedFactMCEff_July19_Central_fixed.root");//'MC TnP Parametrized'
 
@@ -374,12 +380,11 @@ double singleLeptonEfficiency( double& pT, double& eta, int nEff, TFile* fInEff,
 	if(nEff==105 || nEff==106){
 		sprintf(EffType,"totEff_MCTRUTH_pT_eta");
 
-		
 		int binX = hEvalEff->GetXaxis()->FindBin(TMath::Abs(eta));
 		int binY = hEvalEff->GetYaxis()->FindBin(pT);
 		eff = hEvalEff->GetBinContent(binX, binY);
 		//cout<<"HistEff "<<eff<<endl;
-		 
+
 		/*
 		Int_t globalBin = TEff->FindFixBin(TMath::Abs(eta), pT);
 		eff = TEff->GetEfficiency(globalBin);
