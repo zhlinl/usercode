@@ -2,7 +2,7 @@
 #source /afs/cern.ch/user/z/zhlinl/rootset.sh
 source /afs/ihep.ac.cn/users/z/zhangll/workspace/rootset.sh 30
 
-#### following will be changed by "launchFit.sh" ####
+#### following will be changed by "launchFitToy.sh" ####
 # HOMEDIR
 # NState 
 # RapBinMin
