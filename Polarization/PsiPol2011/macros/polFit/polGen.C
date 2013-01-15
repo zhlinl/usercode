@@ -34,15 +34,19 @@ TLorentzVector beam1_LAB( 0., 0., pbeam, Ebeam );
 TLorentzVector beam2_LAB( 0., 0., -pbeam, Ebeam );
 
 
-double func_rap_gen(double* x, double* par)
-{
+double func_rap_gen(double* x, double* par) {
   return   1.;
 }
 
-double func_pT_gen(double* x, double* par)
-{
-  const double beta = 3.;
-  const double pTsq = 49.;
+double func_pT_gen(double* x, double* par) {
+  double beta = 3.; 
+  double pTsq = 49.;
+	if(par[0]==1) {beta = 3.46; pTsq = 47.3;}  // Upsi(1S)
+	if(par[0]==2) {beta = 3.27; pTsq = 65.7;}  // Upsi(2S)
+	if(par[0]==3) {beta = 3.05; pTsq = 80.5;}  // Upsi(3S)
+  if(par[0]==4) {beta = 3.69; pTsq = 12.0;}  // Psi(1S)
+  if(par[0]==5) {beta = 3.71; pTsq = 19.5;}  // Psi(2S)
+
   return x[0] * pow( 1. + 1./(beta - 2.) * x[0]*x[0] / pTsq, -beta  );
 }
 
@@ -65,6 +69,7 @@ void polGen(double rapdilepton_min = 1,
 		int frameSig=1,//CS...1, HX...2, PX...3
 		int frameBkg=1,//CS...1, HX...2, PX...3
 		int nGen=1,
+		int nState=1,
 		Char_t *dirstruct = "ToyDirectory_Default"
 ){
 
@@ -98,6 +103,7 @@ void polGen(double rapdilepton_min = 1,
 	cout<<"Injected lambda_phi Background ............. "<<lambda_phi_bkg<<" , in the "<<frameBkgName<<" frame"<<endl;
 	cout<<"Injected lambda_thetaphi Background ........ "<<lambda_thetaphi_bkg<<" , in the "<<frameBkgName<<" frame"<<endl;
 	cout<<"Number of Generation ....................... "<<nGen<<endl;
+	cout<<"nState ..................................... "<<nState<<endl;
 	cout<<"Directory Structure of Output .............. "<<dirstruct<<endl;
 
 
@@ -112,7 +118,8 @@ void polGen(double rapdilepton_min = 1,
   delete gRandom;
   gRandom = new TRandom3(0);
 
-  TF1* pT_distr = new TF1("pT_distr",func_pT_gen,pTdilepton_min,pTdilepton_max,0);
+  TF1* pT_distr = new TF1("pT_distr",func_pT_gen,pTdilepton_min,pTdilepton_max,1);
+	pT_distr->SetParameter(0,nState);
   TF1* rap_distr = new TF1("rap_distr",func_rap_gen,rapdilepton_min,rapdilepton_max,0);
 
   TFile* hfileout = new TFile(outfilename, "RECREATE", "genData");

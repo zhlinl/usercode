@@ -11,7 +11,7 @@ storagedir=$basedir/Psi/Data
 ########## INPUTS ##########
 NSigma=3.00 #needed in 2 decimal accuracy (x.yz)
 
-for nState in 4;do
+for nState in 4 5;do
 
 cp ../../interface/ToyMC_Psi$[nState-3]S.h ToyMC.h
 cp ../../interface/effsAndCuts_Psi$[nState-3]S.h effsAndCuts.h
@@ -19,18 +19,18 @@ cp ../../interface/rootIncludes.inc rootIncludes.inc
 cp ../../interface/commonVar_Psi$[nState-3]S.h commonVar.h
 
 #JobID=Psi$[nState-3]S_${NSigma}Sigma_11Dec2012
-#JobID=Psi$[nState-3]S_${NSigma}Sigma_11Dec2012_noRhoFactor
-JobID=Psi$[nState-3]S_${NSigma}Sigma_11Dec2012_compareRhoFactor
+JobID=Psi$[nState-3]S_${NSigma}Sigma_11Dec2012_noRhoFactor
+#JobID=Psi$[nState-3]S_${NSigma}Sigma_11Dec2012_compareRhoFactor
 additionalName=_Psi$[nState-3]S
 
 PlotMatt=0
 PlotMattForICHEP=0
-PlotCompare=1
+PlotCompare=0
 
 PlotAsymm=0
 PlotFinalData=1
 PlotSystematics=0
-PlotLegend=1
+PlotLegend=0
 PlotBrazilian=0
 FitGraph=0
 DrawLatexStuff=1
@@ -60,8 +60,8 @@ PlotAlteredPPDResults=0
 #DrawLatexStuff=1
 #MultiPanelPlots=1
 
+DefaultID=${JobID}
 #DefaultID=Psi$[nState-3]S_${NSigma}Sigma_11Dec2012_noRhoFactor
-DefaultID=Psi$[nState-3]S_${NSigma}Sigma_11Dec2012
 CompareID1=Psi$[nState-3]S_${NSigma}Sigma_11Dec2012_noRhoFactor
 CompareID2=Data_TheGreatRun_10B_May11_NewestCentrals_AlteredPPD_May17_BKGlinPLUSRestSquaredGauss_10nRand
 CompareID3=BG0_Mar19_HighCtauSigCheck3p25
@@ -131,6 +131,7 @@ mkdir -p ${JobIDDir}
 cp PlotFinalResults PlotFinalResults_Psi$[nState-3]S
 ./PlotFinalResults_Psi$[nState-3]S PlotAlteredPPDResults=${PlotAlteredPPDResults} MultiPanelPlots=${MultiPanelPlots} DrawLatexStuff=${DrawLatexStuff} ${MPCentralsWithTotalSystID}=MPCentralsWithTotalSystID ${DefaultID}=DefaultID ${CompareID1}=CompareID1 ${CompareID2}=CompareID2 ${CompareID3}=CompareID3 ${CompareID4}=CompareID4 ${JobID}=JobID ${SystID1Base}=SystID1Base ${SystID1Specify}=SystID1Specify ${SystID1Title}=SystID1Title ${SystID2Base}=SystID2Base ${SystID2Specify}=SystID2Specify ${SystID2Title}=SystID2Title ${basedir}=basedir ${storagedir}=storagedir ${ptBinMin}ptBinMin ${ptBinMax}ptBinMax ${nSystematics}nSystematics ${nComp}nComp ${nState}nState ${SystID3Base}=SystID3Base ${SystID3Specify}=SystID3Specify ${SystID3Title}=SystID3Title ${SystID4Base}=SystID4Base ${SystID4Specify}=SystID4Specify ${SystID4Title}=SystID4Title ${SystID5Base}=SystID5Base ${SystID5Specify}=SystID5Specify ${SystID5Title}=SystID5Title ${SystID6Base}=SystID6Base ${SystID6Specify}=SystID6Specify ${SystID6Title}=SystID6Title ${SystID7Base}=SystID7Base ${SystID7Specify}=SystID7Specify ${SystID7Title}=SystID7Title ${SystID8Base}=SystID8Base ${SystID8Specify}=SystID8Specify ${SystID8Title}=SystID8Title PlotMatt=${PlotMatt} PlotAsymm=${PlotAsymm} PlotCompare=${PlotCompare} PlotFinalData=${PlotFinalData} PlotSystematics=${PlotSystematics} PlotLegend=${PlotLegend} PlotBrazilian=${PlotBrazilian} FitGraph=${FitGraph} DrawPreliminary=${DrawPreliminary} PlotMattForICHEP=${PlotMattForICHEP} ${LegendEntryDefID}=LegendEntryDefID ${LegendEntryCompID1}=LegendEntryCompID1
 rm PlotFinalResults_Psi$[nState-3]S
+rm PlotFinalResults
 
 cd ${homedir}/FinalResults/${JobID}/Psi$[nState-3]S
 if [ ${PlotFinalData} -eq 1 ]
@@ -147,7 +148,7 @@ fi
 
 if [ ${PlotSystematics} -eq 1 ]
 then
-cp ${basedir}/latex/Systematics.tex .
+cp ${basedir}/latex/Systematics_Psi$[nState-3]S.tex ./Systematics.tex
 pdflatex Systematics.tex
 mv Systematics.pdf Systematics${additionalName}.pdf
 fi

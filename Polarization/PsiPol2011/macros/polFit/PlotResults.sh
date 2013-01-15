@@ -410,7 +410,7 @@ fi
 
 if [ ${PlotSystematics} -eq 1 ]
 then
-cp ${basedir}/latex/Systematics.tex .
+cp ${basedir}/latex/Systematics_Psi$[nState-3]S.tex ./Systematics.tex
 pdflatex Systematics.tex
 mv Systematics.pdf Systematics${additionalName}.pdf
 fi
