@@ -1176,6 +1176,7 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 		// for non promp polarization: only use high ctau background
 		if(PolNP){
 			hTBG_cosThetaPhi[iFrame] = (TH2D *) hBGinNP_cosThetaPhi[iFrame]->Clone(nameTBG.str().c_str());
+			hTBG_cosThetaPhi[iFrame]->Write();
 		}
 		else{
 			// fNPBG * (hNPS_cosThetaPhi)_norm + fBGsig * (hBG_cosThetaPhi)_norm
