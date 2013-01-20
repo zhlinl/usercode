@@ -1259,7 +1259,7 @@ void PlotLifePar(int  nState) {
 
 		graph_fracGauss2[0][rapBin-1]->SetTitle("");
 		graph_fracGauss2[0][rapBin-1]->GetXaxis()->SetTitle("p_{T} (GeV)");
-		graph_fracGauss2[0][rapBin-1]->GetYaxis()->SetTitle("fraction of 2nd Gauss ");
+		graph_fracGauss2[0][rapBin-1]->GetYaxis()->SetTitle("fraction of 2nd Gaussian");
 		graph_fracGauss2[0][rapBin-1]->GetYaxis()->SetRangeUser(-0.1,0.6);
 		graph_fracGauss2[0][rapBin-1]->GetXaxis()->SetLimits(Xmin, Xmax);
 		graph_fracGauss2[0][rapBin-1]->SetMarkerStyle(onia::marker_rapForPTBins[2]);
@@ -1416,7 +1416,37 @@ void PlotLifePar(int  nState) {
 		LifetimeLegend_2rap->AddEntry(graph_bkgTauSSDR[0][2],"1.2 < |y| < 1.8 LSB","lp");
 		LifetimeLegend_2rap->AddEntry(graph_bkgTauSSDR[1][2],"1.2 < |y| < 1.8 RSB","lp");
 	}
+
+	TLegend* LifetimeLegend_SR_2rap=new TLegend(blX,blY,trX,trY);
+	LifetimeLegend_SR_2rap->SetFillColor(kWhite);
+	LifetimeLegend_SR_2rap->SetTextFont(42);
+	LifetimeLegend_SR_2rap->SetTextSize(0.025);
+	LifetimeLegend_SR_2rap->SetBorderSize(0.);
+	LifetimeLegend_SR_2rap->AddEntry(graph_fracGauss2[0][0],"|y| < 0.6","lp");
+	LifetimeLegend_SR_2rap->AddEntry(graph_fracGauss2[0][1],"0.6 < |y| < 1.2","lp");
+	if(nState==5)
+		LifetimeLegend_SR_2rap->AddEntry(graph_fracGauss2[0][2],"1.2 < |y| < 1.8","lp");
+
+
 	//
+	graph_fracGauss2[0][0]->SetMarkerStyle(21);
+	graph_fracGauss2[0][0]->SetMarkerColor(onia::colour_rapForPTBins[2]);
+	graph_fracGauss2[0][0]->SetLineColor(onia::colour_rapForPTBins[2]);
+	graph_fracGauss2[0][1]->SetMarkerStyle(20);
+	graph_fracGauss2[0][1]->SetMarkerColor(onia::colour_rapForPTBins[3]);
+	graph_fracGauss2[0][1]->SetLineColor(onia::colour_rapForPTBins[3]);
+	if(nState==5){
+		graph_fracGauss2[0][2]->SetMarkerStyle(22);
+		graph_fracGauss2[0][2]->SetMarkerColor(onia::colour_rapForPTBins[4]);
+		graph_fracGauss2[0][2]->SetLineColor(onia::colour_rapForPTBins[4]);
+	}
+	graph_fracGauss2[0][0]->Draw("AP");
+	graph_fracGauss2[0][1]->Draw("P");
+	if(nState==5)
+		graph_fracGauss2[0][2]->Draw("P");
+	LifetimeLegend_SR_2rap->Draw();
+	c1->SaveAs(Form("%s/frac2ndGauss.pdf",savePath.str().c_str()));
+
 	graph_bkgTauSSDR[0][0]->SetMarkerStyle(21);
 	graph_bkgTauSSDR[0][0]->SetMarkerColor(onia::colour_rapForPTBins[2]);
 	graph_bkgTauSSDR[0][0]->SetLineColor(onia::colour_rapForPTBins[2]);
