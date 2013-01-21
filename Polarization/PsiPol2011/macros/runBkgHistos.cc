@@ -9,94 +9,94 @@
 
 //========================================================
 // code to read input arguments
-template<typename T>
+	template<typename T>
 void fromSplit(const std::string& key, const std::string &arg, T& out)
 {
-    const char delim = '=';
-    // Skip if key or delimiter not there
-    if ((arg.find(key) == std::string::npos) ||
-        (arg.find(delim) == std::string::npos))
-        return;
+	const char delim = '=';
+	// Skip if key or delimiter not there
+	if ((arg.find(key) == std::string::npos) ||
+			(arg.find(delim) == std::string::npos))
+		return;
 
-    std::string skey, sval;
-    std::stringstream sstr(arg);
-    std::getline(sstr, skey, delim); // Dummy read to skip key
-    std::getline(sstr, sval, delim); // Get value
-    T tout;
-    if (!(std::istringstream(sval) >> std::boolalpha >> tout))
-        return;
-    out = tout;
-    std::cout << std::boolalpha << skey << ": "  << out << std::endl;
+	std::string skey, sval;
+	std::stringstream sstr(arg);
+	std::getline(sstr, skey, delim); // Dummy read to skip key
+	std::getline(sstr, sval, delim); // Get value
+	T tout;
+	if (!(std::istringstream(sval) >> std::boolalpha >> tout))
+		return;
+	out = tout;
+	std::cout << std::boolalpha << skey << ": "  << out << std::endl;
 }
 
 // Special version for string without the conversion
-template<>
+	template<>
 void fromSplit(const std::string& key, const std::string &arg, std::string &out)
 {
-    const char delim = '=';
-    // Skip if key or delimiter not there
-    if ((arg.find(key) == std::string::npos) ||
-        (arg.find(delim) == std::string::npos))
-        return;
-    std::string skey, sval;
-    std::stringstream sstr(arg);
-    std::getline(sstr, skey, delim); // Dummy read to skip key
-    std::getline(sstr, sval, delim); // Get value
-    out = sval;
-    std::cout << skey << ": "  << out << std::endl;
+	const char delim = '=';
+	// Skip if key or delimiter not there
+	if ((arg.find(key) == std::string::npos) ||
+			(arg.find(delim) == std::string::npos))
+		return;
+	std::string skey, sval;
+	std::stringstream sstr(arg);
+	std::getline(sstr, skey, delim); // Dummy read to skip key
+	std::getline(sstr, sval, delim); // Get value
+	out = sval;
+	std::cout << skey << ": "  << out << std::endl;
 }
 
 
 //===================================================
 int main(int argc, char* argv[]){
 
-    // Set defaults
-    int
-        rapMin = 999,
-        rapMax = 999,
-        ptMin = 999,
-        ptMax = 999,
-        nState = 999;
-    bool
-        MC = false,
-        doCtauUncer = false,
-        PolLSB = false,
-        PolRSB = false,
-        PolNP = false;
+	// Set defaults
+	int
+		rapMin = 999,
+					 rapMax = 999,
+					 ptMin = 999,
+					 ptMax = 999,
+					 nState = 999;
+	bool
+		MC = false,
+			 doCtauUncer = false,
+			 PolLSB = false,
+			 PolRSB = false,
+			 PolNP = false;
 
-    // Loop over argument list
-    for (int i=1; i < argc; i++)
-    {
-        std::string arg = argv[i];
-        fromSplit("rapMin", arg, rapMin);
-        fromSplit("rapMax", arg, rapMax);
-        fromSplit("ptMin", arg, ptMin);
-        fromSplit("ptMax", arg, ptMax);
-        fromSplit("nState", arg, nState);
-        fromSplit("MC", arg, MC);
-        fromSplit("doCtauUncer", arg, doCtauUncer);
-        fromSplit("PolLSB", arg, PolLSB);
-        fromSplit("PolRSB", arg, PolRSB);
-        fromSplit("PolNP", arg, PolNP);
-    }
+	// Loop over argument list
+	for (int i=1; i < argc; i++)
+	{
+		std::string arg = argv[i];
+		fromSplit("rapMin", arg, rapMin);
+		fromSplit("rapMax", arg, rapMax);
+		fromSplit("ptMin", arg, ptMin);
+		fromSplit("ptMax", arg, ptMax);
+		fromSplit("nState", arg, nState);
+		fromSplit("MC", arg, MC);
+		fromSplit("doCtauUncer", arg, doCtauUncer);
+		fromSplit("PolLSB", arg, PolLSB);
+		fromSplit("PolRSB", arg, PolRSB);
+		fromSplit("PolNP", arg, PolNP);
+	}
 
-    std::cout << "-----------------------\n"
-              << "Creating background model for \n"
-              << "y bins " << rapMin << " - " << rapMax << "\n"
-              << "and pT bins "  << ptMin << " - " << ptMax << "\n"
-              << "-----------------------" << std::endl;
+	std::cout << "-----------------------\n"
+		<< "Creating background model for \n"
+		<< "y bins " << rapMin << " - " << rapMax << "\n"
+		<< "and pT bins "  << ptMin << " - " << ptMax << "\n"
+		<< "-----------------------" << std::endl;
 
-    for(int iRap = rapMin; iRap <= rapMax; iRap++){
-        for(int iPT = ptMin; iPT <= ptMax; iPT++){
+	for(int iRap = rapMin; iRap <= rapMax; iRap++){
+		for(int iPT = ptMin; iPT <= ptMax; iPT++){
 
-            std::stringstream temp;
-            temp << "tmpFiles/fit_Psi" << nState-3 << "S_rap" << iRap << "_pt" << iPT << ".root";
-            const std::string infilename = temp.str().c_str();
+			std::stringstream temp;
+			temp << "tmpFiles/fit_Psi" << nState-3 << "S_rap" << iRap << "_pt" << iPT << ".root";
+			const std::string infilename = temp.str().c_str();
 
-            bkgHistos(infilename.c_str(), iRap, iPT, nState, MC, doCtauUncer, PolLSB, PolRSB, PolNP);
+			bkgHistos(infilename.c_str(), iRap, iPT, nState, MC, doCtauUncer, PolLSB, PolRSB, PolNP);
 
-        }
-    }
+		}
+	}
 
-    return 0;
+	return 0;
 }
