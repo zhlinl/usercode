@@ -5,12 +5,12 @@ JobID=FrameworkTest_5Dec2012
 
 Cdir=$PWD
 # input arguments
-for nState in 5;do    #1,2,3,Upsi(1S,2S,3S); 4,Jpsi 5,PsiPrime
+for nState in 4;do    #1,2,3,Upsi(1S,2S,3S); 4,Jpsi 5,PsiPrime
 for FidCuts in 11;do    #defines the set of cuts to be used, see macros/polFit/effsAndCuts.h
 
 rapMin=1     #takes bins, not actual values
-rapMax=2     #if you only want to process 1 y bin, rapMax = rapMin
-ptMin=1     #takes bins, not acutal values
+rapMax=1     #if you only want to process 1 y bin, rapMax = rapMin
+ptMin=4     #takes bins, not acutal values
 ptMax=4     #if you only want to process 1 pt bin, ptMax = ptMin
 Plotting=2   #plotting macro: 1 = plot all, 2 = plot mass, 3 = plot lifetime sidebands, 4 = plot lifetime singal region
 
@@ -26,7 +26,7 @@ PolNP=false       #measure polarization of the non prompt events
 # In case of more input Files: define inputTreeX and adapt the line starting with inputTrees, at the moment up to 4 files implemented
 if [ ${nState} -eq 4 ] 
 then
-inputTree1=/afs/cern.ch/user/z/zhlinl/work/polarization/TTree/TTree_Onia2MuMu_v30_PromptRecoAB_10May2012_Jpsi.root
+inputTree1=/afs/ihep.ac.cn/users/z/zhangll/data/data/Onia2MuMu/TTree/Onia2MuMu_v30_10May2012/TTree_Onia2MuMu_v30_PromptRecoAB_10May2012_Jpsi.root
 if [ ${MC} = 'true' ]
 then
 inputTree1=/scratch/ikratsch/Polarization/Jpsi/InputFiles/TTree_Psi1S_Gun_Pt9p5_70p5_19Dec2012.root
@@ -35,7 +35,7 @@ fi
 
 if [ ${nState} -eq 5 ]
 then
-inputTree1=/afs/cern.ch/user/z/zhlinl/work/polarization/TTree/TTree_Onia2MuMu_v30_PromptRecoAB_10May2012_Psi.root
+inputTree1=/afs/ihep.ac.cn/users/z/zhangll/data/data/Onia2MuMu/TTree/Onia2MuMu_v30_10May2012/TTree_Onia2MuMu_v30_PromptRecoAB_10May2012_Psi.root
 if [ ${MC} = 'true' ]
 then
 inputTree1=/scratch/ikratsch/Polarization/Jpsi/InputFiles/TTree_Psi2S_Gun_Pt6p5_50p5_19Dec2012.root
@@ -46,14 +46,15 @@ fi
 
 #following flags decide if the step is executed (1) or not (0):
 #IMPORTANT: for MC set execute_runWorkspace, execute_MassFit and execute_runLifetimeFit to 0
-execute_runData=0			           #independent of rapMin, rapMax, ptMin, ptMax
+execute_runData=1			           #independent of rapMin, rapMax, ptMin, ptMax
 execute_runWorkspace=0			     #independent of rapMin, rapMax, ptMin, ptMax
 execute_runMassFit=0			       #can be executed for different pt and y bins
 execute_runLifetimeFit=0         #can be executed for different pt and y bins
 execute_runPlotMassLifetime=0    #can be executed for different pt and y bins
-execut_PlotFitPar=1              #independent of rapMin, rapMax, ptMin, ptMax
+execut_PlotFitPar=0              #independent of rapMin, rapMax, ptMin, ptMax
 execute_runBkgHistos=0           #can be executed for different pt and y bins
 execute_PlotCosThetaPhiBG=0 		 #This step only has to be executed once for each set of cuts (indep. of FracLSB and nSigma)
+execute_PlotCosThetaPhiDistribution=0 #This step only has to be executed once for each set of cuts (indep. of FracLSB and nSigma)
 
 #################################
 
@@ -78,7 +79,7 @@ cp ../interface/rootIncludes.inc ${WorkDir}/rootIncludes.inc
 cp runData.cc ${WorkDir}/runData.cc
 cp PolData.C ${WorkDir}/PolData.C
 cp PolData.h ${WorkDir}/PolData.h
-cp polFit/effsAndCuts.h ${WorkDir}/effsAndCuts.h
+cp ../interface/effsAndCuts_Psi$[nState-3]S.h ${WorkDir}/effsAndCuts.h
 
 cp runWorkspace.cc ${WorkDir}/runWorkspace.cc
 cp createWorkspace.C ${WorkDir}/createWorkspace.C
@@ -101,6 +102,7 @@ cp bkgHistos.C ${WorkDir}/bkgHistos.C
 cp calcPol.C ${WorkDir}/calcPol.C
 
 cp PlotCosThetaPhiBG.cc ${WorkDir}/PlotCosThetaPhiBG.cc
+cp PlotCosThetaPhiDistribution.cc ${WorkDir}/PlotCosThetaPhiDistribution.cc
 
 cp ../latex/Mass_sigma.tex ${WorkDir}/Mass_sigma.tex
 cp ../latex/Lifetime_fitParameter.tex ${WorkDir}/Lifetime_fitParameter.tex
@@ -111,6 +113,8 @@ cp ../latex/NumEvents.tex ${WorkDir}/NumEvents.tex
 cp ../latex/cosThetaPhi_$[nState-3]S_BG.tex ${WorkDir}/cosThetaPhi_$[nState-3]S_BG.tex
 cp ../latex/cosThetaPhi_$[nState-3]S_BG_highct.tex ${WorkDir}/cosThetaPhi_$[nState-3]S_BG_highct.tex
 cp ../latex/cosThetaPhi_$[nState-3]S_NPBG.tex ${WorkDir}/cosThetaPhi_$[nState-3]S_NPBG.tex
+cp ../latex/cosThetaPhi_$[nState-3]S_TBG.tex ${WorkDir}/cosThetaPhi_$[nState-3]S_TBG.tex
+cp ../latex/cosThetaPhi_$[nState-3]S.tex ${WorkDir}/cosThetaPhi_$[nState-3]S.tex
 cp ../latex/MassLifetime_Psi$[nState-3]S.tex ${WorkDir}/MassLifetime_Psi$[nState-3]S.tex
 
 cd ${WorkDir}
@@ -181,24 +185,38 @@ then
 pdflatex cosThetaPhi_$[nState-3]S_BG.tex
 pdflatex cosThetaPhi_$[nState-3]S_BG_highct.tex
 pdflatex cosThetaPhi_$[nState-3]S_NPBG.tex
+pdflatex cosThetaPhi_$[nState-3]S_TBG.tex
 mv cosThetaPhi_$[nState-3]S_BG.pdf PDF/cosThetaPhi_$[nState-3]S_BG.pdf
 mv cosThetaPhi_$[nState-3]S_BG_highct.pdf PDF/cosThetaPhi_$[nState-3]S_BG_highct.pdf
 mv cosThetaPhi_$[nState-3]S_NPBG.pdf PDF/cosThetaPhi_$[nState-3]S_NPBG.pdf
+mv cosThetaPhi_$[nState-3]S_TBG.pdf PDF/cosThetaPhi_$[nState-3]S_TBG.pdf
 fi
 
-#rm runData
-#rm runWorkspace
-#rm runMassFit
-#rm runLifetimeFit
-#rm runPlotMassLifetime
-#rm runBkgHistos
-#rm PlotFitPar
-#rm PlotCosThetaPhiBG
+if [ ${execute_PlotCosThetaPhiDistribution} -eq 1 ]
+then
+./PlotCosThetaPhiDistribution ${nState}nState ${WorkDir}=DataPath
+pdflatex cosThetaPhi_$[nState-3]S.tex
+mv cosThetaPhi_$[nState-3]S.pdf PDF/cosThetaPhi_$[nState-3]S.pdf
+fi
+
+rm runData
+rm runWorkspace
+rm runMassFit
+rm runLifetimeFit
+rm runPlotMassLifetime
+rm runBkgHistos
+rm PlotFitPar
+rm PlotCosThetaPhiBG
+rm PlotCosThetaPhiDistribution
+#rm *.tex
 rm *.aux
 rm *.log
-rm *.tex
 rm *.so
 rm *.d
+rm *.nav 
+rm *.out 
+rm *.snm 
+rm *.toc 
 
 done
 done
