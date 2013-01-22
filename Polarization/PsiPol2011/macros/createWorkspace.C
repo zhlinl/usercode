@@ -135,5 +135,93 @@ void createWorkspace(const std::string &infilename, int nState){
 		}//iPT
 	}//iRap
 
+
+	//Integrating rapidity and pt bins
+	double yMin = onia::rapForPTRange[0];
+	double yMax = onia::rapForPTRange[onia::kNbRapForPTBins];
+	double ptMin =  onia::pTRange[0][0];
+	double ptMax =  onia::pTRange[0][onia::kNbPTBins[0]];
+	std::stringstream cutRapPt;
+	cutRapPt << "(JpsiPt >= " << ptMin << " && JpsiPt < "<< ptMax << ") && "
+		<< "(TMath::Abs(JpsiRap) >= " << yMin << " && TMath::Abs(JpsiRap) < " << yMax << ")";
+	RooDataSet* rapPtData = (RooDataSet*)fullData->reduce(cutRapPt.str().c_str());
+	std::stringstream nameRapPt;
+	nameRapPt << "data_rap0_pt0";
+	rapPtData->SetNameTitle(nameRapPt.str().c_str(), "Data For full rap and pt");
+
+	// output file name and workspace
+	std::stringstream outfilename;
+	outfilename << "tmpFiles/backupWorkSpace/fit_Psi" << nState-3 << "S_rap0_pt0.root";
+	RooWorkspace* ws_RapPt = new RooWorkspace(workspacename.c_str());
+	// Import variables to workspace
+	ws_RapPt->import(*rapPtData);
+	ws_RapPt->writeToFile(outfilename.str().c_str());
+
+	f->Close();
+
+	TH2D* rapPt;
+	double MassMin;
+	double MassMax;
+	if(nState==4){
+ 	  rapPt = new TH2D( "rapPt", "rapPt", 52,-1.3,1.3,144,0,72);
+		MassMin=3.011;//massPsi1S-onia::nSigMass*sigma1S;
+		MassMax=3.174;//massPsi1S+onia::nSigMass*sigma1S;
+		// sigma  27.2 MeV
+		// mean 3.093 GeV
+	}
+	if(nState==5){
+ 	  rapPt = new TH2D( "rapPt", "rapPt", 76,-1.9,1.9,144,0,72);
+		MassMin=3.576;//massPsi2S-onia::nSigMass*sigma2S;
+		MassMax=3.786;//massPsi2S+onia::nSigMass*sigma2S;
+		// sigma 34.9 MeV
+		// mean 3.681 GeV
+	}
+
+	cout<<"Plotting rap-Pt for Psi"<<nState-3<<"S"<<endl;
+	cout<<"MassMin for rap-Pt plot = "<<MassMin<<endl;
+	cout<<"MassMax for rap-Pt plot = "<<MassMax<<endl;
+
+	TTree *rapPtTree = (TTree*)rapPtData->tree();
+	rapPtTree->Draw("JpsiPt:JpsiRap>>rapPt");
+
+	TCanvas* c2 = new TCanvas("c2","c2",1200,1500);
+	rapPt->SetYTitle("p_{T}(#mu#mu) [GeV]");
+	rapPt->SetXTitle("y(#mu#mu)");
+	gStyle->SetPalette(1);
+	gPad->SetFillColor(kWhite);
+	rapPt->SetTitle(0);
+	rapPt->SetStats(0);
+	gPad->SetLeftMargin(0.15);
+	gPad->SetRightMargin(0.17);
+	rapPt->GetYaxis()->SetTitleOffset(1.5);
+	rapPt->Draw("colz");
+
+	TLine* rapPtLine;
+
+	for(int iRap=0;iRap<onia::kNbRapForPTBins+1;iRap++){
+		rapPtLine= new TLine( -onia::rapForPTRange[iRap], onia::pTRange[0][0], -onia::rapForPTRange[iRap], onia::pTRange[0][onia::kNbPTBins[iRap]] );
+		rapPtLine->SetLineWidth( 2 );
+		rapPtLine->SetLineStyle( 1 );
+		rapPtLine->SetLineColor( kWhite );
+		rapPtLine->Draw();
+		rapPtLine= new TLine( onia::rapForPTRange[iRap], onia::pTRange[0][0], onia::rapForPTRange[iRap], onia::pTRange[0][onia::kNbPTBins[iRap]] );
+		rapPtLine->SetLineWidth( 2 );
+		rapPtLine->SetLineStyle( 1 );
+		rapPtLine->SetLineColor( kWhite );
+		rapPtLine->Draw();
+
+		for(int iPt=0;iPt<onia::kNbPTBins[iRap+1]+1;iPt++){
+			rapPtLine= new TLine( -onia::rapForPTRange[onia::kNbRapForPTBins], onia::pTRange[0][iPt], onia::rapForPTRange[onia::kNbRapForPTBins], onia::pTRange[0][iPt] );
+			rapPtLine->SetLineWidth( 2 );
+			rapPtLine->SetLineStyle( 1 );
+			rapPtLine->SetLineColor( kWhite );
+			rapPtLine->Draw();
+		}
+	}
+
+	char savename[200];
+	sprintf(savename,"Figures/rapPt_Psi%dS.pdf",nState-3);
+	c2->SaveAs(savename);
+
 	f->Close();
 }
