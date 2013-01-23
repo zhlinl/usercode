@@ -4,7 +4,7 @@ LIBS=$(shell root-config --libs)
 %.o : %.cc
 	$(CXX) -c $<
 
-all: runData runWorkspace runMassFit runLifetimeFit runPlotMassLifetime runBkgHistos PlotFitPar PlotCosThetaPhiBG
+all: runData runWorkspace runMassFit runLifetimeFit runPlotMassLifetime runBkgHistos PlotFitPar PlotCosThetaPhiBG PlotCosThetaPhiDistribution
 
 runData: runData.cc 
 	$(CXX) $^ -o $@ $(LIBS) `root-config --cflags` -lFoam -lMinuit
@@ -30,6 +30,9 @@ PlotFitPar: PlotFitPar.cc
 PlotCosThetaPhiBG: PlotCosThetaPhiBG.cc
 	$(CXX) $^ -o $@ $(LIBS) `root-config --cflags` -lFoam -lMinuit -lRooFit -lRooFitCore
 
+PlotCosThetaPhiDistribution: PlotCosThetaPhiDistribution.cc
+	$(CXX) $^ -o $@ $(LIBS) `root-config --cflags` -lFoam -lMinuit -lRooFit -lRooFitCore
+
 clean: 
-	runData runWorkspace runMassFit runLifetimeFit runPlotMassLifetime runBkgHistos PlotFitPar PlotCosThetaPhiBG
+	runData runWorkspace runMassFit runLifetimeFit runPlotMassLifetime runBkgHistos PlotFitPar PlotCosThetaPhiBG PlotCosThetaPhiDistribution
 
