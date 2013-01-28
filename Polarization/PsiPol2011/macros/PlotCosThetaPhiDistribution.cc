@@ -3,8 +3,8 @@
  *
  *  Created on: Dec 8, 2011
  *      Author: valentinknuenz
- *  Modified on: Jan 22, 2013 linlinzhang 
- * 
+ *  Modified on: Jan 22, 2013 linlinzhang
+ *
  */
 
 #include <iostream>
@@ -15,43 +15,69 @@ using namespace std;
 #include "rootIncludes.inc"
 #include "commonVar.h"
 
-#include "TH2.h"
-#include "TH1.h"
+// binning
+int const pT_binsFOR1Dhists=onia::kNbPTMaxBins;
+int const Rap_binsFOR1Dhists=onia::kNbRapForPTBins;
+int nBins1DCosth=20;
+int nBins1DPhi=18;
+// extremes and binning of lambda_gen extraction histos
+const double l_min = -1;
+const double l_max =  1;
+const double l_step_1D = 0.02;
 
-Int_t const pT_binsFOR1Dhists=onia::kNbPTMaxBins;
-Int_t const Rap_binsFOR1Dhists=onia::kNbRapForPTBins;
-
+// cosTheta - phi - Distributions
 TH2D* CosThPhDist[onia::kNbFrames][onia::kNbRapForPTBins+1][onia::kNbPTMaxBins+1];
 TH1D* CosThDist[onia::kNbFrames][onia::kNbRapForPTBins+1][onia::kNbPTMaxBins+1];
 TH1D* PhiDist[onia::kNbFrames][onia::kNbRapForPTBins+1][onia::kNbPTMaxBins+1];
 
-int nBins1DCosth=20;
-int nBins1DPhi=18;
-//get from BG histogram
+// extraction histos
+TH1D* h_costh2[onia::kNbFrames][onia::kNbRapForPTBins+1][onia::kNbPTMaxBins+1];
+TH1D* h_cos2ph[onia::kNbFrames][onia::kNbRapForPTBins+1][onia::kNbPTMaxBins+1];
+TH1D* h_sin2thcosph[onia::kNbFrames][onia::kNbRapForPTBins+1][onia::kNbPTMaxBins+1];
 
-void LoadHistos(Int_t iRapBin, Int_t iPTBin, int nState, Char_t *DataPath);
-void PlotHistos(Int_t iRapBin, Int_t iPTBin, Int_t iFrame, int nState, Char_t *DataPath);
+// results
+TGraphAsymmErrors* graph_lamth[onia::kNbFrames][onia::kNbRapForPTBins+1];
+TGraphAsymmErrors* graph_lamph[onia::kNbFrames][onia::kNbRapForPTBins+1];
+TGraphAsymmErrors* graph_lamtp[onia::kNbFrames][onia::kNbRapForPTBins+1];
+TGraphAsymmErrors* graph_lamthstar[onia::kNbFrames][onia::kNbRapForPTBins+1];
+TGraphAsymmErrors* graph_lamphstar[onia::kNbFrames][onia::kNbRapForPTBins+1];
+TGraphAsymmErrors* graph_lamtilde[onia::kNbFrames][onia::kNbRapForPTBins+1];
+
+void LoadHistos(int iRapBin, int iPTBin, int nState, Char_t *DataPath);
+void PlotHistos(int iRapBin, int iPTBin, int iFrame, int nState, Char_t *DataPath);
+
 //===========================
+
 int main(int argc, char** argv){
 	Char_t *DataPath = "DataPath_Default";
-	int nState;
+	int nState = 999;
 
 	for( int i=0;i < argc; ++i ) {
 		if(std::string(argv[i]).find("nState") != std::string::npos) {char* nStatechar = argv[i]; char* nStatechar2 = strtok (nStatechar, "p"); nState = atof(nStatechar2); cout<<"nState = "<<nState<<endl;}
 		if(std::string(argv[i]).find("DataPath") != std::string::npos) {char* DataPathchar = argv[i]; char* DataPathchar2 = strtok (DataPathchar, "="); DataPath = DataPathchar2; cout<<"DataPath = "<<DataPath<<endl;}
 	}
 
-
 	gStyle->SetPalette(1);
 	gStyle->SetFrameBorderMode(0);
 
-	cout<<DataPath<<endl;
+	std::cout << DataPath << std::endl;
 
 	int nBinsCT=25;
 	int nBinsPH=25;
-	//get from BG histogram
 
+	// initialization of all graphs
 	for(int iRap = 0; iRap < onia::kNbRapForPTBins; iRap++){
+		for(int iFrame = 0; iFrame < onia::kNbFrames; iFrame++){
+
+			graph_lamth[iFrame][iRap] = new TGraphAsymmErrors();
+			graph_lamph[iFrame][iRap] = new TGraphAsymmErrors();
+			graph_lamtp[iFrame][iRap] = new TGraphAsymmErrors();
+			graph_lamthstar[iFrame][iRap] = new TGraphAsymmErrors();
+			graph_lamphstar[iFrame][iRap] = new TGraphAsymmErrors();
+			graph_lamtilde[iFrame][iRap] = new TGraphAsymmErrors();
+
+		}
+
 		for(int iPT = 0; iPT < onia::kNbPTBins[iRap+1]; iPT++){
 			for(int iFrame = 0; iFrame < onia::kNbFrames; iFrame++){
 
@@ -62,12 +88,19 @@ int main(int argc, char** argv){
 				nBinsCT = hNPBG_cosThetaPhi_PHX->GetNbinsX();
 				nBinsPH = hNPBG_cosThetaPhi_PHX->GetNbinsY();
 				nBins1DCosth = nBinsCT; nBins1DPhi = nBinsPH;
-				CosThPhDist[iFrame][iRap][iPT] = new TH2D("","",nBinsCT, onia::cosTMin, onia::cosTMax, 
+				CosThPhDist[iFrame][iRap][iPT] = new TH2D("","",nBinsCT, onia::cosTMin, onia::cosTMax,
 						nBinsPH, onia::phiPolMin, onia::phiPolMax);
 				CosThDist[iFrame][iRap][iPT] = new TH1D("","",nBins1DCosth, onia::cosTMin, onia::cosTMax);
 				PhiDist[iFrame][iRap][iPT] = new TH1D("","",nBins1DPhi, onia::phiPolMin, onia::phiPolMax);
+
+				h_costh2[iFrame][iRap][iPT] = new TH1D( "", "", int((l_max-l_min)/l_step_1D), l_min, l_max );
+				h_cos2ph[iFrame][iRap][iPT] = new TH1D( "", "", int((l_max-l_min)/l_step_1D), l_min, l_max );
+				h_sin2thcosph[iFrame][iRap][iPT] = new TH1D( "", "", int((l_max-l_min)/l_step_1D), l_min, l_max );
+
 			} //iFrame
+
 			LoadHistos(iRap, iPT,nState,DataPath);
+
 			for(int iFrame = 0; iFrame < 3; iFrame++){
 				PlotHistos(iRap, iPT, iFrame,nState,DataPath);
 			}
@@ -75,17 +108,20 @@ int main(int argc, char** argv){
 		} //iPT
 	} //iRap
 
-
 	char filename[200];
+	sprintf(filename, "%s/Figures/TGraphResults_gen_Psi%dS.root", DataPath, nState-3);
+	TFile* results = new TFile(filename, "RECREATE");
+
 	sprintf(filename, "%s/Figures/AngDistHist.root", DataPath);
 	TFile* AngDistHistFile = new TFile(filename, "RECREATE", "AngDistHistFile");
-	AngDistHistFile->cd();
 
 	for(int iRap = 0; iRap < onia::kNbRapForPTBins; iRap++){
-		for(int iPT = 0; iPT < onia::kNbPTBins[iRap+1]; iPT++){
+		for(int iFrame = 0; iFrame < 3; iFrame++){
+			for(int iPT = 0; iPT < onia::kNbPTBins[iRap+1]; iPT++){
 
-			char histName[200];
-			for(int iFrame = 0; iFrame < 3; iFrame++){
+				AngDistHistFile->cd();
+				char histName[200];               
+				// write histograms to file
 				sprintf(histName,"Proj_%s_costh_rap%d_pT%d",onia::frameLabel[iFrame],iRap+1,iPT+1);
 				CosThDist[iFrame][iRap][iPT]->SetName(histName);
 				CosThDist[iFrame][iRap][iPT]->Write();
@@ -95,18 +131,80 @@ int main(int argc, char** argv){
 				sprintf(histName,"CosthPhi_%s_rap%d_pT%d",onia::frameLabel[iFrame],iRap+1,iPT+1);
 				CosThPhDist[iFrame][iRap][iPT]->SetName(histName);
 				CosThPhDist[iFrame][iRap][iPT]->Write();
-			}
 
-		}
-	}
+				sprintf(histName,"costh2_%s_rap%d_pT%d",onia::frameLabel[iFrame],iRap+1,iPT+1);
+				h_costh2[iFrame][iRap][iPT]->SetName(histName);
+				h_costh2[iFrame][iRap][iPT]->Write();
+				sprintf(histName,"cos2ph_%s_rap%d_pT%d",onia::frameLabel[iFrame],iRap+1,iPT+1);
+				h_cos2ph[iFrame][iRap][iPT]->SetName(histName);
+				h_cos2ph[iFrame][iRap][iPT]->Write();
+				sprintf(histName,"sin2thcosph_%s_rap%d_pT%d",onia::frameLabel[iFrame],iRap+1,iPT+1);
+				h_sin2thcosph[iFrame][iRap][iPT]->SetName(histName);
+				h_sin2thcosph[iFrame][iRap][iPT]->Write();
 
+				// calculate the polarization parameters
+				double costh2 = h_costh2[iFrame][iRap][iPT]->GetMean();
+				double lamth = (1. - 3. * costh2 ) / ( costh2 - 3./5. );
+				double cos2ph = h_cos2ph[iFrame][iRap][iPT]->GetMean();
+				double lamph = cos2ph * (3. + lamth);
+				double sin2thcosph = h_sin2thcosph[iFrame][iRap][iPT]->GetMean();
+				double lamtp = sin2thcosph * 5./4. * (3. + lamth);
+				double lamtilde = (lamth + 3*lamph)/(1-lamph);
+				double lamthstar = -9;
+				double lamphstar = -9;
+
+				// calculate mean pt of bin
+				double meanpt = onia::pTRange[iRap+1][iPT] + (onia::pTRange[iRap+1][iPT+1] - onia::pTRange[iRap+1][iPT])/2; 
+
+				// save to TGraph
+				graph_lamth[iFrame][iRap]->SetPoint(iPT, meanpt, lamth);
+				graph_lamph[iFrame][iRap]->SetPoint(iPT, meanpt, lamph);
+				graph_lamtp[iFrame][iRap]->SetPoint(iPT, meanpt, lamtp);
+				graph_lamtilde[iFrame][iRap]->SetPoint(iPT, meanpt, lamtilde);
+				graph_lamthstar[iFrame][iRap]->SetPoint(iPT, meanpt, lamthstar);
+				graph_lamphstar[iFrame][iRap]->SetPoint(iPT, meanpt, lamphstar);
+
+			} // iPT
+
+			results->cd();
+			char graphName[200];
+			sprintf(graphName,"lth_%s_rap%d", onia::frameLabel[iFrame],iRap+1);
+			if(iFrame==2) sprintf(graphName,"lth_PX_rap%d", iRap+1);
+			graph_lamth[iFrame][iRap]->SetName(graphName);            
+			graph_lamth[iFrame][iRap]->Write();
+			sprintf(graphName,"lph_%s_rap%d", onia::frameLabel[iFrame],iRap+1);
+			if(iFrame==2) sprintf(graphName,"lph_PX_rap%d", iRap+1);
+			graph_lamph[iFrame][iRap]->SetName(graphName);
+			graph_lamph[iFrame][iRap]->Write();
+			sprintf(graphName,"ltp_%s_rap%d", onia::frameLabel[iFrame],iRap+1);
+			if(iFrame==2) sprintf(graphName,"ltp_PX_rap%d", iRap+1);
+			graph_lamtp[iFrame][iRap]->SetName(graphName);
+			graph_lamtp[iFrame][iRap]->Write();
+			sprintf(graphName,"ltilde_%s_rap%d", onia::frameLabel[iFrame],iRap+1);
+			if(iFrame==2) sprintf(graphName,"ltilde_PX_rap%d", iRap+1);
+			graph_lamtilde[iFrame][iRap]->SetName(graphName);
+			graph_lamtilde[iFrame][iRap]->Write();
+			sprintf(graphName,"lthstar_%s_rap%d", onia::frameLabel[iFrame],iRap+1);
+			if(iFrame==2) sprintf(graphName,"lthstar_PX_rap%d", iRap+1);
+			graph_lamthstar[iFrame][iRap]->SetName(graphName);
+			graph_lamthstar[iFrame][iRap]->Write();
+			sprintf(graphName,"lphstar_%s_rap%d", onia::frameLabel[iFrame],iRap+1);
+			if(iFrame==2) sprintf(graphName,"lphstar_PX_rap%d", iRap+1);
+			graph_lamphstar[iFrame][iRap]->SetName(graphName);
+			graph_lamphstar[iFrame][iRap]->Write();
+
+		} // iFrame
+	} // iRap
+
+	results->Write();
+	results->Close();
 	AngDistHistFile->Write();
 	AngDistHistFile->Close();
 
 	return 0;
 }
 //===========================
-void PlotHistos(Int_t iRapBin, Int_t iPTBin, Int_t iFrame,int nState, Char_t *DataPath){
+void PlotHistos(int iRapBin, int iPTBin, int iFrame,int nState, Char_t *DataPath){
 
 	TGaxis::SetMaxDigits(3);
 
@@ -154,7 +252,7 @@ void PlotHistos(Int_t iRapBin, Int_t iPTBin, Int_t iFrame,int nState, Char_t *Da
 }
 
 //===========================
-void LoadHistos(Int_t iRapBin, Int_t iPTBin, int nState, Char_t *DataPath){
+void LoadHistos(int iRapBin, int iPTBin, int nState, Char_t *DataPath){
 	Char_t name[100];
 	sprintf(name, "%s/tmpFiles/data_Psi%dS_rap%d_pT%d.root", DataPath,nState-3, iRapBin+1, iPTBin+1);
 
@@ -178,7 +276,6 @@ void LoadHistos(Int_t iRapBin, Int_t iPTBin, int nState, Char_t *DataPath){
 
 		selectedData->GetEvent( i );
 
-
 		double lepP_pT  = lepP->Pt();
 		double lepN_pT  = lepN->Pt();
 
@@ -186,7 +283,6 @@ void LoadHistos(Int_t iRapBin, Int_t iPTBin, int nState, Char_t *DataPath){
 		double lepN_eta = lepN->PseudoRapidity();
 
 		// dilepton 4-vector:
-
 		TLorentzVector dilepton = *lepP + *lepN;
 		double pT   = dilepton.Pt();
 		double rap  = dilepton.Rapidity();
@@ -204,26 +300,20 @@ void LoadHistos(Int_t iRapBin, Int_t iPTBin, int nState, Char_t *DataPath){
 		TVector3 dilep_direction     = dilepton.Vect().Unit();
 		TVector3 beam1_beam2_bisect  = ( beam1_direction - beam2_direction ).Unit();
 
-
 		// all polarization frames have the same Y axis = the normal to the plane formed by
 		// the directions of the colliding hadrons:
-
 		TVector3 Yaxis = ( beam1_direction.Cross( beam2_direction ) ).Unit();
 
 		// flip of y axis with rapidity:
-
 		if ( rap < 0. ) Yaxis = - Yaxis;
 
 		TVector3 perpendicular_to_beam = ( beam1_beam2_bisect.Cross( Yaxis ) ).Unit();
 
-
 		// positive lepton in the dilepton rest frame:
-
 		TLorentzVector lepton_DILEP = *lepP;
 		lepton_DILEP.Boost(lab_to_dilep);
 
 		// CS frame angles:
-
 		TVector3 newZaxis = beam1_beam2_bisect;
 		TVector3 newYaxis = Yaxis;
 		TVector3 newXaxis = newYaxis.Cross( newZaxis );
@@ -242,9 +332,7 @@ void LoadHistos(Int_t iRapBin, Int_t iPTBin, int nState, Char_t *DataPath){
 		if ( costh_CS > 0. ) phith_CS = phi_CS - 45.;
 		if ( phith_CS < -180. ) phith_CS = 360. + phith_CS;
 
-
 		// HELICITY frame angles:
-
 		newZaxis = dilep_direction;
 		newYaxis = Yaxis;
 		newXaxis = newYaxis.Cross( newZaxis );
@@ -262,9 +350,7 @@ void LoadHistos(Int_t iRapBin, Int_t iPTBin, int nState, Char_t *DataPath){
 		if ( costh_HX > 0. ) phith_HX = phi_HX - 45.;
 		if ( phith_HX < -180. ) phith_HX = 360. + phith_HX;
 
-
 		// PERPENDICULAR HELICITY frame angles:
-
 		newZaxis = perpendicular_to_beam;
 		newYaxis = Yaxis;
 		newXaxis = newYaxis.Cross( newZaxis );
@@ -282,8 +368,37 @@ void LoadHistos(Int_t iRapBin, Int_t iPTBin, int nState, Char_t *DataPath){
 		if ( costh_PX > 0. ) phith_PX = phi_PX - 45.;
 		if ( phith_PX < -180. ) phith_PX = 360. + phith_PX;
 
+		double cosalpha = sqrt( 1. - pow(costh_PX, 2.) ) * sin( lepton_DILEP_rotated.Phi() );
 
+		// Filling Histograms of costh2, cos2ph and sin2thcosph for the extraction of the actual generated polarization
+		// CS frame:
+		double costh2 = pow(costh_CS,2.);
+		double Phi = phi_CS/180. * gPI_;
+		double cos2ph = cos(2.*Phi);
+		double sin2thcosph= sin(2.*acos(costh_CS))*cos(Phi);
+		h_costh2[0][iRapBin][iPTBin]->Fill( costh2 );
+		h_cos2ph[0][iRapBin][iPTBin]->Fill( cos2ph );
+		h_sin2thcosph[0][iRapBin][iPTBin]->Fill( sin2thcosph );
 
+		// HX frame:
+		costh2 = pow(costh_HX,2.);
+		Phi = phi_HX/180. * gPI_;
+		cos2ph = cos(2.*Phi);
+		sin2thcosph= sin(2.*acos(costh_HX))*cos(Phi);
+		h_costh2[1][iRapBin][iPTBin]->Fill( costh2 );
+		h_cos2ph[1][iRapBin][iPTBin]->Fill( cos2ph );
+		h_sin2thcosph[1][iRapBin][iPTBin]->Fill( sin2thcosph );
+
+		// PHX frame:
+		costh2 = pow(costh_PX,2.);
+		Phi = phi_PX/180. * gPI_;
+		cos2ph = cos(2.*Phi);
+		sin2thcosph= sin(2.*acos(costh_PX))*cos(Phi);
+		h_costh2[2][iRapBin][iPTBin]->Fill( costh2 );
+		h_cos2ph[2][iRapBin][iPTBin]->Fill( cos2ph );
+		h_sin2thcosph[2][iRapBin][iPTBin]->Fill( sin2thcosph );
+
+		// fill cosTheta-phi-distributions in different frames
 		CosThPhDist[0][iRapBin][iPTBin]->Fill(costh_CS,phi_CS);
 		CosThPhDist[1][iRapBin][iPTBin]->Fill(costh_HX,phi_HX);
 		CosThPhDist[2][iRapBin][iPTBin]->Fill(costh_PX,phi_PX);
