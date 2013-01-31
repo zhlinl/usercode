@@ -1,6 +1,6 @@
 /*
- *  $Date: 2012/03/22 13:10:56 $
- *  $Revision: 1.1 $
+ *  $Date: 2012/09/13 13:34:17 $
+ *  $Revision: 1.2 $
  *  \author Jean-Roch Vlimant
  */
 
@@ -51,6 +51,8 @@ FlatRapidMeasuredPtGunProducer::~FlatRapidMeasuredPtGunProducer()
 }
 
 double FlatRapidMeasuredPtGunProducer::getRandom(double MinPt, double MaxPt){
+
+	gRandom = new TRandom3(0);
 
 	//realistic pT distribution function
 	TF1 *fPT = new TF1("fPT", "[0]*x*pow(1.+(1./([1]-2.))*x*x/[2],-[1])", MinPt, MaxPt);
