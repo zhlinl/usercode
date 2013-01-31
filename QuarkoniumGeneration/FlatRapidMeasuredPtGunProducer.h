@@ -10,6 +10,7 @@
 #include "IOMC/ParticleGuns/interface/BaseFlatGunProducer.h"
 #include "CLHEP/Random/RandExponential.h"
 #include "TF1.h"
+#include "TRandom3.h"
 namespace edm
 {
   
@@ -19,14 +20,10 @@ namespace edm
   public:
     FlatRapidMeasuredPtGunProducer(const ParameterSet & pset);
     virtual ~FlatRapidMeasuredPtGunProducer();
-		//double getRandom(double MinPt, double MaxPt);
-		//int               fResonance;
 
   private:
    
     virtual void produce(Event & e, const EventSetup& es);
-		//double getRandom(double MinPt, double MaxPt);
-		//int               fResonance;
     
   protected :
   
@@ -37,7 +34,7 @@ namespace edm
 
     double            fMinRapidity;
     double            fMaxRapidity;
-		double               fResonance;
+		double              fResonance;
 		double getRandom(double MinPt, double MaxPt);
 
 
