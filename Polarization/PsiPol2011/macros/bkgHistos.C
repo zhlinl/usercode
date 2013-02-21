@@ -920,7 +920,7 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 					index = 0;
 				else if(jpsi->M() >= massMinR && jpsi->M() <= massMaxR && TMath::Abs(jpsict) < ctauCut)
 					index = 1;
-				else if(jpsi->M() >= massMaxL && jpsi->M() < massMinR && jpsict >= ctauCut)
+				else if(jpsi->M() >= massMinSR && jpsi->M() < massMaxSR && jpsict >= ctauCut)
 					index = 2;
 				else if(jpsi->M() >= massMinL && jpsi->M() < massMaxL && jpsict >= ctauCut)
 					index = 3;
