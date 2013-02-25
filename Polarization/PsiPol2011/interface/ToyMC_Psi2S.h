@@ -2,7 +2,8 @@ namespace ToyMC{
 
 double ScenarioSig [3][9]={{-1,-0.5,0,0.5,1,0,0,0.5,1},{0,0,0,0,0,0.5,-0.5,-0.75,-1},{0,0,0,0,0,0,0,0,0}};//lamth_Signal,lamph_Signal,lamthph_Signal
 
-double ScenarioBkg [3][9]={{-1,-0.5,0,0.5,1,0,0,2,4},{0,0,0,0,0,0.5,0.8,0.4,-0.4},{0,0,0,0,0,0,0,0,0}};////lamth_Bkg,lamph_Bkg,lamthph_Bkg
+//double ScenarioBkg [3][9]={{-1,-0.5,0,0.5,1,0,0,2,4},{0,0,0,0,0,0.5,0.8,0.4,-0.4},{0,0,0,0,0,0,0,0,0}};////lamth_Bkg,lamph_Bkg,lamthph_Bkg
+double ScenarioBkg [3][9]={{-1,-0.5,0,-0.25,1,0,0,2,4},{0,0,0,0.25,0,0.5,0.8,0.4,-0.4},{0,0,0,0,0,0,0,0,0}};////lamth_Bkg,lamph_Bkg,lamthph_Bkg
 
 
 /*int MarkerStyle[3] = {0, 20, 21};
@@ -22,8 +23,15 @@ double MarkerSize[6][4]={{0,0,0},{0,2.75,2.75,2.75},{0,1.65,1.65,1.65},{0,1.65,1
 const int nPtBins=6;
 const int nRapBins=3;
 
-// ToyBackground
-double fracBackground[nRapBins][nPtBins]={{0.01,0.01,0.01,0.01,0.01,0.01},{0.01,0.01,0.01,0.01,0.01,0.01},{0.01,0.01,0.01,0.01,0.01,0.01}};
+// costh and phi bins from data BG histogram 
+int binCosth[nRapBins][nPtBins]={{128, 35, 27, 32, 32, 16},{64, 30, 24, 32, 32, 16},{64, 32, 32, 32, 16, 16}};
+int binPhi  [nRapBins][nPtBins]={{16, 16, 16, 16, 16, 16},{16, 16, 16, 16, 16, 16},{16, 16, 16, 16, 16, 8}};
+
+//// ToyBackground
+//double fracBackground[nRapBins][nPtBins]={{0.01,0.01,0.01,0.01,0.01,0.01},{0.01,0.01,0.01,0.01,0.01,0.01},{0.01,0.01,0.01,0.01,0.01,0.01}};
+//double fracBackground[nRapBins][nPtBins]={{0.001,0.001,0.001,0.001,0.001,0.001},{0.001,0.001,0.001,0.001,0.001,0.001},{0.001,0.001,0.001,0.001,0.001,0.001}}; // for Gen-Fiducial test
+//// from real data
+double fracBackground[nRapBins][nPtBins]={{0.191, 0.183, 0.190, 0.222, 0.274, 0.370},{0.299, 0.258, 0.263, 0.285, 0.357, 0.445},{0.327, 0.303, 0.327, 0.362, 0.420, 0.524}};
 
 //Psi(2): TPV cuts, prompt, Soft approval dataset after cowboy-fix
 double ptCentre[nRapBins][nPtBins]={{9.52022,  11.8943, 15.7294, 19.7371, 25.1272, 36.1102},{9.22147, 11.7868, 15.7024, 19.727, 25.1119, 36.1893},{8.80439, 11.7788, 15.721, 19.7275, 25.1509, 36.174}};
