@@ -37,7 +37,7 @@ void PlotMassLifetime(const std::string &infilename, int rapBin, int ptBin, int 
 		case 4:
 			std::cout << ">>>>Plotting lifetime signal region" << std::endl;
 			plotLifeSig(ws, rapBin, ptBin, nState);
-			//plotLifeSig_linear(ws, rapBin, ptBin, nState);
+			plotLifeSig_linear(ws, rapBin, ptBin, nState);
 			break;
 		default:
 			std::cerr << "I dont know what do do with this value of Plotting" << std::endl;
@@ -555,21 +555,29 @@ void plotMassLog(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 //==============================================
 void plotLifeBg(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 
-	int nbins=140; //bin size 0.025 mm
+	//int nbins=140; //bin size 0.025 mm
+	double binSize = 0.025; // mm 
+	double xaxisMin = -0.5, xaxisMax = 2.5;
+	int nbins = (int)((xaxisMax-xaxisMin)/binSize);
+
 
 	RooRealVar JpsiMass(*ws->var("JpsiMass"));
 	RooRealVar *JpsictErr = ws->var("JpsictErr");
 
-	RooPlot *ctauFrameBkgSBL=((RooRealVar*)ws->var("Jpsict"))->frame(Bins(nbins), Range(-1., 2.5));
+	RooPlot *ctauFrameBkgSBL=((RooRealVar*)ws->var("Jpsict"))->frame(Bins(nbins), Range(xaxisMin, xaxisMax));
 	ctauFrameBkgSBL->SetName(Form("ctaubkg_plot_rap%d_pt%d",rapBin,ptBin));
 	ctauFrameBkgSBL->SetYTitle("Events per 25 micron");
 	ctauFrameBkgSBL->SetTitle("");
+	//if(nState == 4) ctauFrameBkgSBL->GetXaxis()->SetTitle("#ell^{J/#psi} [mm]");
+	//if(nState == 5) ctauFrameBkgSBL->GetXaxis()->SetTitle("#ell^{#psi(2S)} [mm]");
+	ctauFrameBkgSBL->GetXaxis()->SetTitle("lifetime [mm]");
 
-	RooPlot *ctauFrameBkgSBLPull=((RooRealVar*)ws->var("Jpsict"))->frame(Bins(nbins), Range(-1., 2.5));
+	RooPlot *ctauFrameBkgSBLPull=((RooRealVar*)ws->var("Jpsict"))->frame(Bins(nbins), Range(xaxisMin, xaxisMax));
 	ctauFrameBkgSBLPull->SetName(Form("pullctaubkg_plot_rap%d_pt%d",rapBin,ptBin));
 	ctauFrameBkgSBLPull->SetTitle("");
-	if(nState == 4) ctauFrameBkgSBLPull->GetXaxis()->SetTitle("c_{#tau}^{J/#psi} [mm]");
-	if(nState == 5) ctauFrameBkgSBLPull->GetXaxis()->SetTitle("c_{#tau}^{#psi(2S)} [mm]");
+	//if(nState == 4) ctauFrameBkgSBLPull->GetXaxis()->SetTitle("#ell^{J/#psi} [mm]");
+	//if(nState == 5) ctauFrameBkgSBLPull->GetXaxis()->SetTitle("#ell^{#psi(2S)} [mm]");
+	ctauFrameBkgSBLPull->GetXaxis()->SetTitle("lifetime [mm]");
 	ctauFrameBkgSBLPull->GetYaxis()->SetTitle("pull");
 	ctauFrameBkgSBLPull->GetXaxis()->SetTitleSize(0.08);
 	ctauFrameBkgSBLPull->GetYaxis()->SetTitleSize(0.08);
@@ -578,16 +586,20 @@ void plotLifeBg(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 	ctauFrameBkgSBLPull->GetYaxis()->SetTitleOffset(0.4);
 	ctauFrameBkgSBLPull->GetYaxis()->SetRangeUser(-5.5,5.5);
 
-	RooPlot *ctauFrameBkgSBR=((RooRealVar*)ws->var("Jpsict"))->frame(Bins(nbins), Range(-1., 2.5));
+	RooPlot *ctauFrameBkgSBR=((RooRealVar*)ws->var("Jpsict"))->frame(Bins(nbins), Range(xaxisMin, xaxisMax));
 	ctauFrameBkgSBR->SetName(Form("ctaubkg_plot_rap%d_pt%d",rapBin,ptBin));
 	ctauFrameBkgSBR->SetYTitle("Events per 25 micron");
 	ctauFrameBkgSBR->SetTitle("");
+	//if(nState == 4) ctauFrameBkgSBR->GetXaxis()->SetTitle("#ell^{J/#psi} [mm]");
+	//if(nState == 5) ctauFrameBkgSBR->GetXaxis()->SetTitle("#ell^{#psi(2S)} [mm]");
+	ctauFrameBkgSBR->GetXaxis()->SetTitle("lifetime [mm]");
 
-	RooPlot *ctauFrameBkgSBRPull=((RooRealVar*)ws->var("Jpsict"))->frame(Bins(nbins), Range(-1., 2.5));
+	RooPlot *ctauFrameBkgSBRPull=((RooRealVar*)ws->var("Jpsict"))->frame(Bins(nbins), Range(xaxisMin, xaxisMax));
 	ctauFrameBkgSBRPull->SetName(Form("pullctaubkg_plot_rap%d_pt%d",rapBin,ptBin));
 	ctauFrameBkgSBRPull->SetTitle("");
-	if(nState == 4) ctauFrameBkgSBRPull->GetXaxis()->SetTitle("c_{#tau}^{J/#psi} [mm]");
-	if(nState == 5) ctauFrameBkgSBRPull->GetXaxis()->SetTitle("c_{#tau}^{#psi(2S)} [mm]");
+	//if(nState == 4) ctauFrameBkgSBRPull->GetXaxis()->SetTitle("#ell^{J/#psi} [mm]");
+	//if(nState == 5) ctauFrameBkgSBRPull->GetXaxis()->SetTitle("#ell^{#psi(2S)} [mm]");
+	ctauFrameBkgSBRPull->GetXaxis()->SetTitle("lifetime [mm]");
 	ctauFrameBkgSBRPull->GetYaxis()->SetTitle("pull");
 	ctauFrameBkgSBRPull->GetXaxis()->SetTitleSize(0.08);
 	ctauFrameBkgSBRPull->GetYaxis()->SetTitleSize(0.08);
@@ -727,7 +739,8 @@ void plotLifeBg(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 	cout<<"Ymax: "<<Ymax<<endl;
 
 	ctauFrameBkgSBL->SetMaximum(5*Ymax);
-	ctauFrameBkgSBL->SetMinimum(0.001*Ymax);
+	//ctauFrameBkgSBL->SetMinimum(0.001*Ymax);
+	ctauFrameBkgSBL->SetMinimum(1.1);
 
 	dataSBR->plotOn(ctauFrameBkgSBR,MarkerSize(0.8));
 	ModelLifeSBR->plotOn(ctauFrameBkgSBR,
@@ -780,7 +793,8 @@ void plotLifeBg(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 	Ymax = ctauFrameBkgSBR->GetMaximum();
 	cout<<"Ymax: "<<Ymax<<endl;
 	ctauFrameBkgSBR->SetMaximum(5*Ymax);
-	ctauFrameBkgSBR->SetMinimum(0.001*Ymax);
+	//ctauFrameBkgSBR->SetMinimum(0.001*Ymax);
+	ctauFrameBkgSBR->SetMinimum(1.1);
 
 	TH1* legendBlue = dataSBL->createHistogram("legendBlue",JpsiMass,Binning(50)) ; legendBlue->SetLineColor(kBlue) ; legendBlue->SetLineStyle(kSolid) ; legendBlue->SetLineWidth(2) ;
 	TH1* legendBlueDash = dataSBL->createHistogram("legendBlueDash",JpsiMass,Binning(50)) ; legendBlueDash->SetLineColor(kBlue) ; legendBlueDash->SetLineStyle(5) ; legendBlueDash->SetLineWidth(2) ;
@@ -971,7 +985,10 @@ void plotLifeBg(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 //==============================================
 void plotLifeSig(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 
-	int nbins=230; //bin size 0.01 mm
+	//int nbins=230; //bin size 0.01 mm
+	double binSize = 0.01; // mm 
+	double xaxisMin = -0.5, xaxisMax = 2.5;
+	int nbins = (int)((xaxisMax-xaxisMin)/binSize);
 
 	bool plotRegionLine=false;
 
@@ -979,15 +996,20 @@ void plotLifeSig(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 	RooRealVar Jpsict(*ws->var("Jpsict"));
 	RooRealVar *JpsictErr = ws->var("JpsictErr");
 
-	RooPlot *ctauFrameSig=((RooRealVar*)ws->var("Jpsict"))->frame(Bins(nbins), Range(-.3, 2.));
+	RooPlot *ctauFrameSig=((RooRealVar*)ws->var("Jpsict"))->frame(Bins(nbins), Range(xaxisMin, xaxisMax));
 	ctauFrameSig->SetName(Form("ctausig_plot_rap%d_pt%d",rapBin,ptBin));
 	ctauFrameSig->SetYTitle("Events per 10 micron");
 	ctauFrameSig->SetTitle("");
-	RooPlot *ctauFrameSigPull=((RooRealVar*)ws->var("Jpsict"))->frame(Bins(nbins), Range(-.3, 2.));
+	//if(nState == 4) ctauFrameSig->SetXTitle("#ell^{J/#psi} [mm]");
+	//if(nState == 5) ctauFrameSig->SetXTitle("#ell^{#psi(2S)} [mm]");
+	ctauFrameSig->SetXTitle("lifetime [mm]");
+
+	RooPlot *ctauFrameSigPull=((RooRealVar*)ws->var("Jpsict"))->frame(Bins(nbins), Range(xaxisMin, xaxisMax));
 	ctauFrameSigPull->SetName(Form("pullctausig_plot_rap%d_pt%d",rapBin,ptBin));
 	ctauFrameSigPull->SetTitle("");
-	if(nState == 4) ctauFrameSigPull->SetXTitle("c_{#tau}^{J/#psi} [mm]");
-	if(nState == 5) ctauFrameSigPull->SetXTitle("c_{#tau}^{#psi(2S)} [mm]");
+	//if(nState == 4) ctauFrameSigPull->SetXTitle("#ell^{J/#psi} [mm]");
+	//if(nState == 5) ctauFrameSigPull->SetXTitle("#ell^{#psi(2S)} [mm]");
+	ctauFrameSigPull->SetXTitle("lifetime [mm]");
 	ctauFrameSigPull->GetYaxis()->SetTitle("pull");
 	ctauFrameSigPull->GetXaxis()->SetTitleSize(0.08);
 	ctauFrameSigPull->GetYaxis()->SetTitleSize(0.08);
@@ -1046,13 +1068,13 @@ void plotLifeSig(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 	RooAbsPdf *nonPromptSSD = (RooAbsPdf*)ws->pdf("nonPromptSSD");
 	RooAbsPdf *backgroundlifetime = (RooAbsPdf*)ws->pdf("backgroundlifetime");
 
-
 	int parsFit;
 	//ploting signal region
-	dataSR->plotOn(ctauFrameSig,MarkerSize(0.8));
+	dataSR->plotOn(ctauFrameSig,MarkerSize(0.8), Name("myHist"));
 	ModelLife->plotOn(ctauFrameSig,
 			ProjWData(*JpsictErr, *dataSR),
-			LineWidth(2), NumCPU(1));
+			LineWidth(2), NumCPU(1),
+			Name("myCurve"));
 
 	//------get chi2------------SHOULD DONE after PLOTTING------
 	parsFit=(fitRlt->floatParsFinal()).getSize(); //this used the full p.d.f.
@@ -1062,12 +1084,30 @@ void plotLifeSig(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 	int ndof_LSig=nBins_LSig-parsFit;  //num of degree of freedom
 	double chi2_LSig=chi2Pre_LSig*ndof_LSig;
 
-	RooHist* hpull_ctauSig = ctauFrameSig->pullHist() ;
+	//RooHist* hpull_ctauSig = ctauFrameSig->pullHist() ;
+	
+	//RooHist* hpull_ctauSig = ctauFrameSig->pullHist(Form("h_data_rap%d_pt%d_SR",rapBin,ptBin),
+	//		"fulllifetime_Norm[Jpsict]_DataAvg[JpsictErr]",
+	//		kTRUE);
+	RooHist* hpull_ctauSig = ctauFrameSig->pullHist("myHist","myCurve",kTRUE);
+
+	//save pull distribution
+	TH1F* pull = new TH1F("pull","pull distribution", 100,-10.,10.);
+	gSystem->mkdir("Fit/pull",kTRUE);
+	TFile *pullFile = new TFile(Form("Fit/pull/pullAverage_rap%d_pt%d_SR.root",rapBin,ptBin),"RECREATE");
+
 	hpull_ctauSig->SetMarkerSize(0.8);
 	for(int i=0;i<hpull_ctauSig->GetN();i++){
 		hpull_ctauSig->SetPointEYlow(i,0.);
 		hpull_ctauSig->SetPointEYhigh(i,0.);
+		double x,y;
+		hpull_ctauSig->GetPoint(i,x,y);
+		pull->Fill(y);
 	}
+	pullFile->cd();
+	pull->Write();
+	pullFile->Close();
+
 	ctauFrameSigPull->addPlotable(hpull_ctauSig,"P");
 
 	//ModelLife->plotOn(ctauFrameSig,
@@ -1100,7 +1140,8 @@ void plotLifeSig(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 	double Ymax = ctauFrameSig->GetMaximum();
 	cout<<"Ymax: "<<Ymax<<endl;
 	ctauFrameSig->SetMaximum(3*Ymax);
-	ctauFrameSig->SetMinimum(0.001*Ymax);
+	//ctauFrameSig->SetMinimum(0.001*Ymax);
+	ctauFrameSig->SetMinimum(1.1);
 
 
 	TH1* legendBlue = dataSR->createHistogram("legendBlue",JpsiMass,Binning(50)) ; legendBlue->SetLineColor(kBlue) ; legendBlue->SetLineStyle(kSolid) ; legendBlue->SetLineWidth(2) ;
@@ -1239,7 +1280,7 @@ void plotLifeSig(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 	ctauFrameSigPull->Draw();
 
 	std::stringstream savectlog;
-	savectlog << "Fit/ct_SR_log_rap" << rapBin << "_pt" << ptBin << ".pdf";
+	savectlog << "Fit/ct_SR_log_rap" << rapBin << "_pt" << ptBin << "_pullAverage.pdf";
 	c1->SaveAs(savectlog.str().c_str());
 
 	delete c1;
@@ -1256,8 +1297,11 @@ void plotLifeSig(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 //==============================================
 void plotLifeSig_linear(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 
-	int nbins=100; //bin size 0.005 mm
 	TGaxis::SetMaxDigits(3);
+	//int nbins=100; //bin size 0.005 mm
+	double binSize = 0.005; // mm 
+	double xaxisMin = -0.2, xaxisMax = 0.3;
+	int nbins = (int)((xaxisMax-xaxisMin)/binSize);
 
 	bool plotRegionLine=false;
 
@@ -1265,17 +1309,21 @@ void plotLifeSig_linear(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 	RooRealVar Jpsict(*ws->var("Jpsict"));
 	RooRealVar *JpsictErr = ws->var("JpsictErr");
 
-	RooPlot *ctauFrameSig=((RooRealVar*)ws->var("Jpsict"))->frame(Bins(nbins), Range(-.2, .3));
+	RooPlot *ctauFrameSig=((RooRealVar*)ws->var("Jpsict"))->frame(Bins(nbins), Range(xaxisMin, xaxisMax));
 	ctauFrameSig->SetName(Form("ctausig_plot_rap%d_pt%d",rapBin,ptBin));
 	ctauFrameSig->SetYTitle("Events per 5 micron");
 	ctauFrameSig->SetTitle("");
 	ctauFrameSig->GetYaxis()->SetTitleOffset(1.3);
+	//if(nState == 4) ctauFrameSig->SetXTitle("#ell^{J/#psi} [mm]");
+	//if(nState == 5) ctauFrameSig->SetXTitle("#ell^{#psi(2S)} [mm]");
+	ctauFrameSig->SetXTitle("lifetime [mm]");
 
-	RooPlot *ctauFrameSigPull=((RooRealVar*)ws->var("Jpsict"))->frame(Bins(nbins), Range(-.2, .3));
+	RooPlot *ctauFrameSigPull=((RooRealVar*)ws->var("Jpsict"))->frame(Bins(nbins), Range(xaxisMin, xaxisMax));
 	ctauFrameSigPull->SetName(Form("pullctausig_plot_rap%d_pt%d",rapBin,ptBin));
 	ctauFrameSigPull->SetTitle("");
-	if(nState == 4) ctauFrameSigPull->SetXTitle("c_{#tau}^{J/#psi} [mm]");
-	if(nState == 5) ctauFrameSigPull->SetXTitle("c_{#tau}^{#psi(2S)} [mm]");
+	//if(nState == 4) ctauFrameSigPull->SetXTitle("#ell^{J/#psi} [mm]");
+	//if(nState == 5) ctauFrameSigPull->SetXTitle("#ell^{#psi(2S)} [mm]");
+	ctauFrameSigPull->SetXTitle("lifetime [mm]");
 	ctauFrameSigPull->GetYaxis()->SetTitle("pull");
 	ctauFrameSigPull->GetXaxis()->SetTitleSize(0.08);
 	ctauFrameSigPull->GetYaxis()->SetTitleSize(0.08);
@@ -1437,7 +1485,6 @@ void plotLifeSig_linear(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 	double step=textSize*1.3;
 
 	TCanvas *c1=new TCanvas("c1","",800,900);
-	//SetMyStyle();
 	c1->SetTickx();
 	c1->SetTicky();
 

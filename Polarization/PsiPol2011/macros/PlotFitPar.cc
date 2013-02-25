@@ -63,7 +63,6 @@ void fromSplit(const std::string& key, const std::string &arg, std::string &out)
 
 //=====================================================================
 int main(int argc, char* argv[]){
-
 	// set default values
 	int nState = 999;
 	bool doCtauUncer = false;
@@ -77,16 +76,16 @@ int main(int argc, char* argv[]){
 
 	PlotMassPar(nState);
 	PlotLifePar(nState);
-	if(nState==4)
-		PlotBFrac_1S(nState);
-	if(nState==5)
-		PlotBFrac_2S(nState);
+	//if(nState==4)
+	//	PlotBFrac_1S(nState);
+	//if(nState==5)
+	//	PlotBFrac_2S(nState);
 
 	double nSigma=2.5;
 	if(nState==4) nSigma=2.5;
 	if(nState==5) nSigma=2.0;
-	//evaluateCtauCut(nSigma, nState, 0, doCtauUncer);
-	//evaluateCtauCut(nSigma, nState, 1, doCtauUncer);
+	evaluateCtauCut(nSigma, nState, 0, doCtauUncer);
+	evaluateCtauCut(nSigma, nState, 1, doCtauUncer);
 
 	return 0;
 }
@@ -109,6 +108,7 @@ void PlotMassPar(int  nState){
 	double sigma2[RapBins][PtBins];
 	double evtBkgSB[RapBins][PtBins];
 	double fracLSB[RapBins][PtBins];
+	double alphaCB[RapBins][PtBins];
 
 	double pTErr[RapBins][PtBins];
 	double meanErr[RapBins][PtBins];
@@ -118,6 +118,7 @@ void PlotMassPar(int  nState){
 	double sigma2Err[RapBins][PtBins];
 	double evtBkgSBErr[RapBins][PtBins];
 	double fracLSBErr[RapBins][PtBins];
+	double alphaCBErr[RapBins][PtBins];
 
 	for(int rapBin = 1; rapBin < RapBins+1; rapBin++){
 		for(int ptBin = 1; ptBin < PtBins+1; ptBin++){
@@ -242,12 +243,16 @@ void PlotMassPar(int  nState){
 			sigma1[rapBin-1][ptBin-1] = Sigma*1000;
 			sigma2[rapBin-1][ptBin-1] = Sigma2*1000;
 
+			alphaCB[rapBin-1][ptBin-1] = Alpha;
+
 
 			meanErr[rapBin-1][ptBin-1] = MeanErr;
 			sigmaWeiErr[rapBin-1][ptBin-1] = SigmaWeiErr*1000;
 			bkgRatio3SigErr[rapBin-1][ptBin-1] = BkgRatio3SigErr*1000;
 			sigma1Err[rapBin-1][ptBin-1] = SigmaErr*1000;
 			sigma2Err[rapBin-1][ptBin-1] = Sigma2Err*1000;
+
+			alphaCBErr[rapBin-1][ptBin-1] = AlphaErr;
 
 		}
 	}
@@ -262,13 +267,14 @@ void PlotMassPar(int  nState){
 			cout<<"sigma2: "<<sigma2[rapBin-1][ptBin-1]<<"    sigma2Err: "<<sigma2Err[rapBin-1][ptBin-1]<<endl;
 			cout<<"evtBkgSB: "<<evtBkgSB[rapBin-1][ptBin-1]<<"    evtBkgSBErr: "<<evtBkgSBErr[rapBin-1][ptBin-1]<<endl;
 			cout<<"fracLSB: "<<fracLSB[rapBin-1][ptBin-1]<<"    fracLSBErr: "<<fracLSBErr[rapBin-1][ptBin-1]<<endl;
+			cout<<"alphaCB: "<<alphaCB[rapBin-1][ptBin-1]<<"    alphaCBErr: "<<alphaCBErr[rapBin-1][ptBin-1]<<endl;
 		}
 	}
 
 	RooRealVar JpsiMass(*ws->var("JpsiMass"));
 	TGraphErrors *graph_mean[RapBins], *graph_sigmaWei[RapBins], *graph_bkgRatio3Sig[RapBins],
 							 *graph_sigma1[RapBins], *graph_sigma2[RapBins], *graph_evtBkgSB[RapBins],
-							 *graph_fracLSB[RapBins];
+							 *graph_fracLSB[RapBins], *graph_alphaCB[RapBins];
 
 	for(int rapBin = 1; rapBin < RapBins+1; rapBin++){
 		graph_mean[rapBin-1] = new TGraphErrors(PtBins,
@@ -285,6 +291,20 @@ void PlotMassPar(int  nState){
 				pT[rapBin-1], evtBkgSB[rapBin-1], pTErr[rapBin-1], evtBkgSBErr[rapBin-1]);
 		graph_fracLSB[rapBin-1] = new TGraphErrors(PtBins,
 				pT[rapBin-1], fracLSB[rapBin-1], pTErr[rapBin-1], fracLSBErr[rapBin-1]);
+		graph_alphaCB[rapBin-1] = new TGraphErrors(PtBins,
+				pT[rapBin-1], alphaCB[rapBin-1], pTErr[rapBin-1], alphaCBErr[rapBin-1]);
+
+		//remove first pT bin for 2S
+		if(nState==5){
+			graph_mean[rapBin-1]         -> RemovePoint(0);
+			graph_sigmaWei[rapBin-1]     -> RemovePoint(0);
+			graph_bkgRatio3Sig[rapBin-1] -> RemovePoint(0);
+			graph_sigma1[rapBin-1]       -> RemovePoint(0);
+			graph_sigma2[rapBin-1]       -> RemovePoint(0);
+			graph_evtBkgSB[rapBin-1]     -> RemovePoint(0);
+			graph_fracLSB[rapBin-1]      -> RemovePoint(0);
+			graph_alphaCB[rapBin-1]      -> RemovePoint(0);
+		}
 	}
 
 	double blX = 0.17-0.05, blY = 0.70+0.05, trX = 0.4-0.05, trY = 0.84+0.05;
@@ -574,6 +594,34 @@ void PlotMassPar(int  nState){
 		graph_fracLSB[2]->SetLineColor(onia::colour_rapForPTBins[4]);
 	}
 
+	Ymin = 0.5; Ymax = 4.;
+	graph_alphaCB[0]->SetTitle("");
+	graph_alphaCB[0]->GetXaxis()->SetTitle("p_{T} (GeV)");
+	graph_alphaCB[0]->GetYaxis()->SetTitle("#alpha_{CB}");
+	graph_alphaCB[0]->GetXaxis()->SetLimits(Xmin, Xmax);
+	graph_alphaCB[0]->GetYaxis()->SetRangeUser(Ymin, Ymax);
+	graph_alphaCB[0]->SetMarkerStyle(onia::marker_rapForPTBins[2]);
+	graph_alphaCB[0]->SetMarkerColor(onia::colour_rapForPTBins[2]);
+	graph_alphaCB[0]->SetLineColor(onia::colour_rapForPTBins[2]);
+	graph_alphaCB[1]->SetTitle("");
+	graph_alphaCB[1]->GetXaxis()->SetTitle("p_{T} (GeV)");
+	graph_alphaCB[1]->GetYaxis()->SetTitle("#alpha_{CB}");
+	graph_alphaCB[1]->GetXaxis()->SetLimits(Xmin, Xmax);
+	graph_alphaCB[1]->GetYaxis()->SetRangeUser(Ymin, Ymax);
+	graph_alphaCB[1]->SetMarkerStyle(onia::marker_rapForPTBins[3]);
+	graph_alphaCB[1]->SetMarkerColor(onia::colour_rapForPTBins[3]);
+	graph_alphaCB[1]->SetLineColor(onia::colour_rapForPTBins[3]);
+	if(nState==5){
+		graph_alphaCB[2]->SetTitle("");
+		graph_alphaCB[2]->GetXaxis()->SetTitle("p_{T} (GeV)");
+		graph_alphaCB[2]->GetYaxis()->SetTitle("#alpha_{CB}");
+		graph_alphaCB[2]->GetXaxis()->SetLimits(Xmin, Xmax);
+		graph_alphaCB[2]->GetYaxis()->SetRangeUser(Ymin, Ymax);
+		graph_alphaCB[2]->SetMarkerStyle(onia::marker_rapForPTBins[4]);
+		graph_alphaCB[2]->SetMarkerColor(onia::colour_rapForPTBins[4]);
+		graph_alphaCB[2]->SetLineColor(onia::colour_rapForPTBins[4]);
+	}
+
 	double left=0.43, top=0.8+0.05, textSize=0.055;
 	if(nState==5) left=0.41;
 	TLatex *latex=new TLatex();
@@ -651,6 +699,17 @@ void PlotMassPar(int  nState){
 		latex->DrawLatex(left,top,"#psi(2S)");
 	c1->SaveAs(Form("%s/fracLSB.pdf",savePath.str().c_str()));
 
+	graph_alphaCB[0]->Draw("AP");
+	graph_alphaCB[1]->Draw("P");
+	if(nState==5)
+		graph_alphaCB[2]->Draw("P");
+	legendRight->Draw();
+	if(nState==4)
+		latex->DrawLatex(left,top,"J/#psi");
+	if(nState==5)
+		latex->DrawLatex(left,top,"#psi(2S)");
+	c1->SaveAs(Form("%s/alphaCB.pdf",savePath.str().c_str()));
+
 
 	////
 	graph_sigma1[0]->SetMarkerStyle(20);
@@ -696,8 +755,6 @@ void PlotMassPar(int  nState){
 		graph_fracLSB[rapBin-1]->SetName(Form("graph_fracLSB_%d",rapBin)); graph_fracLSB[rapBin-1]->Write();
 	}
 	return;
-
-
 }
 
 //========================================
@@ -758,7 +815,6 @@ double calcuFracL(RooWorkspace *ws, double mean, double sigma){
 
 //==============================================
 void PlotLifePar(int  nState) {
-
 	int RapBins = onia::kNbRapForPTBins,
 			PtBins  = onia::kNbPTMaxBins;
 	int LR=2;
@@ -1146,6 +1202,34 @@ void PlotLifePar(int  nState) {
 
 		graph_ratioLD_SBL[0][rapBin-1] = new TGraphErrors(PtBins, pT[rapBin-1], ratioLD_SBL[0][rapBin-1], pTErr[rapBin-1], ratioLDErr_SBL[0][rapBin-1]);
 		graph_ratioLD_SBR[0][rapBin-1] = new TGraphErrors(PtBins, pT[rapBin-1], ratioLD_SBR[0][rapBin-1], pTErr[rapBin-1], ratioLDErr_SBR[0][rapBin-1]);
+
+		//remove first pT bin for 2S
+		if(nState==5){
+			graph_promptMean[0][rapBin-1] -> RemovePoint(0);
+			graph_promptMean[1][rapBin-1] -> RemovePoint(0);
+			graph_promptCtRe[0][rapBin-1] -> RemovePoint(0);
+			graph_promptCtRe[1][rapBin-1] -> RemovePoint(0);
+			graph_promptCtRe2[0][rapBin-1] -> RemovePoint(0);
+			graph_promptCtRe2[1][rapBin-1] -> RemovePoint(0);
+			graph_promptCtReWei[0][rapBin-1] -> RemovePoint(0);
+			graph_promptCtReWei[1][rapBin-1] -> RemovePoint(0);
+			graph_fracGauss2[0][rapBin-1] -> RemovePoint(0);
+			graph_fracGauss2[1][rapBin-1] -> RemovePoint(0);
+			graph_bkgTauSSDR[0][rapBin-1] -> RemovePoint(0);
+			graph_bkgTauSSDR[1][rapBin-1] -> RemovePoint(0);
+			graph_bkgTauSSDL[0][rapBin-1] -> RemovePoint(0);
+			graph_bkgTauSSDL[1][rapBin-1] -> RemovePoint(0);
+			graph_bkgTauDSD[0][rapBin-1] -> RemovePoint(0);
+			graph_bkgTauDSD[1][rapBin-1] -> RemovePoint(0);
+			graph_fracBkgSSDL_SBL[0][rapBin-1] -> RemovePoint(0);
+			graph_fracBkgSSDR_SBL[0][rapBin-1] -> RemovePoint(0);
+			graph_fracBkgDSD_SBL[0][rapBin-1] -> RemovePoint(0);
+			graph_fracBkgSSDL_SBR[0][rapBin-1] -> RemovePoint(0);
+			graph_fracBkgSSDR_SBR[0][rapBin-1] -> RemovePoint(0);
+			graph_fracBkgDSD_SBR[0][rapBin-1] -> RemovePoint(0);
+			graph_ratioLD_SBL[0][rapBin-1] -> RemovePoint(0);
+			graph_ratioLD_SBR[0][rapBin-1] -> RemovePoint(0);
+		}
 	}
 
 	//TLegend* LifetimeLegend=new TLegend(0.75,0.75,0.88,0.88);
@@ -1616,7 +1700,6 @@ void PlotLifePar(int  nState) {
 
 //==================================
 void PlotBFrac_1S(int nState){
-
 	int RapBins = onia::kNbRapForPTBins,
 			PtBins  = onia::kNbPTMaxBins;
 
@@ -2081,12 +2164,10 @@ void PlotBFrac_1S(int nState){
 	graph_BFracRap1->Write();
 	graph_BFracRap2->Write();
 	outfile->Close();
-
 }
 
 //===========================
 void PlotBFrac_2S(int nState){
-
 	int RapBins = onia::kNbRapForPTBins,
 			PtBins  = onia::kNbPTMaxBins;
 
@@ -2648,7 +2729,7 @@ void PlotBFrac_2S(int nState){
 
 //===============================================
 void evaluateCtauCut(double nSigma, int nState, int type, bool doCtauUncer){ // type=0: PR(-ctau,ctau); type=1: NP(ctau,+infinity)
-	evaluate(nSigma, nState, type, doCtauUncer); 
+	//evaluate(nSigma, nState, type, doCtauUncer); 
 	plotEval(nSigma, nState, type);
 }
 
@@ -3155,7 +3236,7 @@ void evaluate(double nSigma, int nState, int type, bool doCtauUncer){ // type=0:
 		graph_FracPRRelativeErr[rapBin-1]->SetTitle("");
 		graph_FracPRRelativeErr[rapBin-1]->GetXaxis()->SetTitle("p_{T} (GeV)");
 		graph_FracPRRelativeErr[rapBin-1]->GetYaxis()->SetTitle("fraction RelativeError (%)");
-		graph_FracPRRelativeErr[rapBin-1]->GetYaxis()->SetRangeUser(0., 18);
+		graph_FracPRRelativeErr[rapBin-1]->GetYaxis()->SetRangeUser(0., 50.);
 		graph_FracPRRelativeErr[rapBin-1]->GetXaxis()->SetLimits(Xmin, Xmax);
 		graph_FracPRRelativeErr[rapBin-1]->SetMarkerStyle(onia::marker_rapForPTBins[0]);
 		graph_FracPRRelativeErr[rapBin-1]->SetMarkerColor(onia::colour_rapForPTBins[0]);
@@ -3183,7 +3264,7 @@ void evaluate(double nSigma, int nState, int type, bool doCtauUncer){ // type=0:
 		graph_FracNPRelativeErr[rapBin-1]->GetXaxis()->SetTitle("p_{T} (GeV)");
 
 		graph_FracNPRelativeErr[rapBin-1]->GetYaxis()->SetTitle("fraction RelativeError (%)");
-		graph_FracNPRelativeErr[rapBin-1]->GetYaxis()->SetRangeUser(0., 10);
+		graph_FracNPRelativeErr[rapBin-1]->GetYaxis()->SetRangeUser(0., 50.);
 		graph_FracNPRelativeErr[rapBin-1]->GetXaxis()->SetLimits(Xmin, Xmax);
 		graph_FracNPRelativeErr[rapBin-1]->SetMarkerStyle(onia::marker_rapForPTBins[1]);
 		graph_FracNPRelativeErr[rapBin-1]->SetMarkerColor(onia::colour_rapForPTBins[1]);
@@ -3210,7 +3291,7 @@ void evaluate(double nSigma, int nState, int type, bool doCtauUncer){ // type=0:
 		graph_FracBGRelativeErr[rapBin-1]->SetTitle("");
 		graph_FracBGRelativeErr[rapBin-1]->GetXaxis()->SetTitle("p_{T} (GeV)");
 		graph_FracBGRelativeErr[rapBin-1]->GetYaxis()->SetTitle("fraction RelativeError (%)");
-		graph_FracBGRelativeErr[rapBin-1]->GetYaxis()->SetRangeUser(0., 10);
+		graph_FracBGRelativeErr[rapBin-1]->GetYaxis()->SetRangeUser(0., 50.);
 		graph_FracBGRelativeErr[rapBin-1]->GetXaxis()->SetLimits(Xmin, Xmax);
 		graph_FracBGRelativeErr[rapBin-1]->SetMarkerStyle(onia::marker_rapForPTBins[2]);
 		graph_FracBGRelativeErr[rapBin-1]->SetMarkerColor(onia::colour_rapForPTBins[2]);
@@ -3377,10 +3458,32 @@ void plotEval(double nSigma, int nState, int type){
 		graph_sigmaP_L[rapBin-1] = (TGraphAsymmErrors*)infile->Get(Form("graph_sigmaP_L_%d",rapBin-1));
 		graph_sigmaP_L[rapBin-1] -> GetXaxis()->SetLimits(6.,72.);
 
+		if(nState==5){ // for Psi2S, remove first pT bin
+			graph_FracPR[rapBin-1] -> RemovePoint(0);
+			graph_FracNP[rapBin-1] -> RemovePoint(0);
+			graph_FracBG[rapBin-1] -> RemovePoint(0);
+			graph_FracPRErr[rapBin-1] -> RemovePoint(0);
+			graph_FracNPErr[rapBin-1] -> RemovePoint(0);
+			graph_FracBGErr[rapBin-1] -> RemovePoint(0);
+			graph_FracPRRelativeErr[rapBin-1] -> RemovePoint(0);
+			graph_FracNPRelativeErr[rapBin-1] -> RemovePoint(0);
+			graph_FracBGRelativeErr[rapBin-1] -> RemovePoint(0);
+
+			graph_CtauCut[rapBin-1] -> RemovePoint(0);
+			graph_PRprob[rapBin-1] -> RemovePoint(0);
+			graph_sigmaP[rapBin-1] -> RemovePoint(0);
+			graph_sigmaP_L[rapBin-1] -> RemovePoint(0);
+
+			graph_evtPR[rapBin-1] -> RemovePoint(0);  
+			graph_evtNP[rapBin-1] -> RemovePoint(0);
+			graph_evtBG[rapBin-1] -> RemovePoint(0);
+		}
+
 		graph_FracPRRelativeErr[rapBin-1] ->GetYaxis() -> SetRangeUser(0.,50.);
 		graph_FracNPRelativeErr[rapBin-1] ->GetYaxis() -> SetRangeUser(0.,50.);
 		graph_FracBGRelativeErr[rapBin-1] ->GetYaxis() -> SetRangeUser(0.,50.);
 	}
+
 	TCanvas *c1=new TCanvas("c1","c1");
 	c1->SetTickx();
 	c1->SetTicky();
@@ -3718,12 +3821,10 @@ void plotEval(double nSigma, int nState, int type){
 		cout<<"sigmaRap0: "<<sigmaRap0<<endl;
 		cout<<"sigmaRap1: "<<sigmaRap1<<endl;
 	}
-
 }
 
 //===================================
 vector<double> calculateInte(RooWorkspace *ws, RooDataSet *dataJpsictErr, double ctCutMin, double ctCutMax){
-
 	RooAbsPdf *PRpdf = (RooAbsPdf*)ws->pdf("TotalPromptLifetime");
 	RooAbsPdf *NPpdf = (RooAbsPdf*)ws->pdf("nonPromptSSD");
 	RooAbsPdf *BGpdf = (RooAbsPdf*)ws->pdf("backgroundlifetime");
@@ -3785,7 +3886,6 @@ vector<double> calculateInte(RooWorkspace *ws, RooDataSet *dataJpsictErr, double
 
 //===================================
 vector<double> getSigma(RooWorkspace *ws, int rapBin, int ptBin){
-
 	int nbins=200;
 	TGaxis::SetMaxDigits(3);
 	RooRealVar Jpsict(*ws->var("Jpsict"));

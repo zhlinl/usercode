@@ -79,7 +79,7 @@ int main(int argc, char* argv[]){
 	gStyle->SetPalette(1);
 
 	for(int iRap = 0; iRap < onia::kNbRapForPTBins; iRap++){
-		for(int iPT = 0; iPT < onia::kNbPTBins[iRap]; iPT++){
+		for(int iPT = 0; iPT < onia::kNbPTBins[iRap+1]; iPT++){
 			LoadHistos(iRap, iPT, nState);
 			for(int iFrame = 0; iFrame < onia::kNbFrames; iFrame++){
 				PlotHistos(iRap, iPT, iFrame, L);
@@ -94,7 +94,7 @@ int main(int argc, char* argv[]){
 	bool SaveTables=true;
 	if(SaveTables){
 		//for(int iRap = 0; iRap < onia::kNbRapForPTBins; iRap++){
-		//	for(int iPT = 0; iPT < onia::kNbPTBins[iRap]; iPT++){
+		//	for(int iPT = 0; iPT < onia::kNbPTBins[iRap+1]; iPT++){
 		//		cout<<"evtPinPRSR  ["<<iRap<<"]["<<iPT<<"]: "<<evtPinPRSR[iRap][iPT]<<endl;
 		//		cout<<"evtNPinPRSR ["<<iRap<<"]["<<iPT<<"]: "<<evtNPinPRSR[iRap][iPT]<<endl;
 		//		cout<<"evtBGinPRSR ["<<iRap<<"]["<<iPT<<"]: "<<evtBGinPRSR[iRap][iPT]<<endl;
@@ -182,7 +182,7 @@ void PlotHistos(Int_t iRapBin, Int_t iPTBin, Int_t iFrame, Int_t iWindow){
 	gStyle->SetOptStat(0);
 	gStyle->SetFrameBorderMode(0);
 
-	Char_t name[200];
+	Char_t name[500];
 	sprintf(name, "c1_%s_rap%d_pT%d_%s", onia::frameLabel[iFrame], iRapBin+1, iPTBin+1, bgLabel[iWindow]);
 	TCanvas *c1 = new TCanvas(name, "", 500, 500);
 	gStyle->SetPalette(1);
@@ -334,16 +334,20 @@ void LoadHistos(Int_t iRapBin, Int_t iPTBin, Int_t nState){
 		sprintf(name, "hTCosThetaPhi_%s_pT%d_rap%d", onia::frameLabel[iFrame], iRapBin+1, iPTBin+1);
 		hCosThetaPhiNPBG[iRapBin][iPTBin][iFrame]->SetName(name);
 
-		//if(iFrame==2){
-		//	std::cout<<"rap "<<iRapBin+1<<" pt "<<iPTBin+1<<" nBinsCosthBG: "<<
-		//		hCosThetaPhi[iRapBin][iPTBin][iFrame][L]->GetNbinsX()<<std::endl;
-		//	std::cout<<"rap "<<iRapBin+1<<" pt "<<iPTBin+1<<" nBinsPhiBG:   "<<
-		//		hCosThetaPhi[iRapBin][iPTBin][iFrame][L]->GetNbinsY()<<std::endl;
-		//	std::cout<<"rap "<<iRapBin+1<<" pt "<<iPTBin+1<<" nBinsCosthNPBG: "<<
-		//		hCosThetaPhiNPBG[iRapBin][iPTBin][iFrame]->GetNbinsX()<<std::endl;
-		//	std::cout<<"rap "<<iRapBin+1<<" pt "<<iPTBin+1<<" nBinsPhiNPBG:   "<<
-		//		hCosThetaPhiNPBG[iRapBin][iPTBin][iFrame]->GetNbinsY()<<std::endl;
-		//}
+		if(iFrame==2){
+			//std::cout<<"PrintBin rap "<<iRapBin+1<<" pt "<<iPTBin+1<<" nBinsCosthBG: "<<
+			//	hCosThetaPhi[iRapBin][iPTBin][iFrame][L]->GetNbinsX()<<std::endl;
+			//std::cout<<"PrintBin rap "<<iRapBin+1<<" pt "<<iPTBin+1<<" nBinsPhiBG:   "<<
+			//	hCosThetaPhi[iRapBin][iPTBin][iFrame][L]->GetNbinsY()<<std::endl;
+			//std::cout<<"PrintBin rap "<<iRapBin+1<<" pt "<<iPTBin+1<<" nBinsCosthNPBG: "<<
+			//	hCosThetaPhiNPBG[iRapBin][iPTBin][iFrame]->GetNbinsX()<<std::endl;
+			//std::cout<<"PrintBin rap "<<iRapBin+1<<" pt "<<iPTBin+1<<" nBinsPhiNPBG:   "<<
+			//	hCosThetaPhiNPBG[iRapBin][iPTBin][iFrame]->GetNbinsY()<<std::endl;
+			std::cout<<"PrintBin rap "<<iRapBin+1<<" pt "<<iPTBin+1<<" nBinsCosthTBG: "<<
+				hTCosThetaPhi[iRapBin][iPTBin][iFrame]->GetNbinsX()<<std::endl;
+			std::cout<<"PrintBin rap "<<iRapBin+1<<" pt "<<iPTBin+1<<" nBinsPhiTBG:   "<<
+				hTCosThetaPhi[iRapBin][iPTBin][iFrame]->GetNbinsY()<<std::endl;
+		}
 
 	}
 
