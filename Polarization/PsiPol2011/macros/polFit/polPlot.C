@@ -2550,9 +2550,11 @@ void polPlot(Char_t *dirstruct = "OutputDirectory_Default",
 	double lth_phithplots=0.5;
 	double lthplot_zeroLine=0.5;
 
-	bool plotZeros=false;
+	//bool plotZeros=false;
+	bool plotZeros=true; // for Fiducial-test
 
-	plotborder = 1.5;
+	//plotborder = 1.5;
+	plotborder = 1.7; // for Fiducial-test
 
 	// plot angular PDFs (calculated combining parameter-independent terms with best-fit parameters)
 	// normalized to data distribution
@@ -2647,6 +2649,10 @@ void polPlot(Char_t *dirstruct = "OutputDirectory_Default",
 	plotLegend2->AddEntry(PDF_cth_CS_p1,legendentry,"l");
 	sprintf(legendentry,"#lambda_{#theta} = -1,  #lambda_{#phi} = 0,  #lambda_{#theta#phi} = 0");
 	plotLegend2->AddEntry(PDF_cth_CS_m1,legendentry,"l");
+	if(plotZeros){
+		sprintf(legendentry,"#lambda_{#theta} = 0,  #lambda_{#phi} = 0,  #lambda_{#theta#phi} = 0");
+		plotLegend2->AddEntry(PDF_cth_CS_0,legendentry,"l");
+	}
 	plotLegend2->Draw(); plotLegend2->Draw();
 
 	sprintf(filename,"%s/fit_CS_costh_%s.pdf",dirstruct,TreeBinID);
@@ -2732,6 +2738,10 @@ void polPlot(Char_t *dirstruct = "OutputDirectory_Default",
 	plotLegend2->AddEntry(PDF_ph_CS_p1,legendentry,"l");
 	sprintf(legendentry,"#lambda_{#theta} = +0.5,  #lambda_{#phi} = -0.5,  #lambda_{#theta#phi} = 0");
 	plotLegend2->AddEntry(PDF_ph_CS_m1,legendentry,"l");
+	if(plotZeros){
+		sprintf(legendentry,"#lambda_{#theta} = 0,  #lambda_{#phi} = 0,  #lambda_{#theta#phi} = 0");
+		plotLegend2->AddEntry(PDF_ph_CS_0,legendentry,"l");
+	}
 	plotLegend2->Draw(); plotLegend2->Draw();
 
 	sprintf(filename,"%s/fit_CS_phi_%s.pdf",dirstruct,TreeBinID);
@@ -2817,6 +2827,10 @@ void polPlot(Char_t *dirstruct = "OutputDirectory_Default",
 	plotLegend2->AddEntry(PDF_phth_CS_p1,legendentry,"l");
 	sprintf(legendentry,"#lambda_{#theta} = +0.5,  #lambda_{#phi} = 0,  #lambda_{#theta#phi} = -#sqrt{2}/2");
 	plotLegend2->AddEntry(PDF_phth_CS_m1,legendentry,"l");
+	if(plotZeros){
+		sprintf(legendentry,"#lambda_{#theta} = 0,  #lambda_{#phi} = 0,  #lambda_{#theta#phi} = 0");
+		plotLegend2->AddEntry(PDF_phth_CS_0,legendentry,"l");
+	}
 	plotLegend2->Draw(); plotLegend2->Draw();
 
 	sprintf(filename,"%s/fit_CS_phith_%s.pdf",dirstruct,TreeBinID);
@@ -2899,6 +2913,10 @@ void polPlot(Char_t *dirstruct = "OutputDirectory_Default",
 	plotLegend2->AddEntry(PDF_cth_HX_p1,legendentry,"l");
 	sprintf(legendentry,"#lambda_{#theta} = -1,  #lambda_{#phi} = 0,  #lambda_{#theta#phi} = 0");
 	plotLegend2->AddEntry(PDF_cth_HX_m1,legendentry,"l");
+	if(plotZeros){
+		sprintf(legendentry,"#lambda_{#theta} = 0,  #lambda_{#phi} = 0,  #lambda_{#theta#phi} = 0");
+		plotLegend2->AddEntry(PDF_cth_HX_0,legendentry,"l");
+	}
 	plotLegend2->Draw(); plotLegend2->Draw();
 
 	sprintf(filename,"%s/fit_HX_costh_%s.pdf",dirstruct,TreeBinID);
@@ -2985,6 +3003,10 @@ void polPlot(Char_t *dirstruct = "OutputDirectory_Default",
 	plotLegend2->AddEntry(PDF_ph_HX_p1,legendentry,"l");
 	sprintf(legendentry,"#lambda_{#theta} = +0.5,  #lambda_{#phi} = -0.5,  #lambda_{#theta#phi} = 0");
 	plotLegend2->AddEntry(PDF_ph_HX_m1,legendentry,"l");
+	if(plotZeros){
+		sprintf(legendentry,"#lambda_{#theta} = 0,  #lambda_{#phi} = 0,  #lambda_{#theta#phi} = 0");
+		plotLegend2->AddEntry(PDF_ph_HX_0,legendentry,"l");
+	}
 	plotLegend2->Draw(); plotLegend2->Draw();
 
 	sprintf(filename,"%s/fit_HX_phi_%s.pdf",dirstruct,TreeBinID);
@@ -3053,7 +3075,7 @@ void polPlot(Char_t *dirstruct = "OutputDirectory_Default",
 	PDF_phth_HX_m1->Draw("L same");
 
 	PDF_phth_HX_0->SetLineColor(kRed);
-	PDF_phth_HX_0->SetLineStyle(5);
+	PDF_phth_HX_0->SetLineStyle(10);
 	if(plotZeros) PDF_phth_HX_0->Draw("L same");
 
 	DATA_phth_HX->SetLineColor(kBlack);
@@ -3071,6 +3093,10 @@ void polPlot(Char_t *dirstruct = "OutputDirectory_Default",
 	plotLegend2->AddEntry(PDF_phth_HX_p1,legendentry,"l");
 	sprintf(legendentry,"#lambda_{#theta} = +0.5,  #lambda_{#phi} = 0,  #lambda_{#theta#phi} = -#sqrt{2}/2");
 	plotLegend2->AddEntry(PDF_phth_HX_m1,legendentry,"l");
+	if(plotZeros){
+		sprintf(legendentry,"#lambda_{#theta} = 0,  #lambda_{#phi} = 0,  #lambda_{#theta#phi} = 0");
+		plotLegend2->AddEntry(PDF_phth_HX_0,legendentry,"l");
+	}
 	plotLegend2->Draw(); plotLegend2->Draw();
 
 	sprintf(filename,"%s/fit_HX_phith_%s.pdf",dirstruct,TreeBinID);
@@ -3154,6 +3180,10 @@ void polPlot(Char_t *dirstruct = "OutputDirectory_Default",
 	plotLegend2->AddEntry(PDF_cth_PX_p1,legendentry,"l");
 	sprintf(legendentry,"#lambda_{#theta} = -1,  #lambda_{#phi} = 0,  #lambda_{#theta#phi} = 0");
 	plotLegend2->AddEntry(PDF_cth_PX_m1,legendentry,"l");
+	if(plotZeros){
+		sprintf(legendentry,"#lambda_{#theta} = 0,  #lambda_{#phi} = 0,  #lambda_{#theta#phi} = 0");
+		plotLegend2->AddEntry(PDF_cth_PX_0,legendentry,"l");
+	}
 	plotLegend2->Draw(); plotLegend2->Draw();
 
 	sprintf(filename,"%s/fit_PX_costh_%s.pdf",dirstruct,TreeBinID);
@@ -3239,6 +3269,10 @@ void polPlot(Char_t *dirstruct = "OutputDirectory_Default",
 	plotLegend2->AddEntry(PDF_ph_PX_p1,legendentry,"l");
 	sprintf(legendentry,"#lambda_{#theta} = +0.5,  #lambda_{#phi} = -0.5,  #lambda_{#theta#phi} = 0");
 	plotLegend2->AddEntry(PDF_ph_PX_m1,legendentry,"l");
+	if(plotZeros){
+		sprintf(legendentry,"#lambda_{#theta} = 0,  #lambda_{#phi} = 0,  #lambda_{#theta#phi} = 0");
+		plotLegend2->AddEntry(PDF_ph_PX_0,legendentry,"l");
+	}
 	plotLegend2->Draw(); plotLegend2->Draw();
 
 	sprintf(filename,"%s/fit_PX_phi_%s.pdf",dirstruct,TreeBinID);
@@ -3324,6 +3358,10 @@ void polPlot(Char_t *dirstruct = "OutputDirectory_Default",
 	plotLegend2->AddEntry(PDF_phth_PX_p1,legendentry,"l");
 	sprintf(legendentry,"#lambda_{#theta} = +0.5,  #lambda_{#phi} = 0,  #lambda_{#theta#phi} = -#sqrt{2}/2");
 	plotLegend2->AddEntry(PDF_phth_PX_m1,legendentry,"l");
+	if(plotZeros){
+		sprintf(legendentry,"#lambda_{#theta} = 0,  #lambda_{#phi} = 0,  #lambda_{#theta#phi} = 0");
+		plotLegend2->AddEntry(PDF_phth_PX_0,legendentry,"l");
+	}
 	plotLegend2->Draw(); plotLegend2->Draw();
 
 	sprintf(filename,"%s/fit_PX_phith_%s.pdf",dirstruct,TreeBinID);
