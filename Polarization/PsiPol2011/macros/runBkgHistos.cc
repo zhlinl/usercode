@@ -56,7 +56,9 @@ int main(int argc, char* argv[]){
 					 rapMax = 999,
 					 ptMin = 999,
 					 ptMax = 999,
-					 nState = 999;
+					 nState = 999,
+					 ctauScen = 999,
+					 FracLSB = 999;
 	bool
 		MC = false,
 			 doCtauUncer = false,
@@ -73,6 +75,8 @@ int main(int argc, char* argv[]){
 		fromSplit("ptMin", arg, ptMin);
 		fromSplit("ptMax", arg, ptMax);
 		fromSplit("nState", arg, nState);
+		fromSplit("ctauScen", arg, ctauScen);
+		fromSplit("FracLSB", arg, FracLSB);
 		fromSplit("MC", arg, MC);
 		fromSplit("doCtauUncer", arg, doCtauUncer);
 		fromSplit("PolLSB", arg, PolLSB);
@@ -93,7 +97,7 @@ int main(int argc, char* argv[]){
 			temp << "tmpFiles/fit_Psi" << nState-3 << "S_rap" << iRap << "_pt" << iPT << ".root";
 			const std::string infilename = temp.str().c_str();
 
-			bkgHistos(infilename.c_str(), iRap, iPT, nState, MC, doCtauUncer, PolLSB, PolRSB, PolNP);
+			bkgHistos(infilename.c_str(), iRap, iPT, nState, MC, doCtauUncer, PolLSB, PolRSB, PolNP, ctauScen, FracLSB);
 
 		}
 	}

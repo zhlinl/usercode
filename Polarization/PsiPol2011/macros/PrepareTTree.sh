@@ -1,17 +1,22 @@
 ############ INPUTS ####################
 
+#source /afs/cern.ch/user/z/zhlinl/rootset.sh
+source /afs/ihep.ac.cn/users/z/zhangll/workspace/rootset.sh 34
+
 # Define JobID
-JobID=FrameworkTest_5Dec2012
+#JobID=FrameworkTest_5Dec2012
 
 Cdir=$PWD
 # input arguments
 for nState in 4;do    #1,2,3,Upsi(1S,2S,3S); 4,Jpsi 5,PsiPrime
 for FidCuts in 11;do    #defines the set of cuts to be used, see macros/polFit/effsAndCuts.h
+cd $Cdir
+
 
 rapMin=1     #takes bins, not actual values
-rapMax=1     #if you only want to process 1 y bin, rapMax = rapMin
-ptMin=4     #takes bins, not acutal values
-ptMax=4     #if you only want to process 1 pt bin, ptMax = ptMin
+rapMax=2     #if you only want to process 1 y bin, rapMax = rapMin
+ptMin=1     #takes bins, not acutal values
+ptMax=12     #if you only want to process 1 pt bin, ptMax = ptMin
 Plotting=2   #plotting macro: 1 = plot all, 2 = plot mass, 3 = plot lifetime sidebands, 4 = plot lifetime singal region
 
 rejectCowboys=true
@@ -21,6 +26,14 @@ doCtauUncer=false
 PolLSB=false      #measure polarization of the left sideband
 PolRSB=false      #measure polarization of the right sideband
 PolNP=false       #measure polarization of the non prompt events
+ctauScen=0        #0:default(1s:2.5,2s:2.0), 1:(1s:3.5,2s:3.0), 2:(1s:1.5,2s:1.0)
+FracLSB=-1        #-1:defalut, 0, 100
+
+#Define JobID
+#JobID=FrameworkTest_5Dec2012
+#JobID=ctauScen${ctauScen}_FracLSB${FracLSB}
+#JobID=ctauScen${ctauScen}_FracLSB${FracLSB}_25Feb2013
+JobID=ctauScen${ctauScen}_FracLSB${FracLSB}_26Feb2013_BgNoRebin
 
 # input files
 # In case of more input Files: define inputTreeX and adapt the line starting with inputTrees, at the moment up to 4 files implemented
@@ -46,15 +59,15 @@ fi
 
 #following flags decide if the step is executed (1) or not (0):
 #IMPORTANT: for MC set execute_runWorkspace, execute_MassFit and execute_runLifetimeFit to 0
-execute_runData=1			           #independent of rapMin, rapMax, ptMin, ptMax
+execute_runData=0			           #independent of rapMin, rapMax, ptMin, ptMax
 execute_runWorkspace=0			     #independent of rapMin, rapMax, ptMin, ptMax
 execute_runMassFit=0			       #can be executed for different pt and y bins
 execute_runLifetimeFit=0         #can be executed for different pt and y bins
 execute_runPlotMassLifetime=0    #can be executed for different pt and y bins
 execut_PlotFitPar=0              #independent of rapMin, rapMax, ptMin, ptMax
 execute_runBkgHistos=0           #can be executed for different pt and y bins
-execute_PlotCosThetaPhiBG=0 		 #This step only has to be executed once for each set of cuts (indep. of FracLSB and nSigma)
-execute_PlotCosThetaPhiDistribution=0 #This step only has to be executed once for each set of cuts (indep. of FracLSB and nSigma)
+execute_PlotCosThetaPhiBG=1 		 #This step only has to be executed once for each set of cuts (indep. of FracLSB and nSigma)
+execute_PlotCosThetaPhiDistribution=1 #This step only has to be executed once for each set of cuts (indep. of FracLSB and nSigma)
 
 #################################
 
@@ -110,12 +123,12 @@ cp ../latex/myStyle.tex ${WorkDir}/myStyle.tex
 cp ../latex/evaluateCtau.tex ${WorkDir}/evaluateCtau.tex
 cp ../latex/NumEvents.tex ${WorkDir}/NumEvents.tex
 
-cp ../latex/cosThetaPhi_$[nState-3]S_BG.tex ${WorkDir}/cosThetaPhi_$[nState-3]S_BG.tex
+cp ../latex/cosThetaPhi_$[nState-3]S_BG.tex        ${WorkDir}/cosThetaPhi_$[nState-3]S_BG.tex
 cp ../latex/cosThetaPhi_$[nState-3]S_BG_highct.tex ${WorkDir}/cosThetaPhi_$[nState-3]S_BG_highct.tex
-cp ../latex/cosThetaPhi_$[nState-3]S_NPBG.tex ${WorkDir}/cosThetaPhi_$[nState-3]S_NPBG.tex
-cp ../latex/cosThetaPhi_$[nState-3]S_TBG.tex ${WorkDir}/cosThetaPhi_$[nState-3]S_TBG.tex
-cp ../latex/cosThetaPhi_$[nState-3]S.tex ${WorkDir}/cosThetaPhi_$[nState-3]S.tex
-cp ../latex/MassLifetime_Psi$[nState-3]S.tex ${WorkDir}/MassLifetime_Psi$[nState-3]S.tex
+cp ../latex/cosThetaPhi_$[nState-3]S_NPBG.tex      ${WorkDir}/cosThetaPhi_$[nState-3]S_NPBG.tex
+cp ../latex/cosThetaPhi_$[nState-3]S_TBG.tex       ${WorkDir}/cosThetaPhi_$[nState-3]S_TBG.tex
+cp ../latex/cosThetaPhi_$[nState-3]S.tex           ${WorkDir}/cosThetaPhi_$[nState-3]S.tex
+cp ../latex/MassLifetime_Psi$[nState-3]S.tex       ${WorkDir}/MassLifetime_Psi$[nState-3]S.tex
 
 cd ${WorkDir}
 
@@ -153,8 +166,8 @@ then
 cp runPlotMassLifetime runPlotMassLifetime_$[nState-3]S_rap${rapMin}_pt${ptMin}
 ./runPlotMassLifetime_$[nState-3]S_rap${rapMin}_pt${ptMin} rapMin=${rapMin} rapMax=${rapMax} ptMin=${ptMin} ptMax=${ptMax} nState=${nState} Plotting=${Plotting}
 rm runPlotMassLifetime_$[nState-3]S_rap${rapMin}_pt${ptMin}
-pdflatex MassLifetime_Psi$[nState-3]S.tex
-mv MassLifetime_Psi$[nState-3]S.pdf PDF/MassLifetime_Psi$[nState-3]S.pdf
+#pdflatex MassLifetime_Psi$[nState-3]S.tex
+#mv MassLifetime_Psi$[nState-3]S.pdf PDF/MassLifetime_Psi$[nState-3]S.pdf
 fi
 
 if [ ${execut_PlotFitPar} -eq 1 ]
@@ -175,7 +188,7 @@ fi
 if [ ${execute_runBkgHistos} -eq 1 ]
 then
 cp runBkgHistos runBkgHistos_$[nState-3]S_rap${rapMin}_pt${ptMin}
-./runBkgHistos_$[nState-3]S_rap${rapMin}_pt${ptMin} rapMin=${rapMin} rapMax=${rapMax} ptMin=${ptMin} ptMax=${ptMax} nState=${nState} MC=${MC} doCtauUncer=${doCtauUncer} PolLSB=${PolLSB} PolRSB=${PolRSB} PolNP=${PolNP}
+./runBkgHistos_$[nState-3]S_rap${rapMin}_pt${ptMin} rapMin=${rapMin} rapMax=${rapMax} ptMin=${ptMin} ptMax=${ptMax} nState=${nState} MC=${MC} doCtauUncer=${doCtauUncer} PolLSB=${PolLSB} PolRSB=${PolRSB} PolNP=${PolNP} ctauScen=${ctauScen} FracLSB=${FracLSB}
 rm runBkgHistos_$[nState-3]S_rap${rapMin}_pt${ptMin}
 fi
 

@@ -71,7 +71,7 @@ TH2D* ReSetBin(TH2D* hist, int nBinX, int nBinY, const std::stringstream& name, 
 }
 
 //---------------------------------------------------------------------------------------------------------------
-void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, bool MC, bool doCtauUncer, bool PolLSB, bool PolRSB, bool PolNP){
+void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, bool MC, bool doCtauUncer, bool PolLSB, bool PolRSB, bool PolNP, int ctauScen, int FracLSB){
 
 	const std::string
 		datafilename = "tmpFiles/selEvents_data.root",
@@ -86,6 +86,7 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 	}
 	TTree *intree = (TTree *)datafile->Get(treename.c_str());
 	TLorentzVector *lepP = 0, *lepN = 0, *jpsi = 0;
+
 	TFile *fitfile = TFile::Open(infilename.c_str());
 	if(!fitfile){
 		std::cout << "fitfile is missing" << std::endl;
@@ -223,14 +224,28 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 	// mass edges for left and right sideband
 	double massMinL = onia::massMin;
 	double massMaxR = onia::massMax;
-	double massMaxL = mass - onia::nSigBkgLow  * sigma;
-	double massMinR = mass + onia::nSigBkgHigh * sigma;
-	double massMinSR = mass - onia::nSigMass * sigma;
-	double massMaxSR = mass + onia::nSigMass * sigma;
+	double massMaxL = 0,
+				 massMinR = 0,
+				 massMinSR = 0,
+				 massMaxSR = 0;
+	if(MC){
+		//massMaxL = mass - sigma;
+		//massMinR = mass + sigma;
+		massMaxL = mass - 10*sigma;
+		massMinR = mass + 10*sigma;
+		massMinSR = massMaxL;
+		massMaxSR = massMinR;
+		std::cout << "Using 10 sigma for MC" << std::endl;
+	}
+	else{
+		massMaxL = mass - onia::nSigBkgLow  * sigma;
+		massMinR = mass + onia::nSigBkgHigh * sigma;
+		massMinSR = mass - onia::nSigMass * sigma;
+		massMaxSR = mass + onia::nSigMass * sigma;
+	}
 	std::cout << "-------------------------------------------------------------\n" <<
 		"left  sideband: mass window " << massMinL  << " < M < " << massMaxL  << " GeV\n" <<
 		"right sideband: mass window " << massMinR  << " < M < " << massMaxR  << " GeV\n" <<
-		//"signal  region: mass window " << massMaxL  << " < M < " << massMinR  << " GeV\n" <<
 		"signal  region: mass window " << massMinSR  << " < M < " << massMaxSR  << " GeV\n" <<
 		"-------------------------------------------------------------\n" << std::endl;
 
@@ -239,7 +254,6 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 	std::stringstream dataBin, data, cutSR;
 	dataBin << "data_rap" << rapBin << "_pt" << ptBin << "_SR";
 	data    << "data_rap" << rapBin << "_pt" << ptBin;
-	//cutSR   << "JpsiMass > "<<massMaxL<<" && JpsiMass < "<<massMinR;
 	cutSR   << "JpsiMass > " << massMinSR << " && JpsiMass < " << massMaxSR;
 
 	RooAbsData* Data    = ws->data(data.str().c_str());
@@ -262,6 +276,8 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 	RooRealVar *mean_RSB_ws = (RooRealVar*)ws->var("MeanSBR");
 	double mean_RSB = mean_RSB_ws->getVal();
 	double fracLSB = 1 - (mean - mean_LSB)/(mean_RSB - mean_LSB);
+	if(FracLSB!=-1) fracLSB = double(FracLSB);
+	std::cout << " fracLSB: " << fracLSB <<std::endl;
 
 	RooRealVar* fBkg_ws = (RooRealVar*)ws->var("FracBkg");
 	double fBkg = fBkg_ws->getVal();
@@ -307,7 +323,7 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 	//proper decay length
 	double L_decay = a + b * meanPt;
 	//pseudo-proper decay length
-	double l_pdecay = 0., scale = 0.;
+	double l_pdecay = 0., scale = 1.;
 	if(nState==4) l_pdecay = L_decay * mass / meanPt ;
 	if(nState==5) {
 		if(rapBin == 1) scale = 1.21; //1.20
@@ -318,8 +334,24 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 	std::cout << "l_pdecay: " << l_pdecay << std::endl;
 
 	double nSigma = 0.;
-	if(nState==4) nSigma = 2.5;
-	if(nState==5) nSigma = 2.0;
+
+	if(ctauScen==0){ //default values
+		if(nState==4) nSigma = 2.5;
+		if(nState==5) nSigma = 2.0;
+	}
+	else if(ctauScen==1){
+		if(nState==4) nSigma = 3.5;
+		if(nState==5) nSigma = 3.0;
+	}
+	else if(ctauScen==2){
+		if(nState==4) nSigma = 1.5;
+		if(nState==5) nSigma = 1.0;
+	}
+	else{ //default values
+		if(nState==4) nSigma = 2.5;
+		if(nState==5) nSigma = 2.0;
+	} //more can be added if need
+
 	std::cout << "nSigma: " << nSigma << std::endl;
 
 	double ctauCut = nSigma*l_pdecay;
@@ -538,31 +570,36 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 	TH3D* hBG_pTRapMass_L = new TH3D("hBG_pTRapMass_L", ";p_{T} [GeV/c]; |y|; M [GeV]",
 			7, onia::pTRange[rapBin-1][ptBin-1], onia::pTRange[rapBin-1][ptBin],
 			2, onia::rapForPTRange[rapBin-1], onia::rapForPTRange[rapBin],
-			7, massMinL, massMaxR); // signal mass window!
+			7, massMinSR, massMaxSR); // signal mass window!
+			//7, massMinL, massMaxR);
 	hBG_pTRapMass_L->Sumw2();
 
 	TH3D* hBG_pTRapMass_R = new TH3D("hBG_pTRapMass_R", ";p_{T} [GeV/c]; |y|; M [GeV]",
 			7, onia::pTRange[rapBin-1][ptBin-1], onia::pTRange[rapBin-1][ptBin],
 			2, onia::rapForPTRange[rapBin-1], onia::rapForPTRange[rapBin],
-			7, massMinL, massMaxR); // signal mass window!
+			7, massMinSR, massMaxSR); // signal mass window!
+			//7, massMinL, massMaxR); // signal mass window!
 	hBG_pTRapMass_R->Sumw2();
 
 	TH3D* hBG_pTRapMass_highct_L = new TH3D("hBG_pTRapMass_highct_L", ";p_{T} [GeV/c]; |y|; M [GeV]",
 			7, onia::pTRange[rapBin-1][ptBin-1], onia::pTRange[rapBin-1][ptBin],
 			2, onia::rapForPTRange[rapBin-1], onia::rapForPTRange[rapBin],
-			7, massMinL, massMaxR);
+			7, massMinSR, massMaxSR);
+			//7, massMinL, massMaxR);
 	hBG_pTRapMass_highct_L->Sumw2();
 
 	TH3D* hBG_pTRapMass_highct_R = new TH3D("hBG_pTRapMass_highct_R", ";p_{T} [GeV/c]; |y|; M [GeV]",
 			7, onia::pTRange[rapBin-1][ptBin-1], onia::pTRange[rapBin-1][ptBin],
 			2, onia::rapForPTRange[rapBin-1], onia::rapForPTRange[rapBin],
-			7, massMinL, massMaxR);
+			7, massMinSR, massMaxSR);
+			//7, massMinL, massMaxR);
 	hBG_pTRapMass_highct_R->Sumw2();
 
 	TH3D* hNP_pTRapMass = new TH3D("hNP_pTRapMass_NP", ";p_{T} [GeV/c]; |y|; M [GeV]",
 			7, onia::pTRange[rapBin-1][ptBin-1], onia::pTRange[rapBin-1][ptBin],
 			2, onia::rapForPTRange[rapBin-1], onia::rapForPTRange[rapBin],
-			7, massMinL, massMaxR);
+			7, massMinSR, massMaxSR);
+			//7, massMinL, massMaxR);
 	hNP_pTRapMass->Sumw2();
 
 	//------------------------------------------------------------------------------------------------
@@ -570,6 +607,7 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 	int index = -1;
 	int n = intree->GetEntries();
 	int MCevents = 0;
+	int count=0;
 
 	//// for 1S, rap1,pt 1 2 3 4; rap2,pt 1 2 3 4, not use the full statistics
 	//if(nState==4 && ((rapBin==1 && ptBin<5)||(rapBin==2 && ptBin<5)))
@@ -584,7 +622,7 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 		// ------------------------- TLorentzVecotrs -------------------------
 		if(jpsi->Pt() >= onia::pTRange[rapBin-1][ptBin-1] &&
 				jpsi->Pt() < onia::pTRange[rapBin-1][ptBin] &&
-				TMath::Abs(jpsi->Rapidity()) >= onia::rapForPTRange[rapBin-1] && 
+				TMath::Abs(jpsi->Rapidity()) >= onia::rapForPTRange[rapBin-1] &&
 				TMath::Abs(jpsi->Rapidity()) < onia::rapForPTRange[rapBin]){
 
 			//store TLorentzVectors of the two muons in the given pT and rap cell
@@ -614,12 +652,20 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 			} // PolNP
 			// for prompt data and MC
 			//store only events from signal region
-			else{
-				if(jpsi->M() >= massMinSR && jpsi->M() < massMaxSR && TMath::Abs(jpsict) < ctauCut){
+			else if(MC){
+				if(jpsi->M() >= massMinSR && jpsi->M() < massMaxSR){
 					outtree->Fill();
 					pT_PSR->Fill(jpsi->Pt());
 					rap_PSR->Fill(TMath::Abs(jpsi->Rapidity()));
 					if(MC) MCevents++;
+				}
+			}
+			else{
+				if(jpsi->M() >= massMinSR && jpsi->M() < massMaxSR && TMath::Abs(jpsict) < ctauCut){
+					count++;
+					outtree->Fill();
+					pT_PSR->Fill(jpsi->Pt());
+					rap_PSR->Fill(TMath::Abs(jpsi->Rapidity()));
 				}
 			} // else
 
@@ -705,7 +751,7 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 					if(PolNP)
 						hBG_pTRapMass_highct_L->Fill(jpsi->Pt(), TMath::Abs(jpsi->Rapidity()), funcBG->GetRandom(massMinSR, massMaxSR));
 					else
-						hBG_pTRapMass_highct_L->Fill(jpsi->Pt(), TMath::Abs(jpsi->Rapidity()), funcSig->GetRandom(massMinSR, massMaxSR));
+						hBG_pTRapMass_highct_L->Fill(jpsi->Pt(), TMath::Abs(jpsi->Rapidity()), funcSig->GetRandom(massMinSR, massMaxSR)); // to be checked, should be funcBG->GetRandom()?
 					pT_highct_L->Fill(jpsi->Pt());
 					rap_highct_L->Fill(TMath::Abs(jpsi->Rapidity()));
 				}
@@ -714,7 +760,7 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 					if(PolNP)
 						hBG_pTRapMass_highct_R->Fill(jpsi->Pt(), TMath::Abs(jpsi->Rapidity()), funcBG->GetRandom(massMinSR, massMaxSR));
 					else
-						hBG_pTRapMass_highct_R->Fill(jpsi->Pt(), TMath::Abs(jpsi->Rapidity()), funcSig->GetRandom(massMinSR, massMaxSR));
+					 	hBG_pTRapMass_highct_R->Fill(jpsi->Pt(), TMath::Abs(jpsi->Rapidity()), funcSig->GetRandom(massMinSR, massMaxSR)); // to be checked, should be funcBG->GetRandom()?
 					pT_highct_R->Fill(jpsi->Pt());
 					rap_highct_R->Fill(TMath::Abs(jpsi->Rapidity()));
 				}
@@ -749,6 +795,8 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 		} // if(onia...)
 	} // i
 
+	cout<<"total events in PRSR: "<<count<<endl;
+
 	// fill histograms with number of events for MC
 	if(MC){
 		// number of events in signal region
@@ -770,6 +818,7 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 			if(binContent>0) filledBins++;
 		}
 	}
+	std::cout << "filled bins: " << filledBins << " total bins: " << totalBins << std::endl;
 	double coverage = 2*(double)filledBins/(double)totalBins;
 	nBinsCosth = 16*2/coverage;
 	cout<<"coverage: "<<coverage<<endl;
@@ -991,9 +1040,9 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 	int nx = hNPS_pTRapMass->GetXaxis()->GetNbins();
 	int ny = hNPS_pTRapMass->GetYaxis()->GetNbins();
 	int nz = hNPS_pTRapMass->GetZaxis()->GetNbins();
-	for (int j = 1; j <= nx; j++){
-		for (int k = 1; k <= ny; k++){
-			for(int l = 1; l <= nz; l++){
+	for (int j = 0; j <= nx; j++){
+		for (int k = 0; k <= ny; k++){
+			for(int l = 0; l <= nz; l++){
 				double c1 = hNPS_pTRapMass->GetBinContent(j,k,l);
 				if (c1 > 0) {
 					double c2 = hBG_pTRapMass_highct->GetBinContent(j,k,l);
@@ -1081,7 +1130,7 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 	h_meanY->SetBinContent(1, meanY);
 	h_meanY->Write();
 
-	//---rebin BG to be same NPBG
+	//---rebin BG to be same as NPBG
 	bool ResetBin=true;
 	if(ResetBin){
 		cout<<"Resetting bins...."<<endl;
@@ -1141,26 +1190,11 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 		// do manual subtraction
 		nx = hNPS_cosThetaPhi[iFrame]->GetXaxis()->GetNbins();
 		ny = hNPS_cosThetaPhi[iFrame]->GetYaxis()->GetNbins();
-		// bins for non prompt histogram is different from bins of background histograms
-		int xBins = nBinsCosthNPBG/nBinsCosthBG;
-		int yBins = nBinsPhiNPBG/nBinsPhiBG;
-		int x = 0;
-		for (int j = 1; j <= nx; j++){
-			if(j%xBins==1) x++;
-			int y = 0;
-			for (int k = 1; k <= ny; k++){
-				if(k%yBins==1) y++;
+		for (int j = 0; j <= nx; j++){
+			for (int k = 0; k <= ny; k++){
 				double c1 = hNPS_cosThetaPhi[iFrame]->GetBinContent(j,k);
-				if (c1 > 0) {
-					double c2 = 0;
-					if(xBins == 1 && yBins == 1)
-						c2 = hBGinNP_cosThetaPhi[iFrame]->GetBinContent(j,k);
-					else if(xBins == 1 && yBins != 1)
-						c2 = hBGinNP_cosThetaPhi[iFrame]->GetBinContent(j,y);
-					else if(xBins != 1 && yBins == 1)
-						c2 = hBGinNP_cosThetaPhi[iFrame]->GetBinContent(x,k);
-					else
-						c2 = hBGinNP_cosThetaPhi[iFrame]->GetBinContent(x,y);
+				if (c1 > 0){
+					double c2 = hBGinNP_cosThetaPhi[iFrame]->GetBinContent(j,k);
 					// value must be above 0, otherwise set 0
 					double c3 = c1 - 1.*c2;
 					if(c3 < 0) c3 = 0;
@@ -1183,30 +1217,7 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 			hBG_cosThetaPhi[iFrame]->Scale(fBGsig/(1.*hBG_cosThetaPhi[iFrame]->Integral()));
 			hNPS_cosThetaPhi[iFrame]->Scale(fNPB/(1.*hNPS_cosThetaPhi[iFrame]->Integral()));
 			hTBG_cosThetaPhi[iFrame] = (TH2D *) hNPS_cosThetaPhi[iFrame]->Clone(nameTBG.str().c_str());
-			x = 0;
-			for (int j = 1; j <= nx; j++){
-				if(j%xBins==1) x++;
-				int y = 0;
-				for (int k = 1; k <= ny; k++){
-					if(k%yBins==1) y++;
-					double c1 = hTBG_cosThetaPhi[iFrame]->GetBinContent(j,k);
-					if (c1 > 0) {
-						double c2 = 0;
-						if(xBins == 1 && yBins == 1)
-							c2 = hBGinNP_cosThetaPhi[iFrame]->GetBinContent(j,k);
-						else if(xBins == 1 && yBins != 1)
-							c2 = hBGinNP_cosThetaPhi[iFrame]->GetBinContent(j,y);
-						else if(xBins != 1 && yBins == 1)
-							c2 = hBGinNP_cosThetaPhi[iFrame]->GetBinContent(x,k);
-						else
-							c2 = hBGinNP_cosThetaPhi[iFrame]->GetBinContent(x,y);
-						// value must be above 0, otherwise set 0
-						double c3 = c1 + 1.*c2;
-						if(c3 < 0) c3 = 0;
-						hTBG_cosThetaPhi[iFrame]->SetBinContent(j,k,c3);
-					}
-				} // k
-			} // j
+			hTBG_cosThetaPhi[iFrame]->Add(hBG_cosThetaPhi[iFrame]);
 			hTBG_cosThetaPhi[iFrame]->Write();
 		}
 
