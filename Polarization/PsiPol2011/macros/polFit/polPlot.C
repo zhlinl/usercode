@@ -2548,7 +2548,8 @@ void polPlot(Char_t *dirstruct = "OutputDirectory_Default",
 
 	double lth_phiplots=0.5;
 	double lth_phithplots=0.5;
-	double lthplot_zeroLine=0.5;
+	//double lthplot_zeroLine=0.5;
+	double lthplot_zeroLine=0.; // for Fiducial-test
 
 	//bool plotZeros=false;
 	bool plotZeros=true; // for Fiducial-test

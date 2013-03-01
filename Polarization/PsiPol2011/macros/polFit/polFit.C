@@ -29,7 +29,8 @@
 
 // number of discarded intial random extractions (burn-in period):
 int n_burnIn = 10000; // do not change this, 2000 is default
-int Toy_n_burnIn = 2000; // do not change this, 2000 is default
+int Toy_n_burnIn = 2000; // do not change this, 2000 is default 
+//int Toy_n_burnIn = 10000; // do not change this, 2000 is default // for Gen-Fiducial test
 bool RandomSeed=true;
 bool RandomLambdaTheta=false;
 
@@ -328,173 +329,173 @@ void polFit(int n_sampledPoints=1,
   sprintf(hEvalEffName,"%s/EvalHisto1D.root",dirstruct);
 //  hEvalEff1D->SaveAs(hEvalEffName);
   sprintf(hEvalEffName,"%s/EvalHisto2D.root",dirstruct);
-//  hEvalEff2D->SaveAs(hEvalEffName);
-}
+	//  hEvalEff2D->SaveAs(hEvalEffName);
+	}
 
 
 
 
-  if( nEff>1019 && nEff<1099 ){
-  const int etaBinsTotal = 8;
-  double etaBinningParametrized[etaBinsTotal+1]={0.,0.2,0.3,0.6,0.8,1.0,1.2,1.4,1.6};
-  int pTBinsNew = 2000;
-  int etaBinsNew = 200;
-  hEvalEff1D   = new TH2D( "hEvalEff1D", "hEvalEff1D", etaBinsNew, 0,1.6, pTBinsNew,  0, 100);
-  double eff;
-  double effBuffer;
-  char graphName[200];
+	if( nEff>1019 && nEff<1099 ){
+		const int etaBinsTotal = 8;
+		double etaBinningParametrized[etaBinsTotal+1]={0.,0.2,0.3,0.6,0.8,1.0,1.2,1.4,1.6};
+		int pTBinsNew = 2000;
+		int etaBinsNew = 200;
+		hEvalEff1D   = new TH2D( "hEvalEff1D", "hEvalEff1D", etaBinsNew, 0,1.6, pTBinsNew,  0, 100);
+		double eff;
+		double effBuffer;
+		char graphName[200];
 
 
-  int currentEtaBin;
-  for(int etaBin=0;etaBin<etaBinsNew;etaBin++){
-	  for(int etaSearch=0;etaSearch<etaBinsTotal;etaSearch++){
-	  if(hEvalEff1D->GetXaxis()->GetBinCenter(etaBin+1)>etaBinningParametrized[etaSearch] && hEvalEff1D->GetXaxis()->GetBinCenter(etaBin+1)<etaBinningParametrized[etaSearch+1])
-		  currentEtaBin=etaSearch+1;
-	  }
-	  sprintf(graphName,"gEff_DATA_PT_AETA%d",currentEtaBin-1);
-	  TGraphAsymmErrors *graph = new TGraphAsymmErrors(*((TGraphAsymmErrors *) fInEff->Get(graphName)));
+		int currentEtaBin;
+		for(int etaBin=0;etaBin<etaBinsNew;etaBin++){
+			for(int etaSearch=0;etaSearch<etaBinsTotal;etaSearch++){
+				if(hEvalEff1D->GetXaxis()->GetBinCenter(etaBin+1)>etaBinningParametrized[etaSearch] && hEvalEff1D->GetXaxis()->GetBinCenter(etaBin+1)<etaBinningParametrized[etaSearch+1])
+					currentEtaBin=etaSearch+1;
+			}
+			sprintf(graphName,"gEff_DATA_PT_AETA%d",currentEtaBin-1);
+			TGraphAsymmErrors *graph = new TGraphAsymmErrors(*((TGraphAsymmErrors *) fInEff->Get(graphName)));
 
-		  for(int pTBin=0;pTBin<pTBinsNew;pTBin++){
-			  eff = graph->Eval(hEvalEff1D->GetYaxis()->GetBinCenter(pTBin+1));
-		  	  if(eff<0) eff=0;
-		  	  hEvalEff1D->SetBinContent(etaBin+1,pTBin+1,eff); effBuffer=eff;
-  }
+			for(int pTBin=0;pTBin<pTBinsNew;pTBin++){
+				eff = graph->Eval(hEvalEff1D->GetYaxis()->GetBinCenter(pTBin+1));
+				if(eff<0) eff=0;
+				hEvalEff1D->SetBinContent(etaBin+1,pTBin+1,eff); effBuffer=eff;
+			}
 
-  }
-  sprintf(hEvalEffName,"%s/EvalHisto1D.root",dirstruct);
-//  hEvalEff1D->SaveAs(hEvalEffName);
-}
-
-
-  if( nEff==1101||nEff==1102 ){
-  const int etaBinsTotal = 16;
-  double etaBinningParametrized[etaBinsTotal+1]={0.,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0,1.1,1.2,1.3,1.4,1.5,1.6};
-  int pTBinsNew = 2000;
-  int etaBinsNew = 200;
-  hEvalEff1D   = new TH2D( "hEvalEff1D", "hEvalEff1D", etaBinsNew, 0,1.6, pTBinsNew,  0, 100);
-  double eff;
-  double effBuffer;
-  char graphName[200];
+		}
+		sprintf(hEvalEffName,"%s/EvalHisto1D.root",dirstruct);
+		//  hEvalEff1D->SaveAs(hEvalEffName);
+	}
 
 
-  int currentEtaBin;
-  for(int etaBin=0;etaBin<etaBinsNew;etaBin++){
-	  for(int etaSearch=0;etaSearch<etaBinsTotal;etaSearch++){
-	  if(hEvalEff1D->GetXaxis()->GetBinCenter(etaBin+1)>etaBinningParametrized[etaSearch] && hEvalEff1D->GetXaxis()->GetBinCenter(etaBin+1)<etaBinningParametrized[etaSearch+1])
-		  currentEtaBin=etaSearch+1;
-	  }
-	  sprintf(graphName,"gEff_DATA_PT_AETA%d",currentEtaBin-1);
-	  TGraphAsymmErrors *graph = new TGraphAsymmErrors(*((TGraphAsymmErrors *) fInEff->Get(graphName)));
-
-		  for(int pTBin=0;pTBin<pTBinsNew;pTBin++){
-			  eff = graph->Eval(hEvalEff1D->GetYaxis()->GetBinCenter(pTBin+1));
-		  	  if(eff<0) eff=0;
-		  	  hEvalEff1D->SetBinContent(etaBin+1,pTBin+1,eff); effBuffer=eff;
-  }
-
-  }
-  sprintf(hEvalEffName,"%s/EvalHisto1D.root",dirstruct);
-//  hEvalEff1D->SaveAs(hEvalEffName);
-}
+	if( nEff==1101||nEff==1102 ){
+		const int etaBinsTotal = 16;
+		double etaBinningParametrized[etaBinsTotal+1]={0.,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0,1.1,1.2,1.3,1.4,1.5,1.6};
+		int pTBinsNew = 2000;
+		int etaBinsNew = 200;
+		hEvalEff1D   = new TH2D( "hEvalEff1D", "hEvalEff1D", etaBinsNew, 0,1.6, pTBinsNew,  0, 100);
+		double eff;
+		double effBuffer;
+		char graphName[200];
 
 
+		int currentEtaBin;
+		for(int etaBin=0;etaBin<etaBinsNew;etaBin++){
+			for(int etaSearch=0;etaSearch<etaBinsTotal;etaSearch++){
+				if(hEvalEff1D->GetXaxis()->GetBinCenter(etaBin+1)>etaBinningParametrized[etaSearch] && hEvalEff1D->GetXaxis()->GetBinCenter(etaBin+1)<etaBinningParametrized[etaSearch+1])
+					currentEtaBin=etaSearch+1;
+			}
+			sprintf(graphName,"gEff_DATA_PT_AETA%d",currentEtaBin-1);
+			TGraphAsymmErrors *graph = new TGraphAsymmErrors(*((TGraphAsymmErrors *) fInEff->Get(graphName)));
 
+			for(int pTBin=0;pTBin<pTBinsNew;pTBin++){
+				eff = graph->Eval(hEvalEff1D->GetYaxis()->GetBinCenter(pTBin+1));
+				if(eff<0) eff=0;
+				hEvalEff1D->SetBinContent(etaBin+1,pTBin+1,eff); effBuffer=eff;
+			}
 
-
-TEfficiency* TEff;
-TH2D* hEvalEff;
-if(nEff==105 || nEff==106){
-	sprintf(EffType,"totEff_MCTRUTH_pT_eta");
-	TEfficiency* TEff2=(TEfficiency*) fInEff->Get(EffType);
-	TH1* hEffTOT=(TH1*)TEff2->GetTotalHistogram();
-	TH1* hEffPASS=(TH1*)TEff2->GetPassedHistogram();
-	hEffPASS->Divide(hEffTOT);
-	hEvalEff=(TH2D*)hEffPASS->Clone("hEffPASS");
-	TEff=(TEfficiency*) fInEff->Get(EffType);
-}
-
-
-if(nEff!=105 && nEff!=106 && nEff!=1)
-	hEvalEff = (TH2D*)hEvalEff1D->Clone("hEvalEff");
-if(nEff > 10000) hEvalEff = (TH2D*)hEvalEff2D->Clone("hEvalEff");
-
-sprintf(hEvalEffName,"%s/EvalHisto.root",dirstruct);
-//hEvalEff->SaveAs(hEvalEffName);
+		}
+		sprintf(hEvalEffName,"%s/EvalHisto1D.root",dirstruct);
+		//  hEvalEff1D->SaveAs(hEvalEffName);
+	}
 
 
 
 
 
-cout<<"Get Amap"<<endl;
-
-////// Get Amap
-
-EvaluateEffFileName(nAmap,EffFileName,false);
-sprintf(EffFile,"%s/%s",effDir,EffFileName);
-
-TFile *fInAmap = new TFile(EffFile);
-
-
-
-
-
-cout<<"Get Amap Denominator"<<endl;
+	TEfficiency* TEff;
+	TH2D* hEvalEff;
+	if(nEff==105 || nEff==106){
+		sprintf(EffType,"totEff_MCTRUTH_pT_eta");
+		TEfficiency* TEff2=(TEfficiency*) fInEff->Get(EffType);
+		TH1* hEffTOT=(TH1*)TEff2->GetTotalHistogram();
+		TH1* hEffPASS=(TH1*)TEff2->GetPassedHistogram();
+		hEffPASS->Divide(hEffTOT);
+		hEvalEff=(TH2D*)hEffPASS->Clone("hEffPASS");
+		TEff=(TEfficiency*) fInEff->Get(EffType);
+	}
 
 
-////// Get Amap Denominator
+	if(nEff!=105 && nEff!=106 && nEff!=1)
+		hEvalEff = (TH2D*)hEvalEff1D->Clone("hEvalEff");
+	if(nEff > 10000) hEvalEff = (TH2D*)hEvalEff2D->Clone("hEvalEff");
 
-TEfficiency* TEff_nDenominatorAmap;
-TH2D* hEvalEff_nDenominatorAmap;
-
-TH2D*  hEvalEff1D_nDenominatorAmap;
-
-EvaluateEffFileName(nDenominatorAmap,EffFileName,true);
-sprintf(EffFile,"%s/%s",effDir,EffFileName);
-
-TFile *fInEff_nDenominatorAmap = new TFile(EffFile);
-
-if( nDenominatorAmap==1101 ){
-const int etaBinsTotal = 16;
-double etaBinningParametrized[etaBinsTotal+1]={0.,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0,1.1,1.2,1.3,1.4,1.5,1.6};
-int pTBinsNew = 2000;
-int etaBinsNew = 200;
-hEvalEff1D_nDenominatorAmap   = new TH2D( "hEvalEff1D_nDenominatorAmap", "hEvalEff1D_nDenominatorAmap", etaBinsNew, 0,1.6, pTBinsNew,  0, 100);
-double eff;
-double effBuffer;
-char graphName[200];
+	sprintf(hEvalEffName,"%s/EvalHisto.root",dirstruct);
+	//hEvalEff->SaveAs(hEvalEffName);
 
 
-int currentEtaBin;
-for(int etaBin=0;etaBin<etaBinsNew;etaBin++){
-	  for(int etaSearch=0;etaSearch<etaBinsTotal;etaSearch++){
-	  if(hEvalEff1D_nDenominatorAmap->GetXaxis()->GetBinCenter(etaBin+1)>etaBinningParametrized[etaSearch] && hEvalEff1D_nDenominatorAmap->GetXaxis()->GetBinCenter(etaBin+1)<etaBinningParametrized[etaSearch+1])
-		  currentEtaBin=etaSearch+1;
-	  }
-	  sprintf(graphName,"gEff_DATA_PT_AETA%d",currentEtaBin-1);
-	  TGraphAsymmErrors *graph = new TGraphAsymmErrors(*((TGraphAsymmErrors *) fInEff_nDenominatorAmap->Get(graphName)));
-
-		  for(int pTBin=0;pTBin<pTBinsNew;pTBin++){
-			  eff = graph->Eval(hEvalEff1D_nDenominatorAmap->GetYaxis()->GetBinCenter(pTBin+1));
-		  	  if(eff<0) eff=0;
-		  	  hEvalEff1D_nDenominatorAmap->SetBinContent(etaBin+1,pTBin+1,eff); effBuffer=eff;
-}
-
-}
-}
-
-if(nDenominatorAmap!=105 && nDenominatorAmap!=106 && nDenominatorAmap!=1)
-	hEvalEff_nDenominatorAmap = (TH2D*)hEvalEff1D_nDenominatorAmap->Clone("hEvalEff_nDenominatorAmap");
 
 
-if(nDenominatorAmap==105 || nDenominatorAmap==106){
-	sprintf(EffType,"totEff_MCTRUTH_pT_eta");
-	TEfficiency* TEff2=(TEfficiency*) fInEff_nDenominatorAmap->Get(EffType);
-	TH1* hEffTOT=(TH1*)TEff2->GetTotalHistogram();
-	TH1* hEffPASS=(TH1*)TEff2->GetPassedHistogram();
-	hEffPASS->Divide(hEffTOT);
-	hEvalEff_nDenominatorAmap=(TH2D*)hEffPASS->Clone("hEffPASS");
-	TEff_nDenominatorAmap=(TEfficiency*) fInEff_nDenominatorAmap->Get(EffType);
-}
+
+	cout<<"Get Amap"<<endl;
+
+	////// Get Amap
+
+	EvaluateEffFileName(nAmap,EffFileName,false);
+	sprintf(EffFile,"%s/%s",effDir,EffFileName);
+
+	TFile *fInAmap = new TFile(EffFile);
+
+
+
+
+
+	cout<<"Get Amap Denominator"<<endl;
+
+
+	////// Get Amap Denominator
+
+	TEfficiency* TEff_nDenominatorAmap;
+	TH2D* hEvalEff_nDenominatorAmap;
+
+	TH2D*  hEvalEff1D_nDenominatorAmap;
+
+	EvaluateEffFileName(nDenominatorAmap,EffFileName,true);
+	sprintf(EffFile,"%s/%s",effDir,EffFileName);
+
+	TFile *fInEff_nDenominatorAmap = new TFile(EffFile);
+
+	if( nDenominatorAmap==1101 ){
+		const int etaBinsTotal = 16;
+		double etaBinningParametrized[etaBinsTotal+1]={0.,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0,1.1,1.2,1.3,1.4,1.5,1.6};
+		int pTBinsNew = 2000;
+		int etaBinsNew = 200;
+		hEvalEff1D_nDenominatorAmap   = new TH2D( "hEvalEff1D_nDenominatorAmap", "hEvalEff1D_nDenominatorAmap", etaBinsNew, 0,1.6, pTBinsNew,  0, 100);
+		double eff;
+		double effBuffer;
+		char graphName[200];
+
+
+		int currentEtaBin;
+		for(int etaBin=0;etaBin<etaBinsNew;etaBin++){
+			for(int etaSearch=0;etaSearch<etaBinsTotal;etaSearch++){
+				if(hEvalEff1D_nDenominatorAmap->GetXaxis()->GetBinCenter(etaBin+1)>etaBinningParametrized[etaSearch] && hEvalEff1D_nDenominatorAmap->GetXaxis()->GetBinCenter(etaBin+1)<etaBinningParametrized[etaSearch+1])
+					currentEtaBin=etaSearch+1;
+			}
+			sprintf(graphName,"gEff_DATA_PT_AETA%d",currentEtaBin-1);
+			TGraphAsymmErrors *graph = new TGraphAsymmErrors(*((TGraphAsymmErrors *) fInEff_nDenominatorAmap->Get(graphName)));
+
+			for(int pTBin=0;pTBin<pTBinsNew;pTBin++){
+				eff = graph->Eval(hEvalEff1D_nDenominatorAmap->GetYaxis()->GetBinCenter(pTBin+1));
+				if(eff<0) eff=0;
+				hEvalEff1D_nDenominatorAmap->SetBinContent(etaBin+1,pTBin+1,eff); effBuffer=eff;
+			}
+
+		}
+	}
+
+	if(nDenominatorAmap!=105 && nDenominatorAmap!=106 && nDenominatorAmap!=1)
+		hEvalEff_nDenominatorAmap = (TH2D*)hEvalEff1D_nDenominatorAmap->Clone("hEvalEff_nDenominatorAmap");
+
+
+	if(nDenominatorAmap==105 || nDenominatorAmap==106){
+		sprintf(EffType,"totEff_MCTRUTH_pT_eta");
+		TEfficiency* TEff2=(TEfficiency*) fInEff_nDenominatorAmap->Get(EffType);
+		TH1* hEffTOT=(TH1*)TEff2->GetTotalHistogram();
+		TH1* hEffPASS=(TH1*)TEff2->GetPassedHistogram();
+		hEffPASS->Divide(hEffTOT);
+		hEvalEff_nDenominatorAmap=(TH2D*)hEffPASS->Clone("hEffPASS");
+		TEff_nDenominatorAmap=(TEfficiency*) fInEff_nDenominatorAmap->Get(EffType);
+	}
 
 
 
@@ -844,6 +845,8 @@ if(nDenominatorAmap==105 || nDenominatorAmap==106){
                    * singleLeptonEfficiency( lepN_pT, lepN_eta, nEff, fInEff, hEvalEff, MCeff, TEff);
 
     double costh_DILEff;
+  //const double beta = 3.7;  // Psi(2S)
+  //const double pTsq = 20.;  // Psi(2S)
     double phi_DILEff;
     if(nDileptonEff>200 && nDileptonEff<211) {costh_DILEff=costh_CS; phi_DILEff=phi_CS;}
     if(nDileptonEff>210 && nDileptonEff<221) {costh_DILEff=costh_HX; phi_DILEff=phi_HX;}
@@ -1507,12 +1510,15 @@ if(nDenominatorAmap==105 || nDenominatorAmap==106){
   cout << endl;
 
 
-  double n_signalEvents = i_signalEvent;
+  double n_signalEvents = (double)i_signalEvent;
 
-  cout<<"Fraction of rejected signal events due to eff>1%: "<<i_EffRejectedSignalEvent/(n_signalEvents+i_EffRejectedSignalEvent)<<endl;
+  cout<<"Fraction of rejected signal events due to eff<1%: "<<
+		(double)i_EffRejectedSignalEvent/(n_signalEvents+(double)i_EffRejectedSignalEvent)<<endl;
 
   double f_background_actual = n_background_subtracted / double( n_events );
+	cout << "n_events: " << n_events << " n_background_subtracted: " << n_background_subtracted<<endl;
   cout << "Background fraction: " << f_background << ", subtracted: " << f_background_actual << endl;
+	cout << "Ratio: " << f_background_actual/f_background << endl;
 
 
   SubtractedBG_test->Fill(f_background_actual/f_background);
