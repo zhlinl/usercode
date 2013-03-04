@@ -36,7 +36,7 @@ void PlotMassLifetime(const std::string &infilename, int rapBin, int ptBin, int 
 			break;
 		case 4:
 			std::cout << ">>>>Plotting lifetime signal region" << std::endl;
-			plotLifeSig(ws, rapBin, ptBin, nState);
+			//plotLifeSig(ws, rapBin, ptBin, nState);
 			plotLifeSig_linear(ws, rapBin, ptBin, nState);
 			break;
 		default:
@@ -222,7 +222,8 @@ void plotMass(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 	TH1* legendPink = data->createHistogram("legendPink",*JpsiMass,Binning(50)) ; legendPink->SetLineColor(kPink+3) ; legendPink->SetLineStyle(7) ; legendPink->SetLineWidth(2) ;
 
 	//TLegend* MassLegend=new TLegend(0.65,0.7,0.88,0.88);
-	TLegend* MassLegend=new TLegend(0.65,0.5,0.88,0.7);
+	//TLegend* MassLegend=new TLegend(0.65,0.5,0.88,0.7);
+	TLegend* MassLegend=new TLegend(0.7,0.55,0.88,0.75);
 	MassLegend->SetFillColor(kWhite);
 	MassLegend->SetTextFont(42);
 	MassLegend->SetTextSize(0.025);
@@ -232,20 +233,27 @@ void plotMass(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 	MassLegend->AddEntry(legendGreen,"signal CB_{2}","l");
 	MassLegend->AddEntry(legendPink,"background","l");
 
-	double left=0.65, top=0.65, textSize=0.025;
+	//double left=0.65, top=0.85, textSize=0.025;
+	double left=0.7, top=0.9, textSize=0.025;
 	TLatex *latex=new TLatex();
 	latex->SetTextFont(42);
 	latex->SetNDC(kTRUE);
 	latex->SetTextSize(textSize);
 	double step=textSize*1.3;
 
+	gStyle->SetPadBottomMargin(0.12);
+	gStyle->SetPadLeftMargin(0.12);
+	gStyle->SetPadRightMargin(0.05);
+	gStyle->SetPadTopMargin(0.05);
+	
 	TCanvas *c1=new TCanvas("c1","",800,700);
 	c1->SetTickx();
 	c1->SetTicky();
 
 	massFrame->Draw(); MassLegend->Draw();
 	lineSBLow->Draw("same"); lineSBHigh->Draw("same"); lineSigLow->Draw("same"); lineSigHigh->Draw("same");
-	top=0.85; textSize=0.030; latex->SetTextSize(textSize);
+	//top=0.85; textSize=0.030; latex->SetTextSize(textSize);
+	top=0.90; textSize=0.030; latex->SetTextSize(textSize);
 	if(nState == 4)
 		latex->DrawLatex(left,top,"J/#psi");
 	if(nState == 5)
@@ -267,7 +275,8 @@ void plotMass(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 	top-=0.5*step;
 	latex->DrawLatex(left,top,Form("n_{CB}  =  %.1f",cbN));
 
-	left=0.15; top=0.85; textSize=0.020;
+	//left=0.15; top=0.85; textSize=0.020;
+	left=0.15; top=0.90; textSize=0.020;
 	latex->SetTextSize(textSize);
 	latex->DrawLatex(left,top,Form("#chi^{2}/ndof = %.2f / %d", chi2_Mass, ndof_Mass));
 	top-=step;
@@ -279,7 +288,8 @@ void plotMass(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 	top-=step;
 	latex->DrawLatex(left,top,Form("#alpha  =  %.3f #pm %.3f",Alpha, AlphaErr));
 	top-=step;
-	latex->DrawLatex(left,top,Form("#lambda =  %.3f #pm %.3f",lambda, lambdaErr));
+	//latex->DrawLatex(left,top,Form("#lambda =  %.3f #pm %.3f",lambda, lambdaErr));
+	latex->DrawLatex(left,top,Form("#lambda =  %.3f #pm %.3f",-lambda, lambdaErr)); // change to has positive value
 	top-=step;
 	latex->DrawLatex(left,top,Form("frac_{CB_{1}}  =  %.3f #pm %.3f",fracCB1, fracCB1Err));
 	top-=step;
@@ -492,7 +502,8 @@ void plotMassLog(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 	TH1* legendGreen = data->createHistogram("legendGreen",JpsiMass,Binning(50)) ; legendGreen->SetLineColor(kGreen) ; legendGreen->SetLineStyle(2) ; legendGreen->SetLineWidth(2) ;
 	TH1* legendPink = data->createHistogram("legendPink",JpsiMass,Binning(50)) ; legendPink->SetLineColor(kPink+3) ; legendPink->SetLineStyle(7) ; legendPink->SetLineWidth(2) ;
 
-	TLegend* MassLegend=new TLegend(0.65,0.75,0.88,0.88);
+	//TLegend* MassLegend=new TLegend(0.65,0.75,0.88,0.88);
+	TLegend* MassLegend=new TLegend(0.7,0.8,0.93,0.93);
 	MassLegend->SetFillColor(kWhite);
 	MassLegend->SetTextFont(42);
 	MassLegend->SetTextSize(0.025);
@@ -502,12 +513,18 @@ void plotMassLog(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 	MassLegend->AddEntry(legendGreen,"signal CB_{2}","l");
 	MassLegend->AddEntry(legendPink,"background","l");
 
-	double left=0.15, top=0.85, textSize=0.025;
+	//double left=0.15, top=0.85, textSize=0.025;
+	double left=0.15, top=0.90, textSize=0.025;
 	TLatex *latex=new TLatex();
 	latex->SetTextFont(42);
 	latex->SetNDC(kTRUE);
 	latex->SetTextSize(textSize);
 	double step=textSize*1.3;
+
+	gStyle->SetPadBottomMargin(0.12);
+	gStyle->SetPadLeftMargin(0.12);
+	gStyle->SetPadRightMargin(0.05);
+	gStyle->SetPadTopMargin(0.05);
 
 	TCanvas *c1=new TCanvas("c1","",800,700);
 	c1->SetTickx();
@@ -805,7 +822,9 @@ void plotLifeBg(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 	TH1* legendPink = dataSBL->createHistogram("legendPink",JpsiMass,Binning(50)) ; legendPink->SetLineColor(kPink+3) ; legendPink->SetLineStyle(7) ; legendPink->SetLineWidth(2) ;
 
 	//TLegend* LifetimeLegendBkgSBL=new TLegend(0.65,0.75,0.88,0.88);
-	TLegend* LifetimeLegendBkgSBL=new TLegend(0.12,0.75,0.25,0.88);
+	//TLegend* LifetimeLegendBkgSBL=new TLegend(0.12,0.75,0.25,0.88);
+	//TLegend* LifetimeLegendBkgSBL=new TLegend(0.12,0.75,0.25,0.88);
+	TLegend* LifetimeLegendBkgSBL=new TLegend(0.12,0.8,0.28,0.93);
 	LifetimeLegendBkgSBL->SetFillColor(kWhite);
 	LifetimeLegendBkgSBL->SetTextFont(42);
 	LifetimeLegendBkgSBL->SetTextSize(0.025);
@@ -815,7 +834,8 @@ void plotLifeBg(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 	LifetimeLegendBkgSBL->AddEntry(legendRed,"SSR ","l");
 	LifetimeLegendBkgSBL->AddEntry(legendBlack,"DS","l");
 
-	TLegend* LifetimeLegendBkgSBR=new TLegend(0.12,0.75,0.25,0.88);
+	//TLegend* LifetimeLegendBkgSBR=new TLegend(0.12,0.75,0.25,0.88);
+	TLegend* LifetimeLegendBkgSBR=new TLegend(0.12,0.8,0.28,0.93);
 	LifetimeLegendBkgSBR->SetFillColor(kWhite);
 	LifetimeLegendBkgSBR->SetTextFont(42);
 	LifetimeLegendBkgSBR->SetTextSize(0.025);
@@ -825,29 +845,17 @@ void plotLifeBg(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 	LifetimeLegendBkgSBR->AddEntry(legendRed,"SSR ","l");
 	LifetimeLegendBkgSBR->AddEntry(legendBlack,"DS","l");
 
-	//TLegend* LifetimeLegendSig=new TLegend(0.65,0.7,0.88,0.88);
-	TLegend* LifetimeLegendSig=new TLegend(0.12,0.75,0.25,0.88);
-	LifetimeLegendSig->SetFillColor(kWhite);
-	LifetimeLegendSig->SetTextFont(42);
-	LifetimeLegendSig->SetTextSize(0.025);
-	LifetimeLegendSig->SetBorderSize(0.);
-	LifetimeLegendSig->AddEntry(legendBlue,"sum","l");
-	if(nState == 4){
-		LifetimeLegendSig->AddEntry(legendBlueDash,"prompt J/#psi","l");
-		LifetimeLegendSig->AddEntry(legendRed,"non-Prompt J/#psi","l");
-	}
-	if(nState == 5){
-		LifetimeLegendSig->AddEntry(legendBlueDash,"prompt #psi(2S)","l");
-		LifetimeLegendSig->AddEntry(legendRed,"non-Prompt #psi(2S)","l");
-	}
-	LifetimeLegendSig->AddEntry(legendPink,"background","l");
-
-	double left=0.6, top=0.85, textSize=0.025;
+	double left=0.7, top=0.9, textSize=0.025;
 	TLatex *latex=new TLatex();
 	latex->SetTextFont(42);
 	latex->SetNDC(kTRUE);
 	latex->SetTextSize(textSize);
 	double step=textSize*1.3;
+
+	gStyle->SetPadBottomMargin(0.12);
+	gStyle->SetPadLeftMargin(0.12);
+	gStyle->SetPadRightMargin(0.05);
+	gStyle->SetPadTopMargin(0.05);
 
 	TCanvas *c1=new TCanvas("c1","",800,900);
 	c1->SetTickx();
@@ -869,7 +877,8 @@ void plotLifeBg(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 	pad2->cd(0);pad2->SetLogy(1);
 	ctauFrameBkgSBL->Draw();
 	LifetimeLegendBkgSBL->Draw();
-	left=0.4; top=0.85; textSize=0.030; latex->SetTextSize(textSize);
+	//left=0.4; top=0.85; textSize=0.030; latex->SetTextSize(textSize);
+	left=0.5; top=0.9; textSize=0.030; latex->SetTextSize(textSize);
 	if(nState == 4) latex->DrawLatex(left,top,"J/#psi");
 	if(nState == 5) latex->DrawLatex(left,top,"#psi(2S)");
 	top-=step;
@@ -899,7 +908,8 @@ void plotLifeBg(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 		latex->DrawLatex(left,top,Form("frac_{SSR}   =  %.2f",fBkgSSDR_SBL));
 
 
-	left=0.6; top=0.85;
+	//left=0.6; top=0.85;
+	left=0.7; top=0.9;
 	latex->DrawLatex(left,top,Form("#chi^{2}/ndof   =  %.2f/%d",chi2_LSBL,ndof_LSBL));
 	top-=step;
 	latex->DrawLatex(left,top,Form("frac_{DS}   =  %.3f #pm %.3f",fBkgDSD_SBL, fBkgDSDErr_SBL));
@@ -929,7 +939,8 @@ void plotLifeBg(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 	pad2->cd(0);pad2->SetLogy(1);
 	ctauFrameBkgSBR->Draw();
 	LifetimeLegendBkgSBR->Draw();
-	left=0.4; top=0.85; textSize=0.030; latex->SetTextSize(textSize);
+	//left=0.4; top=0.85; textSize=0.030; latex->SetTextSize(textSize);
+	left=0.5; top=0.9; textSize=0.030; latex->SetTextSize(textSize);
 	if(nState == 4) latex->DrawLatex(left,top,"J/#psi");
 	if(nState == 5) latex->DrawLatex(left,top,"#psi(2S)");
 	top-=step;
@@ -950,7 +961,8 @@ void plotLifeBg(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 	latex->SetTextColor(kBlack);
 	top-=step;
 
-	left=0.6; top=0.85;
+	//left=0.6; top=0.85;
+	left=0.7; top=0.9;
 	latex->DrawLatex(left,top,Form("#chi^{2}/ndof   =  %.2f/%d",chi2_LSBR,ndof_LSBR));
 	top-=step;
 	latex->DrawLatex(left,top,Form("frac_{DS}   =  %.3f #pm %.3f",fBkgDSD_SBR, fBkgDSDErr_SBR));
@@ -1084,17 +1096,14 @@ void plotLifeSig(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 	int ndof_LSig=nBins_LSig-parsFit;  //num of degree of freedom
 	double chi2_LSig=chi2Pre_LSig*ndof_LSig;
 
-	//RooHist* hpull_ctauSig = ctauFrameSig->pullHist() ;
-	
-	//RooHist* hpull_ctauSig = ctauFrameSig->pullHist(Form("h_data_rap%d_pt%d_SR",rapBin,ptBin),
-	//		"fulllifetime_Norm[Jpsict]_DataAvg[JpsictErr]",
-	//		kTRUE);
-	RooHist* hpull_ctauSig = ctauFrameSig->pullHist("myHist","myCurve",kTRUE);
+	RooHist* hpull_ctauSig = ctauFrameSig->pullHist() ;
+	//RooHist* hpull_ctauSig = ctauFrameSig->pullHist("myHist","myCurve",kTRUE);
 
 	//save pull distribution
 	TH1F* pull = new TH1F("pull","pull distribution", 100,-10.,10.);
 	gSystem->mkdir("Fit/pull",kTRUE);
-	TFile *pullFile = new TFile(Form("Fit/pull/pullAverage_rap%d_pt%d_SR.root",rapBin,ptBin),"RECREATE");
+	//TFile *pullFile = new TFile(Form("Fit/pull/pullAverage_rap%d_pt%d_SR.root",rapBin,ptBin),"RECREATE");
+	TFile *pullFile = new TFile(Form("Fit/pull/pull_rap%d_pt%d_SR.root",rapBin,ptBin),"RECREATE");
 
 	hpull_ctauSig->SetMarkerSize(0.8);
 	for(int i=0;i<hpull_ctauSig->GetN();i++){
@@ -1152,28 +1161,8 @@ void plotLifeSig(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 	TH1* legendGreenDash = dataSR->createHistogram("legendGreenDash",JpsiMass,Binning(50)) ; legendGreenDash->SetLineColor(kGreen) ; legendGreenDash->SetLineStyle(2) ; legendGreenDash->SetLineWidth(2) ;
 	TH1* legendPink = dataSR->createHistogram("legendPink",JpsiMass,Binning(50)) ; legendPink->SetLineColor(kPink+3) ; legendPink->SetLineStyle(7) ; legendPink->SetLineWidth(2) ;
 
-	//TLegend* LifetimeLegendBkgSBL=new TLegend(0.65,0.75,0.88,0.88);
-	TLegend* LifetimeLegendBkgSBL=new TLegend(0.12,0.75,0.25,0.88);
-	LifetimeLegendBkgSBL->SetFillColor(kWhite);
-	LifetimeLegendBkgSBL->SetTextFont(42);
-	LifetimeLegendBkgSBL->SetTextSize(0.025);
-	LifetimeLegendBkgSBL->SetBorderSize(0.);
-	LifetimeLegendBkgSBL->AddEntry(legendBlue,"sum sideband","l");
-	LifetimeLegendBkgSBL->AddEntry(legendRed,"right side ","l");
-	LifetimeLegendBkgSBL->AddEntry(legendGreenDash,"left side","l");
-	LifetimeLegendBkgSBL->AddEntry(legendBlack,"double side","l");
-
-	TLegend* LifetimeLegendBkgSBR=new TLegend(0.12,0.75,0.25,0.88);
-	LifetimeLegendBkgSBR->SetFillColor(kWhite);
-	LifetimeLegendBkgSBR->SetTextFont(42);
-	LifetimeLegendBkgSBR->SetTextSize(0.025);
-	LifetimeLegendBkgSBR->SetBorderSize(0.);
-	LifetimeLegendBkgSBR->AddEntry(legendBlue,"sum sideband","l");
-	LifetimeLegendBkgSBR->AddEntry(legendRed,"right side ","l");
-	LifetimeLegendBkgSBR->AddEntry(legendGreenDash,"left side","l");
-	LifetimeLegendBkgSBR->AddEntry(legendBlack,"double side","l");
-
-	TLegend* LifetimeLegendSig=new TLegend(0.25,0.75,0.37,0.88);
+	//TLegend* LifetimeLegendSig=new TLegend(0.25,0.75,0.37,0.88);
+	TLegend* LifetimeLegendSig=new TLegend(0.35,0.8,0.47,0.93);
 	LifetimeLegendSig->SetFillColor(kWhite);
 	LifetimeLegendSig->SetTextFont(42);
 	LifetimeLegendSig->SetTextSize(0.025);
@@ -1183,12 +1172,17 @@ void plotLifeSig(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 	LifetimeLegendSig->AddEntry(legendRed,"non-prompt","l");
 	LifetimeLegendSig->AddEntry(legendPink,"background","l");
 
-	double left=0.4, top=0.85, textSize=0.025;
+	double left=0.5, top=0.9, textSize=0.025;
 	TLatex *latex=new TLatex();
 	latex->SetTextFont(42);
 	latex->SetNDC(kTRUE);
 	latex->SetTextSize(textSize);
 	double step=textSize*1.3;
+
+	gStyle->SetPadBottomMargin(0.12);
+	gStyle->SetPadLeftMargin(0.12);
+	gStyle->SetPadRightMargin(0.05);
+	gStyle->SetPadTopMargin(0.05);
 
 	TCanvas *c1=new TCanvas("c1","",800,900);
 	c1->SetTickx();
@@ -1236,7 +1230,8 @@ void plotLifeSig(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 	LifetimeLegendSig->Draw();
 	if(plotRegionLine){ lineP->Draw("same");lineNP->Draw("same"); }
 
-	left=0.4; top=0.85; textSize=0.030; latex->SetTextSize(textSize);
+	//left=0.4; top=0.85; textSize=0.030; latex->SetTextSize(textSize);
+	left=0.5; top=0.9; textSize=0.030; latex->SetTextSize(textSize);
 	if(nState == 4) latex->DrawLatex(left,top,"J/#psi");
 	if(nState == 5) latex->DrawLatex(left,top,"#psi(2S)");
 	top-=step;
@@ -1262,7 +1257,8 @@ void plotLifeSig(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 	top-=step;
 	latex->DrawLatex(left,top,Form("resolution2  =  %.1f",promptCtRe2));
 
-	left=0.6, top=0.85;
+	//left=0.6, top=0.85;
+	left=0.7, top=0.9;
 	latex->DrawLatex(left,top,Form("#chi^{2}/ndof   =  %.2f/%d",chi2_LSig,ndof_LSig));
 	top-=step;
 	latex->DrawLatex(left,top,Form("frac_{Gauss2}   =  %.3f #pm %.3f",fracGauss2, fracGauss2Err));
@@ -1280,7 +1276,8 @@ void plotLifeSig(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 	ctauFrameSigPull->Draw();
 
 	std::stringstream savectlog;
-	savectlog << "Fit/ct_SR_log_rap" << rapBin << "_pt" << ptBin << "_pullAverage.pdf";
+	//savectlog << "Fit/ct_SR_log_rap" << rapBin << "_pt" << ptBin << "_pullAverage.pdf";
+	savectlog << "Fit/ct_SR_log_rap" << rapBin << "_pt" << ptBin << ".pdf";
 	c1->SaveAs(savectlog.str().c_str());
 
 	delete c1;
@@ -1442,31 +1439,11 @@ void plotLifeSig_linear(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 	TH1* legendGreenDash = dataSR->createHistogram("legendGreenDash",JpsiMass,Binning(50)) ; legendGreenDash->SetLineColor(kGreen) ; legendGreenDash->SetLineStyle(2) ; legendGreenDash->SetLineWidth(2) ;
 	TH1* legendPink = dataSR->createHistogram("legendPink",JpsiMass,Binning(50)) ; legendPink->SetLineColor(kPink+3) ; legendPink->SetLineStyle(7) ; legendPink->SetLineWidth(2) ;
 
-	//TLegend* LifetimeLegendBkgSBL=new TLegend(0.65,0.75,0.88,0.88);
-	TLegend* LifetimeLegendBkgSBL=new TLegend(0.12,0.75,0.25,0.88);
-	LifetimeLegendBkgSBL->SetFillColor(kWhite);
-	LifetimeLegendBkgSBL->SetTextFont(42);
-	LifetimeLegendBkgSBL->SetTextSize(0.025);
-	LifetimeLegendBkgSBL->SetBorderSize(0.);
-	LifetimeLegendBkgSBL->AddEntry(legendBlue,"sum sideband","l");
-	LifetimeLegendBkgSBL->AddEntry(legendRed,"right side ","l");
-	LifetimeLegendBkgSBL->AddEntry(legendGreenDash,"left side","l");
-	LifetimeLegendBkgSBL->AddEntry(legendBlack,"double side","l");
-
-	TLegend* LifetimeLegendBkgSBR=new TLegend(0.12,0.75,0.25,0.88);
-	LifetimeLegendBkgSBR->SetFillColor(kWhite);
-	LifetimeLegendBkgSBR->SetTextFont(42);
-	LifetimeLegendBkgSBR->SetTextSize(0.025);
-	LifetimeLegendBkgSBR->SetBorderSize(0.);
-	LifetimeLegendBkgSBR->AddEntry(legendBlue,"sum sideband","l");
-	LifetimeLegendBkgSBR->AddEntry(legendRed,"right side ","l");
-	LifetimeLegendBkgSBR->AddEntry(legendGreenDash,"left side","l");
-	LifetimeLegendBkgSBR->AddEntry(legendBlack,"double side","l");
-
 	////TLegend* LifetimeLegendSig=new TLegend(0.65,0.7,0.88,0.88);
-	TLegend* LifetimeLegendSig=new TLegend(0.12,0.75,0.25,0.88);
 	////TLegend* LifetimeLegendSig=new TLegend(0.48,0.75,0.6,0.88);
 	//TLegend* LifetimeLegendSig=new TLegend(0.43,0.75,0.55,0.88);
+	//TLegend* LifetimeLegendSig=new TLegend(0.12,0.75,0.25,0.88);
+	TLegend* LifetimeLegendSig=new TLegend(0.12,0.8,0.25,0.93);
 	LifetimeLegendSig->SetFillColor(kWhite);
 	LifetimeLegendSig->SetTextFont(42);
 	LifetimeLegendSig->SetTextSize(0.025);
@@ -1476,13 +1453,18 @@ void plotLifeSig_linear(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 	LifetimeLegendSig->AddEntry(legendRed,"non-prompt","l");
 	LifetimeLegendSig->AddEntry(legendPink,"background","l");
 
-	double left=0.65, top=0.85, textSize=0.032;
-	//double left=0.6, top=0.85, textSize=0.025;
+	//double left=0.65, top=0.85, textSize=0.032;
+	double left=0.75, top=0.9, textSize=0.032;
 	TLatex *latex=new TLatex();
 	latex->SetTextFont(42);
 	latex->SetNDC(kTRUE);
 	latex->SetTextSize(textSize);
 	double step=textSize*1.3;
+
+	gStyle->SetPadBottomMargin(0.12);
+	gStyle->SetPadLeftMargin(0.12);
+	gStyle->SetPadRightMargin(0.05);
+	gStyle->SetPadTopMargin(0.05);
 
 	TCanvas *c1=new TCanvas("c1","",800,900);
 	c1->SetTickx();
@@ -1531,7 +1513,8 @@ void plotLifeSig_linear(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 	LifetimeLegendSig->Draw();
 	if(plotRegionLine){ lineP->Draw("same");lineNP->Draw("same"); }
 
-	left=0.65; top=0.85; textSize=0.030; latex->SetTextSize(textSize);
+	//left=0.65; top=0.85; textSize=0.030; latex->SetTextSize(textSize);
+	left=0.75; top=0.9; textSize=0.030; latex->SetTextSize(textSize);
 	if(nState == 4) latex->DrawLatex(left,top,"J/#psi");
 	if(nState == 5) latex->DrawLatex(left,top,"#psi(2S)");
 	top-=step;

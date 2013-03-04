@@ -76,10 +76,10 @@ int main(int argc, char* argv[]){
 
 	PlotMassPar(nState);
 	PlotLifePar(nState);
-	//if(nState==4)
-	//	PlotBFrac_1S(nState);
-	//if(nState==5)
-	//	PlotBFrac_2S(nState);
+	if(nState==4)
+		PlotBFrac_1S(nState);
+	if(nState==5)
+		PlotBFrac_2S(nState);
 
 	double nSigma=2.5;
 	if(nState==4) nSigma=2.5;
@@ -109,6 +109,9 @@ void PlotMassPar(int  nState){
 	double evtBkgSB[RapBins][PtBins];
 	double fracLSB[RapBins][PtBins];
 	double alphaCB[RapBins][PtBins];
+	double fracSigInLSB[RapBins][PtBins];
+	double fracSigInRSB[RapBins][PtBins];
+	double evtInLSB[RapBins][PtBins];
 
 	double pTErr[RapBins][PtBins];
 	double meanErr[RapBins][PtBins];
@@ -119,6 +122,9 @@ void PlotMassPar(int  nState){
 	double evtBkgSBErr[RapBins][PtBins];
 	double fracLSBErr[RapBins][PtBins];
 	double alphaCBErr[RapBins][PtBins];
+	double fracSigInLSBErr[RapBins][PtBins];
+	double fracSigInRSBErr[RapBins][PtBins];
+	double evtInLSBErr[RapBins][PtBins];
 
 	for(int rapBin = 1; rapBin < RapBins+1; rapBin++){
 		for(int ptBin = 1; ptBin < PtBins+1; ptBin++){
@@ -135,7 +141,10 @@ void PlotMassPar(int  nState){
 			sigma1[rapBin-1][ptBin-1]       = 0.;
 			sigma2[rapBin-1][ptBin-1]       = 0.;
 			evtBkgSB[rapBin-1][ptBin-1]     = 0.;
-			fracLSB[rapBin-1][ptBin-1]        = 0.;
+			fracLSB[rapBin-1][ptBin-1]      = 0.;
+			fracSigInLSB[rapBin-1][ptBin-1]   = 0.;
+			fracSigInRSB[rapBin-1][ptBin-1]   = 0.;
+			evtInLSB[rapBin-1][ptBin-1]   = 0.;
 
 			meanErr[rapBin-1][ptBin-1]         = 0.;
 			sigmaWeiErr[rapBin-1][ptBin-1]     = 0.;
@@ -143,7 +152,10 @@ void PlotMassPar(int  nState){
 			sigma1Err[rapBin-1][ptBin-1]       = 0.;
 			sigma2Err[rapBin-1][ptBin-1]       = 0.;
 			evtBkgSBErr[rapBin-1][ptBin-1]     = 0.;
-			fracLSBErr[rapBin-1][ptBin-1]        = 0.;
+			fracLSBErr[rapBin-1][ptBin-1]      = 0.;
+			fracSigInLSBErr[rapBin-1][ptBin-1]   = 0.;
+			fracSigInRSBErr[rapBin-1][ptBin-1]   = 0.;
+			evtInLSBErr[rapBin-1][ptBin-1]   = 0.;
 		}
 	}
 
@@ -205,6 +217,11 @@ void PlotMassPar(int  nState){
 			double sigMinMass = Mean-SigmaWei*onia::nSigMass;
 			double sbHighMass = Mean+SigmaWei*onia::nSigBkgHigh;
 			double sbLowMass =  Mean-SigmaWei*onia::nSigBkgLow;
+			sbLowMass = Mean-SigmaWei*4.0;
+			cout<<"Mean: "<<Mean<<" SigmaWei: "<<SigmaWei<<endl;
+			cout<<"Mean-5.5*SigmaWei: "<<Mean-SigmaWei*5.5<<endl;
+			//double MassMin = onia::massMin; // = JpsiMass.getMin()
+			//double MassMax = onia::massMax; // = JpsiMass.getMax()
 
 			int nEntries = data->numEntries();
 			JpsiMass.setRange("SR",sigMinMass,sigMaxMass);
@@ -212,7 +229,9 @@ void PlotMassPar(int  nState){
 			JpsiMass.setRange("SBR",sbHighMass, JpsiMass.getMax());
 
 			RooAddPdf *massPdf = (RooAddPdf*)ws->pdf("massModel");
-			RooAddPdf *bkgMassShape = (RooAddPdf*)ws->pdf("bkgMassShape");
+			RooAbsPdf *bkgMassShape = (RooAbsPdf*)ws->pdf("bkgMassShape");
+			RooAddPdf *sigMassShape = (RooAddPdf*)ws->pdf("massFull");
+
 			RooRealVar* fracFull3Sig=(RooRealVar*)massPdf->createIntegral(JpsiMass,NormSet(JpsiMass),Range("SR"));
 			RooRealVar* fracBkg3Sig=(RooRealVar*)bkgMassShape->createIntegral(JpsiMass,NormSet(JpsiMass),Range("SR"));
 			double FracFull3Sig = fracFull3Sig->getVal();
@@ -235,6 +254,25 @@ void PlotMassPar(int  nState){
 			evtBkgSB[rapBin-1][ptBin-1]    = nEntries*fracBkg*(FracBkgSBL+FracBkgSBR);
 			evtBkgSBErr[rapBin-1][ptBin-1] = nEntries*fracBkgErr*(FracBkgSBL+FracBkgSBR);
 
+			//// fracSigInLSB: signal fraction in LSB
+			RooRealVar *signalInSBL = (RooRealVar*)sigMassShape->createIntegral(JpsiMass,NormSet(JpsiMass),Range("SBL"));
+			RooRealVar *fullInSBL = (RooRealVar*)massPdf->createIntegral(JpsiMass,NormSet(JpsiMass),Range("SBL"));
+			double SignalInSBL = signalInSBL->getVal();
+			double FullInSBL   = fullInSBL  ->getVal();
+			fracSigInLSB[rapBin-1][ptBin-1]    = SignalInSBL * (1-fracBkg) / FullInSBL ;
+			//fracSigInLSBErr[rapBin-1][ptBin-1] = SignalInSBL / FullInSBL ;
+			fracSigInLSBErr[rapBin-1][ptBin-1] = 0. ;
+			evtInLSB[rapBin-1][ptBin-1] = nEntries*fracBkg*FracBkgSBL;
+
+			//// fracSigInRSB: signal fraction in LSB
+			RooRealVar *signalInSBR = (RooRealVar*)sigMassShape->createIntegral(JpsiMass,NormSet(JpsiMass),Range("SBR"));
+			RooRealVar *fullInSBR = (RooRealVar*)massPdf->createIntegral(JpsiMass,NormSet(JpsiMass),Range("SBR"));
+			double SignalInSBR = signalInSBR->getVal();
+			double FullInSBR   = fullInSBR  ->getVal();
+			fracSigInRSB[rapBin-1][ptBin-1]    = SignalInSBR * (1-fracBkg) / FullInSBR ;
+			//fracSigInRSBErr[rapBin-1][ptBin-1] = SignalInSBR / FullInSBR ;
+			fracSigInRSBErr[rapBin-1][ptBin-1] = 0. ;
+
 			fracLSB[rapBin-1][ptBin-1]  = calcuFracL(ws, Mean, SigmaWei);
 
 			mean[rapBin-1][ptBin-1] = Mean;
@@ -248,7 +286,7 @@ void PlotMassPar(int  nState){
 
 			meanErr[rapBin-1][ptBin-1] = MeanErr;
 			sigmaWeiErr[rapBin-1][ptBin-1] = SigmaWeiErr*1000;
-			bkgRatio3SigErr[rapBin-1][ptBin-1] = BkgRatio3SigErr*1000;
+			bkgRatio3SigErr[rapBin-1][ptBin-1] = BkgRatio3SigErr;
 			sigma1Err[rapBin-1][ptBin-1] = SigmaErr*1000;
 			sigma2Err[rapBin-1][ptBin-1] = Sigma2Err*1000;
 
@@ -268,13 +306,17 @@ void PlotMassPar(int  nState){
 			cout<<"evtBkgSB: "<<evtBkgSB[rapBin-1][ptBin-1]<<"    evtBkgSBErr: "<<evtBkgSBErr[rapBin-1][ptBin-1]<<endl;
 			cout<<"fracLSB: "<<fracLSB[rapBin-1][ptBin-1]<<"    fracLSBErr: "<<fracLSBErr[rapBin-1][ptBin-1]<<endl;
 			cout<<"alphaCB: "<<alphaCB[rapBin-1][ptBin-1]<<"    alphaCBErr: "<<alphaCBErr[rapBin-1][ptBin-1]<<endl;
+			cout<<"fracSigInLSB: "<<fracSigInLSB[rapBin-1][ptBin-1]<<"    fracSigInLSBErr: "<<fracSigInLSBErr[rapBin-1][ptBin-1]<<endl;
+			cout<<"fracSigInRSB: "<<fracSigInRSB[rapBin-1][ptBin-1]<<"    fracSigInRSBErr: "<<fracSigInRSBErr[rapBin-1][ptBin-1]<<endl;
+			cout<<"evtInLSB: "<<evtInLSB[rapBin-1][ptBin-1]<<"    evtInLSBErr: "<<evtInLSBErr[rapBin-1][ptBin-1]<<endl;
 		}
 	}
 
 	RooRealVar JpsiMass(*ws->var("JpsiMass"));
 	TGraphErrors *graph_mean[RapBins], *graph_sigmaWei[RapBins], *graph_bkgRatio3Sig[RapBins],
 							 *graph_sigma1[RapBins], *graph_sigma2[RapBins], *graph_evtBkgSB[RapBins],
-							 *graph_fracLSB[RapBins], *graph_alphaCB[RapBins];
+							 *graph_fracLSB[RapBins], *graph_alphaCB[RapBins], 
+							 *graph_fracSigInLSB[RapBins], *graph_fracSigInRSB[RapBins], *graph_evtInLSB[RapBins];
 
 	for(int rapBin = 1; rapBin < RapBins+1; rapBin++){
 		graph_mean[rapBin-1] = new TGraphErrors(PtBins,
@@ -293,21 +335,31 @@ void PlotMassPar(int  nState){
 				pT[rapBin-1], fracLSB[rapBin-1], pTErr[rapBin-1], fracLSBErr[rapBin-1]);
 		graph_alphaCB[rapBin-1] = new TGraphErrors(PtBins,
 				pT[rapBin-1], alphaCB[rapBin-1], pTErr[rapBin-1], alphaCBErr[rapBin-1]);
+		graph_fracSigInLSB[rapBin-1] = new TGraphErrors(PtBins,
+				pT[rapBin-1], fracSigInLSB[rapBin-1], pTErr[rapBin-1], fracSigInLSBErr[rapBin-1]);
+		graph_fracSigInRSB[rapBin-1] = new TGraphErrors(PtBins,
+				pT[rapBin-1], fracSigInRSB[rapBin-1], pTErr[rapBin-1], fracSigInRSBErr[rapBin-1]);
+		graph_evtInLSB[rapBin-1] = new TGraphErrors(PtBins,
+				pT[rapBin-1], evtInLSB[rapBin-1], pTErr[rapBin-1], evtInLSBErr[rapBin-1]);
 
 		//remove first pT bin for 2S
 		if(nState==5){
-			graph_mean[rapBin-1]         -> RemovePoint(0);
-			graph_sigmaWei[rapBin-1]     -> RemovePoint(0);
-			graph_bkgRatio3Sig[rapBin-1] -> RemovePoint(0);
-			graph_sigma1[rapBin-1]       -> RemovePoint(0);
-			graph_sigma2[rapBin-1]       -> RemovePoint(0);
-			graph_evtBkgSB[rapBin-1]     -> RemovePoint(0);
-			graph_fracLSB[rapBin-1]      -> RemovePoint(0);
-			graph_alphaCB[rapBin-1]      -> RemovePoint(0);
+			//graph_mean[rapBin-1]         -> RemovePoint(0);
+			//graph_sigmaWei[rapBin-1]     -> RemovePoint(0);
+			//graph_bkgRatio3Sig[rapBin-1] -> RemovePoint(0);
+			//graph_sigma1[rapBin-1]       -> RemovePoint(0);
+			//graph_sigma2[rapBin-1]       -> RemovePoint(0);
+			//graph_evtBkgSB[rapBin-1]     -> RemovePoint(0);
+			//graph_fracLSB[rapBin-1]      -> RemovePoint(0);
+			//graph_alphaCB[rapBin-1]      -> RemovePoint(0);
+			//graph_fracSigInLSB[rapBin-1]      -> RemovePoint(0);
+			//graph_fracSigInRSB[rapBin-1]      -> RemovePoint(0);
+			//graph_evtInLSB[rapBin-1]      -> RemovePoint(0);
 		}
 	}
 
-	double blX = 0.17-0.05, blY = 0.70+0.05, trX = 0.4-0.05, trY = 0.84+0.05;
+	//double blX = 0.17-0.05, blY = 0.70+0.05, trX = 0.4-0.05, trY = 0.84+0.05;
+	double blX = 0.17, blY = 0.8, trX = 0.4, trY = 0.94;
 	TLegend* legend=new TLegend(blX,blY,trX,trY);
 	legend->SetFillColor(kWhite);
 	legend->SetTextFont(42);
@@ -334,7 +386,8 @@ void PlotMassPar(int  nState){
 
 	//0.75,0.75,0.82,0.84
 	//double blX = 0.65, blY = 0.15, trX = 0.85, trY = 0.35;
-	blX = 0.625+0.05; blY = 0.70+0.05; trX = 0.825+0.05; trY = 0.84+0.05;
+	//blX = 0.625+0.05; blY = 0.70+0.05; trX = 0.825+0.05; trY = 0.84+0.05;
+	blX = 0.725; blY = 0.8; trX = 0.925; trY = 0.94;
 	TLegend* legendRight=new TLegend(blX,blY,trX,trY);
 	legendRight->SetFillColor(kWhite);
 	legendRight->SetTextFont(42);
@@ -345,7 +398,8 @@ void PlotMassPar(int  nState){
 	if(nState==5)
 		legendRight->AddEntry(graph_mean[2],"1.2 < |y| < 1.8","lp");
 
-	blX = 0.625+0.05; blY = 0.60+0.05; trX = 0.825+0.05; trY = 0.84+0.05;
+	//blX = 0.625+0.05; blY = 0.60+0.05; trX = 0.825+0.05; trY = 0.84+0.05;
+	blX = 0.725; blY = 0.7; trX = 0.925; trY = 0.94;
 	TLegend* legendRightFull=new TLegend(blX,blY,trX,trY);
 	legendRightFull->SetFillColor(kWhite);
 	legendRightFull->SetTextFont(42);
@@ -359,6 +413,11 @@ void PlotMassPar(int  nState){
 		legendRightFull->AddEntry(graph_sigma1[2],"1.2 < |y| < 1.8 #sigma_{1}","lp");
 		legendRightFull->AddEntry(graph_sigma2[2],"1.2 < |y| < 1.8 #sigma_{2}","lp");
 	}
+
+	gStyle->SetPadBottomMargin(0.12);
+	gStyle->SetPadLeftMargin(0.12);
+	gStyle->SetPadRightMargin(0.05);
+	gStyle->SetPadTopMargin(0.05);
 
 	TCanvas *c1=new TCanvas("c1","");
 	c1->SetTickx();
@@ -388,7 +447,7 @@ void PlotMassPar(int  nState){
 
 	Xmin = 6.;    Xmax = 72.;
 	Ymin = 3.085; Ymax = 3.095;
-  if(nState==5) Ymin = 3.674; Ymax = 3.685;
+  if(nState==5) {Ymin = 3.674; Ymax = 3.685;}
 
 	graph_mean[0]->SetTitle("");
 	graph_mean[0]->GetXaxis()->SetTitle("p_{T} (GeV)");
@@ -622,8 +681,94 @@ void PlotMassPar(int  nState){
 		graph_alphaCB[2]->SetLineColor(onia::colour_rapForPTBins[4]);
 	}
 
-	double left=0.43, top=0.8+0.05, textSize=0.055;
-	if(nState==5) left=0.41;
+	Ymin = 0.0; Ymax = 0.4;
+	graph_fracSigInLSB[0]->SetTitle("");
+	graph_fracSigInLSB[0]->GetXaxis()->SetTitle("p_{T} (GeV)");
+	graph_fracSigInLSB[0]->GetYaxis()->SetTitle("signal contamination in LSB");
+	graph_fracSigInLSB[0]->GetXaxis()->SetLimits(Xmin, Xmax);
+	graph_fracSigInLSB[0]->GetYaxis()->SetRangeUser(Ymin, Ymax);
+	graph_fracSigInLSB[0]->SetMarkerStyle(onia::marker_rapForPTBins[2]);
+	graph_fracSigInLSB[0]->SetMarkerColor(onia::colour_rapForPTBins[2]);
+	graph_fracSigInLSB[0]->SetLineColor(onia::colour_rapForPTBins[2]);
+	graph_fracSigInLSB[1]->SetTitle("");
+	graph_fracSigInLSB[1]->GetXaxis()->SetTitle("p_{T} (GeV)");
+	graph_fracSigInLSB[1]->GetYaxis()->SetTitle("signal contamination in LSB");
+	graph_fracSigInLSB[1]->GetXaxis()->SetLimits(Xmin, Xmax);
+	graph_fracSigInLSB[1]->GetYaxis()->SetRangeUser(Ymin, Ymax);
+	graph_fracSigInLSB[1]->SetMarkerStyle(onia::marker_rapForPTBins[3]);
+	graph_fracSigInLSB[1]->SetMarkerColor(onia::colour_rapForPTBins[3]);
+	graph_fracSigInLSB[1]->SetLineColor(onia::colour_rapForPTBins[3]);
+	if(nState==5){
+		graph_fracSigInLSB[2]->SetTitle("");
+		graph_fracSigInLSB[2]->GetXaxis()->SetTitle("p_{T} (GeV)");
+		graph_fracSigInLSB[2]->GetYaxis()->SetTitle("signal contamination in LSB");
+		graph_fracSigInLSB[2]->GetXaxis()->SetLimits(Xmin, Xmax);
+		graph_fracSigInLSB[2]->GetYaxis()->SetRangeUser(Ymin, Ymax);
+		graph_fracSigInLSB[2]->SetMarkerStyle(onia::marker_rapForPTBins[4]);
+		graph_fracSigInLSB[2]->SetMarkerColor(onia::colour_rapForPTBins[4]);
+		graph_fracSigInLSB[2]->SetLineColor(onia::colour_rapForPTBins[4]);
+	}
+
+	Ymin = 0.0; Ymax = 0.4;
+	graph_fracSigInRSB[0]->SetTitle("");
+	graph_fracSigInRSB[0]->GetXaxis()->SetTitle("p_{T} (GeV)");
+	graph_fracSigInRSB[0]->GetYaxis()->SetTitle("signal contamination in RSB");
+	graph_fracSigInRSB[0]->GetXaxis()->SetLimits(Xmin, Xmax);
+	graph_fracSigInRSB[0]->GetYaxis()->SetRangeUser(Ymin, Ymax);
+	graph_fracSigInRSB[0]->SetMarkerStyle(onia::marker_rapForPTBins[2]);
+	graph_fracSigInRSB[0]->SetMarkerColor(onia::colour_rapForPTBins[2]);
+	graph_fracSigInRSB[0]->SetLineColor(onia::colour_rapForPTBins[2]);
+	graph_fracSigInRSB[1]->SetTitle("");
+	graph_fracSigInRSB[1]->GetXaxis()->SetTitle("p_{T} (GeV)");
+	graph_fracSigInRSB[1]->GetYaxis()->SetTitle("signal contamination in RSB");
+	graph_fracSigInRSB[1]->GetXaxis()->SetLimits(Xmin, Xmax);
+	graph_fracSigInRSB[1]->GetYaxis()->SetRangeUser(Ymin, Ymax);
+	graph_fracSigInRSB[1]->SetMarkerStyle(onia::marker_rapForPTBins[3]);
+	graph_fracSigInRSB[1]->SetMarkerColor(onia::colour_rapForPTBins[3]);
+	graph_fracSigInRSB[1]->SetLineColor(onia::colour_rapForPTBins[3]);
+	if(nState==5){
+		graph_fracSigInRSB[2]->SetTitle("");
+		graph_fracSigInRSB[2]->GetXaxis()->SetTitle("p_{T} (GeV)");
+		graph_fracSigInRSB[2]->GetYaxis()->SetTitle("signal contamination in RSB");
+		graph_fracSigInRSB[2]->GetXaxis()->SetLimits(Xmin, Xmax);
+		graph_fracSigInRSB[2]->GetYaxis()->SetRangeUser(Ymin, Ymax);
+		graph_fracSigInRSB[2]->SetMarkerStyle(onia::marker_rapForPTBins[4]);
+		graph_fracSigInRSB[2]->SetMarkerColor(onia::colour_rapForPTBins[4]);
+		graph_fracSigInRSB[2]->SetLineColor(onia::colour_rapForPTBins[4]);
+	}
+
+	Ymin = 8; Ymax = 1.e6+100;
+	graph_evtInLSB[0]->SetTitle("");
+	graph_evtInLSB[0]->GetXaxis()->SetTitle("p_{T} (GeV)");
+	graph_evtInLSB[0]->GetYaxis()->SetTitle("number of events in LSB");
+	graph_evtInLSB[0]->GetXaxis()->SetLimits(Xmin, Xmax);
+	graph_evtInLSB[0]->GetYaxis()->SetRangeUser(Ymin, Ymax);
+	graph_evtInLSB[0]->SetMarkerStyle(onia::marker_rapForPTBins[2]);
+	graph_evtInLSB[0]->SetMarkerColor(onia::colour_rapForPTBins[2]);
+	graph_evtInLSB[0]->SetLineColor(onia::colour_rapForPTBins[2]);
+	graph_evtInLSB[1]->SetTitle("");
+	graph_evtInLSB[1]->GetXaxis()->SetTitle("p_{T} (GeV)");
+	graph_evtInLSB[1]->GetYaxis()->SetTitle("number of events in LSB");
+	graph_evtInLSB[1]->GetXaxis()->SetLimits(Xmin, Xmax);
+	graph_evtInLSB[1]->GetYaxis()->SetRangeUser(Ymin, Ymax);
+	graph_evtInLSB[1]->SetMarkerStyle(onia::marker_rapForPTBins[3]);
+	graph_evtInLSB[1]->SetMarkerColor(onia::colour_rapForPTBins[3]);
+	graph_evtInLSB[1]->SetLineColor(onia::colour_rapForPTBins[3]);
+	if(nState==5){
+		graph_evtInLSB[2]->SetTitle("");
+		graph_evtInLSB[2]->GetXaxis()->SetTitle("p_{T} (GeV)");
+		graph_evtInLSB[2]->GetYaxis()->SetTitle("number of events in LSB");
+		graph_evtInLSB[2]->GetXaxis()->SetLimits(Xmin, Xmax);
+		graph_evtInLSB[2]->GetYaxis()->SetRangeUser(Ymin, Ymax);
+		graph_evtInLSB[2]->SetMarkerStyle(onia::marker_rapForPTBins[4]);
+		graph_evtInLSB[2]->SetMarkerColor(onia::colour_rapForPTBins[4]);
+		graph_evtInLSB[2]->SetLineColor(onia::colour_rapForPTBins[4]);
+	}
+
+	//double left=0.43, top=0.8+0.05, textSize=0.055;
+	//if(nState==5) left=0.41;
+	double left=0.45, top=0.87, textSize=0.055;
+	if(nState==5) left=0.43;
 	TLatex *latex=new TLatex();
 	latex->SetTextFont(42);
 	latex->SetNDC(kTRUE);
@@ -710,6 +855,40 @@ void PlotMassPar(int  nState){
 		latex->DrawLatex(left,top,"#psi(2S)");
 	c1->SaveAs(Form("%s/alphaCB.pdf",savePath.str().c_str()));
 
+	graph_fracSigInLSB[0]->Draw("AP");
+	graph_fracSigInLSB[1]->Draw("P");
+	if(nState==5)
+		graph_fracSigInLSB[2]->Draw("P");
+	legendRight->Draw();
+	if(nState==4)
+		latex->DrawLatex(left,top,"J/#psi");
+	if(nState==5)
+		latex->DrawLatex(left,top,"#psi(2S)");
+	c1->SaveAs(Form("%s/fracSigInLSB_sigma_4p0.pdf",savePath.str().c_str()));
+
+	graph_fracSigInRSB[0]->Draw("AP");
+	graph_fracSigInRSB[1]->Draw("P");
+	if(nState==5)
+		graph_fracSigInRSB[2]->Draw("P");
+	legendRight->Draw();
+	if(nState==4)
+		latex->DrawLatex(left,top,"J/#psi");
+	if(nState==5)
+		latex->DrawLatex(left,top,"#psi(2S)");
+	c1->SaveAs(Form("%s/fracSigInRSB.pdf",savePath.str().c_str()));
+
+	c1->SetLogy();
+	graph_evtInLSB[0]->Draw("AP");
+	graph_evtInLSB[1]->Draw("P");
+	if(nState==5)
+		graph_evtInLSB[2]->Draw("P");
+	legendRight->Draw();
+	if(nState==4)
+		latex->DrawLatex(left,top,"J/#psi");
+	if(nState==5)
+		latex->DrawLatex(left,top,"#psi(2S)");
+	c1->SaveAs(Form("%s/evtInLSB_sigma_4p0.pdf",savePath.str().c_str()));
+	c1->SetLogy(0);
 
 	////
 	graph_sigma1[0]->SetMarkerStyle(20);
@@ -1205,30 +1384,30 @@ void PlotLifePar(int  nState) {
 
 		//remove first pT bin for 2S
 		if(nState==5){
-			graph_promptMean[0][rapBin-1] -> RemovePoint(0);
-			graph_promptMean[1][rapBin-1] -> RemovePoint(0);
-			graph_promptCtRe[0][rapBin-1] -> RemovePoint(0);
-			graph_promptCtRe[1][rapBin-1] -> RemovePoint(0);
-			graph_promptCtRe2[0][rapBin-1] -> RemovePoint(0);
-			graph_promptCtRe2[1][rapBin-1] -> RemovePoint(0);
-			graph_promptCtReWei[0][rapBin-1] -> RemovePoint(0);
-			graph_promptCtReWei[1][rapBin-1] -> RemovePoint(0);
-			graph_fracGauss2[0][rapBin-1] -> RemovePoint(0);
-			graph_fracGauss2[1][rapBin-1] -> RemovePoint(0);
-			graph_bkgTauSSDR[0][rapBin-1] -> RemovePoint(0);
-			graph_bkgTauSSDR[1][rapBin-1] -> RemovePoint(0);
-			graph_bkgTauSSDL[0][rapBin-1] -> RemovePoint(0);
-			graph_bkgTauSSDL[1][rapBin-1] -> RemovePoint(0);
-			graph_bkgTauDSD[0][rapBin-1] -> RemovePoint(0);
-			graph_bkgTauDSD[1][rapBin-1] -> RemovePoint(0);
-			graph_fracBkgSSDL_SBL[0][rapBin-1] -> RemovePoint(0);
-			graph_fracBkgSSDR_SBL[0][rapBin-1] -> RemovePoint(0);
-			graph_fracBkgDSD_SBL[0][rapBin-1] -> RemovePoint(0);
-			graph_fracBkgSSDL_SBR[0][rapBin-1] -> RemovePoint(0);
-			graph_fracBkgSSDR_SBR[0][rapBin-1] -> RemovePoint(0);
-			graph_fracBkgDSD_SBR[0][rapBin-1] -> RemovePoint(0);
-			graph_ratioLD_SBL[0][rapBin-1] -> RemovePoint(0);
-			graph_ratioLD_SBR[0][rapBin-1] -> RemovePoint(0);
+			//graph_promptMean[0][rapBin-1] -> RemovePoint(0);
+			//graph_promptMean[1][rapBin-1] -> RemovePoint(0);
+			//graph_promptCtRe[0][rapBin-1] -> RemovePoint(0);
+			//graph_promptCtRe[1][rapBin-1] -> RemovePoint(0);
+			//graph_promptCtRe2[0][rapBin-1] -> RemovePoint(0);
+			//graph_promptCtRe2[1][rapBin-1] -> RemovePoint(0);
+			//graph_promptCtReWei[0][rapBin-1] -> RemovePoint(0);
+			//graph_promptCtReWei[1][rapBin-1] -> RemovePoint(0);
+			//graph_fracGauss2[0][rapBin-1] -> RemovePoint(0);
+			//graph_fracGauss2[1][rapBin-1] -> RemovePoint(0);
+			//graph_bkgTauSSDR[0][rapBin-1] -> RemovePoint(0);
+			//graph_bkgTauSSDR[1][rapBin-1] -> RemovePoint(0);
+			//graph_bkgTauSSDL[0][rapBin-1] -> RemovePoint(0);
+			//graph_bkgTauSSDL[1][rapBin-1] -> RemovePoint(0);
+			//graph_bkgTauDSD[0][rapBin-1] -> RemovePoint(0);
+			//graph_bkgTauDSD[1][rapBin-1] -> RemovePoint(0);
+			//graph_fracBkgSSDL_SBL[0][rapBin-1] -> RemovePoint(0);
+			//graph_fracBkgSSDR_SBL[0][rapBin-1] -> RemovePoint(0);
+			//graph_fracBkgDSD_SBL[0][rapBin-1] -> RemovePoint(0);
+			//graph_fracBkgSSDL_SBR[0][rapBin-1] -> RemovePoint(0);
+			//graph_fracBkgSSDR_SBR[0][rapBin-1] -> RemovePoint(0);
+			//graph_fracBkgDSD_SBR[0][rapBin-1] -> RemovePoint(0);
+			//graph_ratioLD_SBL[0][rapBin-1] -> RemovePoint(0);
+			//graph_ratioLD_SBR[0][rapBin-1] -> RemovePoint(0);
 		}
 	}
 
@@ -1247,6 +1426,11 @@ void PlotLifePar(int  nState) {
 	LifetimeLegendLR->SetTextSize(0.025);
 	LifetimeLegendLR->SetBorderSize(0.);
 	LifetimeLegendLR->AddEntry(graph_promptMean[0][0],"SBL(R)","lp");
+
+	gStyle->SetPadBottomMargin(0.12);
+	gStyle->SetPadLeftMargin(0.12);
+	gStyle->SetPadRightMargin(0.05);
+	gStyle->SetPadTopMargin(0.05);
 
 	TCanvas *c1=new TCanvas("c1","");
 	c1->SetTickx();
@@ -1475,8 +1659,10 @@ void PlotLifePar(int  nState) {
 	}
 
 	//double blX = 0.6, blY = 0.75, trX = 0.84, trY = 0.84;
-	double blX = 0.65, blY = 0.75, trX = 0.86, trY = 0.86;
-	if(nState==5) blY = 0.65;
+	//double blX = 0.65, blY = 0.75, trX = 0.86, trY = 0.86;
+	//if(nState==5) blY = 0.65;
+	double blX = 0.7, blY = 0.8, trX = 0.93, trY = 0.93;
+	if(nState==5) blY = 0.7;
 	TLegend* LifetimeLegendLR_2rap=new TLegend(blX,blY,trX,trY);
 	LifetimeLegendLR_2rap->SetFillColor(kWhite);
 	LifetimeLegendLR_2rap->SetTextFont(42);
@@ -1831,8 +2017,9 @@ void PlotBFrac_1S(int nState){
 
 
 	//TLegend* LifetimeLegend2D=new TLegend(0.75,0.75,0.82,0.84);
-	double blX = 0.16-0.05, blY = 0.72+0.05, trX = 0.4-0.05, trY = 0.84+0.05;
 	//double blX = 0.65, blY = 0.15, trX = 0.85, trY = 0.35;
+	//double blX = 0.16-0.05, blY = 0.72+0.05, trX = 0.4-0.05, trY = 0.84+0.05;
+	double blX = 0.15, blY = 0.82, trX = 0.4, trY = 0.93;
 
 	TLegend* LifetimeLegend=new TLegend(blX,blY,trX,trY);
 	LifetimeLegend->SetFillColor(kWhite);
@@ -1850,6 +2037,10 @@ void PlotBFrac_1S(int nState){
 	LifetimeLegend2Steps->AddEntry(graph_BFrac[0][0],"|y| < 0.6","lp");
 	LifetimeLegend2Steps->AddEntry(graph_BFrac[0][1],"0.6 < |y| < 1.2","lp");
 
+	gStyle->SetPadBottomMargin(0.12);
+	gStyle->SetPadLeftMargin(0.12);
+	gStyle->SetPadRightMargin(0.05);
+	gStyle->SetPadTopMargin(0.05);
 
 	TCanvas *c1=new TCanvas("c1","");
 	c1->SetTickx();
@@ -1879,7 +2070,8 @@ void PlotBFrac_1S(int nState){
 	double Ymin = 0., Ymax = 1.;
 	double Xmin = 6., Xmax = 72.;
 
-	double lvalue = 0.615+0.02, tvalue = 0.4-0.01;
+	//double lvalue = 0.615+0.02, tvalue = 0.4-0.01;
+	double lvalue = 0.68, tvalue = 0.41;
 	double left=lvalue, top=tvalue, textSize=0.035;
 	TLatex *latex=new TLatex();
 	latex->SetTextFont(42);
@@ -2297,8 +2489,9 @@ void PlotBFrac_2S(int nState){
 
 
 	//TLegend* LifetimeLegend2D=new TLegend(0.75,0.75,0.82,0.84);
-	double blX = 0.16-0.05, blY = 0.72+0.05, trX = 0.4-0.05, trY = 0.84+0.05;
 	//double blX = 0.65, blY = 0.15, trX = 0.85, trY = 0.35;
+	//double blX = 0.16-0.05, blY = 0.72+0.05, trX = 0.4-0.05, trY = 0.84+0.05;
+	double blX = 0.15, blY = 0.82, trX = 0.4, trY = 0.93;
 
 	TLegend* LifetimeLegend=new TLegend(blX,blY,trX,trY);
 	LifetimeLegend->SetFillColor(kWhite);
@@ -2317,6 +2510,10 @@ void PlotBFrac_2S(int nState){
 	LifetimeLegend2Steps->AddEntry(graph_BFrac[0][1],"0.6 < |y| < 1.2","lp");
 	LifetimeLegend2Steps->AddEntry(graph_BFrac[0][2],"1.2 < |y| < 1.8","lp");
 
+	gStyle->SetPadBottomMargin(0.12);
+	gStyle->SetPadLeftMargin(0.12);
+	gStyle->SetPadRightMargin(0.05);
+	gStyle->SetPadTopMargin(0.05);
 
 	TCanvas *c1=new TCanvas("c1","");
 	c1->SetTickx();
@@ -2346,7 +2543,8 @@ void PlotBFrac_2S(int nState){
 	double Ymin = 0., Ymax = 1.;
 	double Xmin = 6., Xmax = 72.;
 
-	double lvalue = 0.615+0.02, tvalue = 0.4-0.01;
+	//double lvalue = 0.615+0.02, tvalue = 0.4-0.01;
+	double lvalue = 0.68, tvalue = 0.41;
 	double left=lvalue, top=tvalue, textSize=0.035;
 	TLatex *latex=new TLatex();
 	latex->SetTextFont(42);
@@ -3459,30 +3657,35 @@ void plotEval(double nSigma, int nState, int type){
 		graph_sigmaP_L[rapBin-1] -> GetXaxis()->SetLimits(6.,72.);
 
 		if(nState==5){ // for Psi2S, remove first pT bin
-			graph_FracPR[rapBin-1] -> RemovePoint(0);
-			graph_FracNP[rapBin-1] -> RemovePoint(0);
-			graph_FracBG[rapBin-1] -> RemovePoint(0);
-			graph_FracPRErr[rapBin-1] -> RemovePoint(0);
-			graph_FracNPErr[rapBin-1] -> RemovePoint(0);
-			graph_FracBGErr[rapBin-1] -> RemovePoint(0);
-			graph_FracPRRelativeErr[rapBin-1] -> RemovePoint(0);
-			graph_FracNPRelativeErr[rapBin-1] -> RemovePoint(0);
-			graph_FracBGRelativeErr[rapBin-1] -> RemovePoint(0);
+			//graph_FracPR[rapBin-1] -> RemovePoint(0);
+			//graph_FracNP[rapBin-1] -> RemovePoint(0);
+			//graph_FracBG[rapBin-1] -> RemovePoint(0);
+			//graph_FracPRErr[rapBin-1] -> RemovePoint(0);
+			//graph_FracNPErr[rapBin-1] -> RemovePoint(0);
+			//graph_FracBGErr[rapBin-1] -> RemovePoint(0);
+			//graph_FracPRRelativeErr[rapBin-1] -> RemovePoint(0);
+			//graph_FracNPRelativeErr[rapBin-1] -> RemovePoint(0);
+			//graph_FracBGRelativeErr[rapBin-1] -> RemovePoint(0);
 
-			graph_CtauCut[rapBin-1] -> RemovePoint(0);
-			graph_PRprob[rapBin-1] -> RemovePoint(0);
-			graph_sigmaP[rapBin-1] -> RemovePoint(0);
-			graph_sigmaP_L[rapBin-1] -> RemovePoint(0);
+			//graph_CtauCut[rapBin-1] -> RemovePoint(0);
+			//graph_PRprob[rapBin-1] -> RemovePoint(0);
+			//graph_sigmaP[rapBin-1] -> RemovePoint(0);
+			//graph_sigmaP_L[rapBin-1] -> RemovePoint(0);
 
-			graph_evtPR[rapBin-1] -> RemovePoint(0);  
-			graph_evtNP[rapBin-1] -> RemovePoint(0);
-			graph_evtBG[rapBin-1] -> RemovePoint(0);
+			//graph_evtPR[rapBin-1] -> RemovePoint(0);  
+			//graph_evtNP[rapBin-1] -> RemovePoint(0);
+			//graph_evtBG[rapBin-1] -> RemovePoint(0);
 		}
 
 		graph_FracPRRelativeErr[rapBin-1] ->GetYaxis() -> SetRangeUser(0.,50.);
 		graph_FracNPRelativeErr[rapBin-1] ->GetYaxis() -> SetRangeUser(0.,50.);
 		graph_FracBGRelativeErr[rapBin-1] ->GetYaxis() -> SetRangeUser(0.,50.);
 	}
+
+	gStyle->SetPadBottomMargin(0.12);
+	gStyle->SetPadLeftMargin(0.12);
+	gStyle->SetPadRightMargin(0.05);
+	gStyle->SetPadTopMargin(0.05);
 
 	TCanvas *c1=new TCanvas("c1","c1");
 	c1->SetTickx();
@@ -3509,7 +3712,9 @@ void plotEval(double nSigma, int nState, int type){
 
 
 	//double left=0.65, top=0.65, textSize=0.032;
-	double left=0.17, top=0.83, textSize=0.035;
+	//double left=0.17, top=0.83, textSize=0.035;
+	double leftVal=0.17, topVal=0.88;
+	double left=leftVal, top=topVal, textSize=0.035;
 	TLatex *latex=new TLatex();
 	latex->SetTextFont(42);
 	latex->SetNDC(kTRUE);
@@ -3519,7 +3724,7 @@ void plotEval(double nSigma, int nState, int type){
 	//double blX = 0.16, blY = 0.70, trX = 0.4, trY = 0.84;
 	//double blX = 0.65, blY = 0.15, trX = 0.85, trY = 0.35;
 	//double blX = 0.7, blY = 0.73, trX = 0.83, trY = 0.84;
-	double blX = 0.7, blY = 0.73, trX = 0.89, trY = 0.89;
+	double blX = 0.72, blY = 0.75, trX = 0.93, trY = 0.93;
 	TLegend* legend_rap1=new TLegend(blX,blY,trX,trY);
 	legend_rap1->SetFillColor(kWhite);
 	legend_rap1->SetTextFont(42);
@@ -3558,7 +3763,7 @@ void plotEval(double nSigma, int nState, int type){
 	graph_FracBG[0]->Draw("P");
 	//graph_FracBGNP[0]->Draw("P");
 	legend_rap1->Draw();
-	top=0.83;
+	top=topVal;
 	if(nState==4) latex->DrawLatex(left,top, "J/#psi");
 	if(nState==5) latex->DrawLatex(left,top, "#psi(2S)");
 	top -= stepLatex;
@@ -3569,7 +3774,7 @@ void plotEval(double nSigma, int nState, int type){
 	graph_FracNPErr[0]->Draw("P");
 	graph_FracBGErr[0]->Draw("P");
 	legend_rap1->Draw();
-	top=0.83;
+	top=topVal;
 	if(nState==4) latex->DrawLatex(left,top, "J/#psi");
 	if(nState==5) latex->DrawLatex(left,top, "#psi(2S)");
 	top -= stepLatex;
@@ -3580,7 +3785,7 @@ void plotEval(double nSigma, int nState, int type){
 	graph_FracNPRelativeErr[0]->Draw("P");
 	graph_FracBGRelativeErr[0]->Draw("P");
 	legend_rap1->Draw();
-	top=0.83;
+	top=topVal;
 	if(nState==4) latex->DrawLatex(left,top, "J/#psi");
 	if(nState==5) latex->DrawLatex(left,top, "#psi(2S)");
 
@@ -3593,7 +3798,7 @@ void plotEval(double nSigma, int nState, int type){
 	graph_FracBG[1]->Draw("P");
 	//graph_FracBGNP[1]->Draw("P");
 	legend_rap2->Draw();
-	top=0.83;
+	top=topVal;
 	if(nState==4) latex->DrawLatex(left,top, "J/#psi");
 	if(nState==5) latex->DrawLatex(left,top, "#psi(2S)");
 	top -= stepLatex;
@@ -3604,7 +3809,7 @@ void plotEval(double nSigma, int nState, int type){
 	graph_FracNPErr[1]->Draw("P");
 	graph_FracBGErr[1]->Draw("P");
 	legend_rap2->Draw();
-	top=0.83;
+	top=topVal;
 	if(nState==4) latex->DrawLatex(left,top, "J/#psi");
 	if(nState==5) latex->DrawLatex(left,top, "#psi(2S)");
 	top -= stepLatex;
@@ -3615,7 +3820,7 @@ void plotEval(double nSigma, int nState, int type){
 	graph_FracNPRelativeErr[1]->Draw("P");
 	graph_FracBGRelativeErr[1]->Draw("P");
 	legend_rap2->Draw();
-	top=0.83;
+	top=topVal;
 	if(nState==4) latex->DrawLatex(left,top, "J/#psi");
 	if(nState==5) latex->DrawLatex(left,top, "#psi(2S)");
 	top -= stepLatex;
@@ -3627,7 +3832,7 @@ void plotEval(double nSigma, int nState, int type){
 		graph_FracNP[2]->Draw("P");
 		graph_FracBG[2]->Draw("P");
 		legend_rap3->Draw();
-		top=0.83;
+		top=topVal;
 		latex->DrawLatex(left,top, "#psi(2S)");
 		top -= stepLatex;
 		latex->DrawLatex(left,top, "1.2 < |y| < 1.8");
@@ -3637,7 +3842,7 @@ void plotEval(double nSigma, int nState, int type){
 		graph_FracNPErr[2]->Draw("P");
 		graph_FracBGErr[2]->Draw("P");
 		legend_rap3->Draw();
-		top=0.83;
+		top=topVal;
 		latex->DrawLatex(left,top, "#psi(2S)");
 		top -= stepLatex;
 		latex->DrawLatex(left,top, "1.2 < |y| < 1.8");
@@ -3647,7 +3852,7 @@ void plotEval(double nSigma, int nState, int type){
 		graph_FracNPRelativeErr[2]->Draw("P");
 		graph_FracBGRelativeErr[2]->Draw("P");
 		legend_rap3->Draw();
-		top=0.83;
+		top=topVal;
 		latex->DrawLatex(left,top, "#psi(2S)");
 		top -= stepLatex;
 		latex->DrawLatex(left,top, "1.2 < |y| < 1.8");
@@ -3689,7 +3894,10 @@ void plotEval(double nSigma, int nState, int type){
 	if(nState==5)
 		graph_CtauCut[2]->Draw("P");
 	legend_ctauCut->Draw();
-	left=0.55;top=0.83;
+
+	//left=0.55;top=0.83;
+	leftVal=0.6; topVal=0.88;
+	left=leftVal;top=topVal;
 	if(nState==4) latex->DrawLatex(left,top, "J/#psi");
 	if(nState==5) latex->DrawLatex(left,top, "#psi(2S)");
 	c1->SaveAs(Form("%s/CtauCut.pdf",savePath.str().c_str()));
@@ -3699,7 +3907,7 @@ void plotEval(double nSigma, int nState, int type){
 	if(nState==5)
 		graph_PRprob[2]->Draw("P");
 	legend_promptProb->Draw();
-	left=0.55;top=0.83;
+	left=leftVal;top=topVal;
 	if(nState==4) latex->DrawLatex(left,top, "J/#psi");
 	if(nState==5) latex->DrawLatex(left,top, "#psi(2S)");
 	c1->SaveAs(Form("%s/PRprob.pdf",savePath.str().c_str()));
@@ -3711,7 +3919,7 @@ void plotEval(double nSigma, int nState, int type){
 	if(nState==5)
 		graph_evtPR[2]->Draw("P");
 	legend_evt->Draw();
-	left=0.55;top=0.83;
+	left=leftVal;top=topVal;
 	if(nState==4) latex->DrawLatex(left,top, "J/#psi");
 	if(nState==5) latex->DrawLatex(left,top, "#psi(2S)");
 	c1->SaveAs(Form("%s/evtP.pdf",savePath.str().c_str()));
@@ -3721,7 +3929,7 @@ void plotEval(double nSigma, int nState, int type){
 	if(nState==5)
 		graph_evtNP[2]->Draw("P");
 	legend_evt->Draw();
-	left=0.55;top=0.83;
+	left=leftVal;top=topVal;
 	if(nState==4) latex->DrawLatex(left,top, "J/#psi");
 	if(nState==5) latex->DrawLatex(left,top, "#psi(2S)");
 	c1->SaveAs(Form("%s/evtNP.pdf",savePath.str().c_str()));
@@ -3731,7 +3939,7 @@ void plotEval(double nSigma, int nState, int type){
 	if(nState==5)
 		graph_evtBG[2]->Draw("P");
 	legend_evt->Draw();
-	left=0.55;top=0.83;
+	left=leftVal;top=topVal;
 	if(nState==4) latex->DrawLatex(left,top, "J/#psi");
 	if(nState==5) latex->DrawLatex(left,top, "#psi(2S)");
 	c1->SaveAs(Form("%s/evtBG.pdf",savePath.str().c_str()));
@@ -3752,7 +3960,7 @@ void plotEval(double nSigma, int nState, int type){
 	if(nState==5)
 		graph_sigmaP[2]->Draw("P");
 	legend_sigmaP->Draw();
-	left=0.55;top=0.83;
+	left=leftVal;top=topVal;
 	if(nState==4) latex->DrawLatex(left,top, "J/#psi");
 	if(nState==5) latex->DrawLatex(left,top, "#psi(2S)");
 	c1->SaveAs(Form("%s/rms.pdf",savePath.str().c_str()));
@@ -3762,7 +3970,7 @@ void plotEval(double nSigma, int nState, int type){
 	if(nState==5)
 		graph_sigmaP_L[2]->Draw("P");
 	legend_sigmaP->Draw();
-	left=0.55;top=0.83;
+	left=leftVal;top=topVal;
 	if(nState==4) latex->DrawLatex(left,top, "J/#psi");
 	if(nState==5) latex->DrawLatex(left,top, "#psi(2S)");
 	c1->SaveAs(Form("%s/rmsL.pdf",savePath.str().c_str()));
