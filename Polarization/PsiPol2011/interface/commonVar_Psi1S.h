@@ -15,8 +15,8 @@ namespace onia{
   // mass ranges 
   const double massMin = 2.85;
   const double massMax = 3.3;
-  const double nSigMass = 3.;
-  const double nSigBkgLow = 3.5;
+  const double nSigMass = 3.0;
+  const double nSigBkgLow = 4.0;
   const double nSigBkgHigh = 3.5;
 	
   // Binning

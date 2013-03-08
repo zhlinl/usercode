@@ -116,6 +116,10 @@ bool isMuonInAcceptance(int iCut, double pT, double eta){
 		if(TMath::Abs(eta)>1.3 && TMath::Abs(eta)<2.2 && pT>2.9) decision=kTRUE;
 	}
 
+	if(iCut==14){
+		if(pT>5.) decision=kTRUE;
+	}
+
 	return decision;
 }
 
@@ -189,8 +193,10 @@ void EvaluateEffFileName(int nEff, char EffFileName [200], bool singleLeptonEff)
 		if(nEff==302 || nEff==312 || nEff==322) sprintf(EffFileName,"rhoFactor_Ups1S_MCTruthEff_23Jan2011.root");
 		if(nEff==303 || nEff==313 || nEff==323) sprintf(EffFileName,"rhoFactor_Ups1S_SingleMuEff_7Feb2012.root");
 		if(nEff==304 || nEff==314 || nEff==324) sprintf(EffFileName,"rhoFactor_Ups1S_ProdSingleMuEff_7Feb2012.root");
-		//if(nEff==305 || nEff==315 || nEff==325) sprintf(EffFileName,"rhoFactor_Ups1S_MCTruthEff_21March2012_finalPTBins_TPVCuts.root");
 		if(nEff==305 || nEff==315 || nEff==325) sprintf(EffFileName,"rhoFactor_Psi2S_Luca_27Nov2012.root");
+		//if(nEff==306 || nEff==316 || nEff==326) sprintf(EffFileName,"rhoFactor_Psi2S_newMC_Luca_18Feb2013.root");
+		//if(nEff==306 || nEff==316 || nEff==326) sprintf(EffFileName,"rhoFactor_Psi2S_newMC_Luca_21Feb2013.root");
+		if(nEff==306 || nEff==316 || nEff==326) sprintf(EffFileName,"rhoFactor_Psi2S_combinedMC_Luca_27Feb2013.root");
 	}
 
 
@@ -201,12 +207,17 @@ double EvaluateRhoFactor( double& costh, double& phi, int nEff, TFile* fInRhoFac
 	double eff=1;
 	if(nEff==1) return eff;
 
+	//if(pT<30.) return eff;
+
 	int pTbin;
 	int rapBin;
-	const int nRhoPtBins=10;
+	const int nRhoPtBins=16;
 	const int nRhorapBins=3;
 	Double_t rapRangeRho[nRhorapBins+1] = {0.,0.6,1.2,1.8};
-	Double_t pTRangeRho[nRhoPtBins+1] = {7.,10.,14.,18.,22.,26.,30.,35.,40.,45.,50.};
+	//Double_t pTRangeRho[nRhoPtBins+1] = {7.,10.,14.,18.,22.,26.,30.,35.,40.,45.,50.}; //old
+	//Double_t pTRangeRho[nRhoPtBins+1] = {10.,14.,18.,22.,26.,30.,35.,40.,45.,50.,55.,60.,65.,70.};
+	//Double_t pTRangeRho[nRhoPtBins+1] = {10.,11.,12.,14.,16.,18.,20.,22.,25.,30.,35.,40.,45.,50.,55.,60.,65.,70.};
+	Double_t pTRangeRho[nRhoPtBins+1] = {10.,12.,14.,16.,18.,20.,22.,25.,30.,35.,40.,45.,50.,55.,60.,65.,70.};
 
 	if(pT>pTRangeRho[nRhoPtBins]){eff=0;return eff;}
 
@@ -233,7 +244,7 @@ double EvaluateRhoFactor( double& costh, double& phi, int nEff, TFile* fInRhoFac
 		Int_t binX = hEff->GetXaxis()->FindBin(costh);
 		Int_t binY = hEff->GetYaxis()->FindBin(phi);
 		eff = hEff->GetBinContent(binX, binY);
-		//	  cout<<eff<<endl;
+		//cout<<"eff: "<<eff<<endl;
 		return eff;
 	}
 
@@ -361,6 +372,7 @@ double DiLeptonEfficiency( double& costh, double& phi, int nEff, TFile* fInDilep
 		Int_t binX = hEff->GetXaxis()->FindBin(costh);
 		Int_t binY = hEff->GetYaxis()->FindBin(phi);
 		eff = hEff->GetBinContent(binX, binY);
+		//cout<<"Eff "<<eff<<endl;
 		return eff;
 	}
 
@@ -415,6 +427,7 @@ double singleLeptonEfficiency( double& pT, double& eta, int nEff, TFile* fInEff,
 		int binY = hEvalEff->GetYaxis()->FindBin(pT);
 
 		eff = hEvalEff->GetBinContent(binX, binY);
+		//cout<<"HistEff "<<eff<<endl;
 
 		return eff;
 	}

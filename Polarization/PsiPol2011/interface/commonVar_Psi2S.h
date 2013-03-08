@@ -15,23 +15,24 @@ namespace onia{
   // mass ranges
   const double massMin = 3.4; 
   const double massMax = 4.0;
-  const double nSigMass = 3.;
-  const double nSigBkgLow = 3.5;
+  const double nSigMass = 3.0;
+  const double nSigBkgLow = 4.0;
   const double nSigBkgHigh = 3.5;	
 	
   //PsiPrime
   const int kNbRapForPTBins = 3;
-  double rapForPTRange[kNbRapForPTBins+1] = {0., 0.6, 1.2, 1.8};
+  double rapForPTRange[kNbRapForPTBins+1] = {0., 0.6, 1.2, 1.5};
   //study the negative and positive rapidity sides separately
-  double rapRange[2*kNbRapForPTBins+1] = {-1.8, -1.2, -0.6, -0., 0.6, 1.2, 1.8};
+  double rapRange[2*kNbRapForPTBins+1] = {-1.5, -1.2, -0.6, -0., 0.6, 1.2, 1.5};
 
-  const int kNbPTMaxBins = 6;                                                                                                            
+  const int kNbPTMaxBins = 5;
+
   const int kNbPTBins[kNbRapForPTBins+1] = {kNbPTMaxBins, kNbPTMaxBins, kNbPTMaxBins, kNbPTMaxBins};//all y, y1 
   double pTRange[kNbRapForPTBins+1][kNbPTMaxBins+1] = {
-    {7., 10., 14., 18., 22., 30., 50.},//all rapidities
-    {7., 10., 14., 18., 22., 30., 50.},//mid-rapidity
-    {7., 10., 14., 18., 22., 30., 50.},//0.6 < |y| < 1.2
-    {7., 10., 14., 18., 22., 30., 50.}};//1.2 < |y| < 1.8
+    {10., 14., 18., 22., 30., 50.},//all rapidities
+    {10., 14., 18., 22., 30., 50.},//mid-rapidity
+    {10., 14., 18., 22., 30., 50.},//0.6 < |y| < 1.2
+    {10., 14., 18., 22., 30., 50.}};//1.2 < |y| < 1.5
     
   //number of reference frames
   const int kNbFrames = 6;

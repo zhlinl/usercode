@@ -1,7 +1,7 @@
 ############ INPUTS ####################
 
 #source /afs/cern.ch/user/z/zhlinl/rootset.sh
-source /afs/ihep.ac.cn/users/z/zhangll/workspace/rootset.sh 34
+source /afs/ihep.ac.cn/users/z/zhangll/fs/rootset.sh
 
 # Define JobID
 #JobID=FrameworkTest_5Dec2012
@@ -13,11 +13,11 @@ for FidCuts in 11;do    #defines the set of cuts to be used, see macros/polFit/e
 cd $Cdir
 
 
-rapMin=1     #takes bins, not actual values
+rapMin=2     #takes bins, not actual values
 rapMax=2     #if you only want to process 1 y bin, rapMax = rapMin
 ptMin=1     #takes bins, not acutal values
-ptMax=12     #if you only want to process 1 pt bin, ptMax = ptMin
-Plotting=2   #plotting macro: 1 = plot all, 2 = plot mass, 3 = plot lifetime sidebands, 4 = plot lifetime singal region
+ptMax=1     #if you only want to process 1 pt bin, ptMax = ptMin
+Plotting=3   #plotting macro: 1 = plot all, 2 = plot mass, 3 = plot lifetime sidebands, 4 = plot lifetime singal region
 
 rejectCowboys=true
 RequestTrigger=true
@@ -33,7 +33,10 @@ FracLSB=-1        #-1:defalut, 0, 100
 #JobID=FrameworkTest_5Dec2012
 #JobID=ctauScen${ctauScen}_FracLSB${FracLSB}
 #JobID=ctauScen${ctauScen}_FracLSB${FracLSB}_25Feb2013
-JobID=ctauScen${ctauScen}_FracLSB${FracLSB}_26Feb2013_BgNoRebin
+#JobID=ctauScen${ctauScen}_FracLSB${FracLSB}_26Feb2013_BgNoRebin
+#JobID=ctauScen${ctauScen}_FracLSB${FracLSB}_25Feb2013_Bin20_2_2
+#JobID=ctauScen${ctauScen}_FracLSB${FracLSB}_25Feb2013_Bin5_8_8
+JobID=ctauScen${ctauScen}_FracLSB${FracLSB}_newMLfit_4Mar2013
 
 # input files
 # In case of more input Files: define inputTreeX and adapt the line starting with inputTrees, at the moment up to 4 files implemented
@@ -64,10 +67,10 @@ execute_runWorkspace=0			     #independent of rapMin, rapMax, ptMin, ptMax
 execute_runMassFit=0			       #can be executed for different pt and y bins
 execute_runLifetimeFit=0         #can be executed for different pt and y bins
 execute_runPlotMassLifetime=0    #can be executed for different pt and y bins
-execut_PlotFitPar=0              #independent of rapMin, rapMax, ptMin, ptMax
+execut_PlotFitPar=1              #independent of rapMin, rapMax, ptMin, ptMax
 execute_runBkgHistos=0           #can be executed for different pt and y bins
-execute_PlotCosThetaPhiBG=1 		 #This step only has to be executed once for each set of cuts (indep. of FracLSB and nSigma)
-execute_PlotCosThetaPhiDistribution=1 #This step only has to be executed once for each set of cuts (indep. of FracLSB and nSigma)
+execute_PlotCosThetaPhiBG=0 		 #This step only has to be executed once for each set of cuts (indep. of FracLSB and nSigma)
+execute_PlotCosThetaPhiDistribution=0 #This step only has to be executed once for each set of cuts (indep. of FracLSB and nSigma)
 
 #################################
 
@@ -117,7 +120,7 @@ cp calcPol.C ${WorkDir}/calcPol.C
 cp PlotCosThetaPhiBG.cc ${WorkDir}/PlotCosThetaPhiBG.cc
 cp PlotCosThetaPhiDistribution.cc ${WorkDir}/PlotCosThetaPhiDistribution.cc
 
-cp ../latex/Mass_sigma.tex ${WorkDir}/Mass_sigma.tex
+cp ../latex/Mass_fitParameter.tex ${WorkDir}/Mass_fitParameter.tex
 cp ../latex/Lifetime_fitParameter.tex ${WorkDir}/Lifetime_fitParameter.tex
 cp ../latex/myStyle.tex ${WorkDir}/myStyle.tex
 cp ../latex/evaluateCtau.tex ${WorkDir}/evaluateCtau.tex
@@ -166,21 +169,21 @@ then
 cp runPlotMassLifetime runPlotMassLifetime_$[nState-3]S_rap${rapMin}_pt${ptMin}
 ./runPlotMassLifetime_$[nState-3]S_rap${rapMin}_pt${ptMin} rapMin=${rapMin} rapMax=${rapMax} ptMin=${ptMin} ptMax=${ptMax} nState=${nState} Plotting=${Plotting}
 rm runPlotMassLifetime_$[nState-3]S_rap${rapMin}_pt${ptMin}
-#pdflatex MassLifetime_Psi$[nState-3]S.tex
-#mv MassLifetime_Psi$[nState-3]S.pdf PDF/MassLifetime_Psi$[nState-3]S.pdf
+pdflatex MassLifetime_Psi$[nState-3]S.tex
+mv MassLifetime_Psi$[nState-3]S.pdf PDF/MassLifetime_Psi$[nState-3]S.pdf
 fi
 
 if [ ${execut_PlotFitPar} -eq 1 ]
 then
 ./PlotFitPar nState=${nState} doCtauUncer=${doCtauUncer}
 pdflatex Lifetime_fitParameter.tex
-pdflatex Mass_sigma.tex
+pdflatex Mass_fitParameter.tex
 pdflatex evaluateCtau.tex
 pdflatex evaluateCtau.tex
 pdflatex NumEvents.tex
 pdflatex NumEvents.tex
 mv Lifetime_fitParameter.pdf PDF/Lifetime_fitParameter.pdf
-mv Mass_sigma.pdf PDF/Mass_sigma.pdf
+mv Mass_fitParameter.pdf PDF/Mass_fitParameter.pdf
 mv evaluateCtau.pdf PDF/evaluateCtau.pdf
 mv NumEvents.pdf PDF/NumEvents.pdf
 fi

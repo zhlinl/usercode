@@ -36,7 +36,7 @@ void PlotMassLifetime(const std::string &infilename, int rapBin, int ptBin, int 
 			break;
 		case 4:
 			std::cout << ">>>>Plotting lifetime signal region" << std::endl;
-			//plotLifeSig(ws, rapBin, ptBin, nState);
+			plotLifeSig(ws, rapBin, ptBin, nState);
 			plotLifeSig_linear(ws, rapBin, ptBin, nState);
 			break;
 		default:
@@ -226,7 +226,7 @@ void plotMass(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 	TLegend* MassLegend=new TLegend(0.7,0.55,0.88,0.75);
 	MassLegend->SetFillColor(kWhite);
 	MassLegend->SetTextFont(42);
-	MassLegend->SetTextSize(0.025);
+	MassLegend->SetTextSize(0.035);
 	MassLegend->SetBorderSize(0.);
 	MassLegend->AddEntry(legendBlue,"sum","l");
 	MassLegend->AddEntry(legendRed,"signal CB_{1}","l");
@@ -241,10 +241,10 @@ void plotMass(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 	latex->SetTextSize(textSize);
 	double step=textSize*1.3;
 
-	gStyle->SetPadBottomMargin(0.12);
-	gStyle->SetPadLeftMargin(0.12);
-	gStyle->SetPadRightMargin(0.05);
-	gStyle->SetPadTopMargin(0.05);
+	gStyle->SetPadBottomMargin(0.08); //0.12
+	gStyle->SetPadLeftMargin(0.09); //0.12
+	gStyle->SetPadRightMargin(0.02); //0.05
+	gStyle->SetPadTopMargin(0.05); //0.05
 	
 	TCanvas *c1=new TCanvas("c1","",800,700);
 	c1->SetTickx();
@@ -506,7 +506,7 @@ void plotMassLog(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 	TLegend* MassLegend=new TLegend(0.7,0.8,0.93,0.93);
 	MassLegend->SetFillColor(kWhite);
 	MassLegend->SetTextFont(42);
-	MassLegend->SetTextSize(0.025);
+	MassLegend->SetTextSize(0.035);
 	MassLegend->SetBorderSize(0.);
 	MassLegend->AddEntry(legendBlue,"sum","l");
 	MassLegend->AddEntry(legendRed,"signal CB_{1}","l");
@@ -521,10 +521,10 @@ void plotMassLog(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 	latex->SetTextSize(textSize);
 	double step=textSize*1.3;
 
-	gStyle->SetPadBottomMargin(0.12);
-	gStyle->SetPadLeftMargin(0.12);
-	gStyle->SetPadRightMargin(0.05);
-	gStyle->SetPadTopMargin(0.05);
+	gStyle->SetPadBottomMargin(0.08); //0.12
+	gStyle->SetPadLeftMargin(0.09); //0.12
+	gStyle->SetPadRightMargin(0.02); //0.05
+	gStyle->SetPadTopMargin(0.02); //0.05
 
 	TCanvas *c1=new TCanvas("c1","",800,700);
 	c1->SetTickx();
@@ -642,8 +642,6 @@ void plotLifeBg(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 	RooRealVar *bkgTauDSD_=(RooRealVar*)ws->var("bkgTauDSD");
 
 	RooRealVar *bkgTauSSD_SBR_=(RooRealVar*)ws->var("bkgTauSSD_SBR");
-	//RooRealVar *bkgTauFD_=(RooRealVar*)ws->var("bkgTauFD");
-	//RooRealVar *bkgTauDSD_=(RooRealVar*)ws->var("bkgTauDSD");
 
 	RooRealVar *fBkgSSDR_SBL_ = (RooRealVar*)ws->var("fBkgSSDR_SBL");
 	RooRealVar *fBkgDSD_SBL_ = (RooRealVar*)ws->var("fBkgDSD_SBL");
@@ -651,6 +649,11 @@ void plotLifeBg(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 	RooRealVar *fBkgDSD_SBR_ = (RooRealVar*)ws->var("fBkgDSD_SBR");
 
 	RooRealVar *fBkg_ = (RooRealVar*)ws->var("fBkg");
+
+	RooRealVar *fBkgSBL_ = (RooRealVar*)ws->var("fBkgSBL");
+	RooRealVar *fBkgSBR_ = (RooRealVar*)ws->var("fBkgSBR");
+	//RooRealVar *fPromptSBL_ = (RooRealVar*)ws->var("fPromptSBL");
+	//RooRealVar *fPromptSBR_ = (RooRealVar*)ws->var("fPromptSBR");
 
 	double promptMean = promptMean_->getVal();
 	double promptMeanErr = promptMean_->getError();
@@ -674,8 +677,15 @@ void plotLifeBg(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 
 	double fBkg = fBkg_->getVal();
 	double fBkgErr = fBkg_->getError();
-	cout<<"fBkg: "<<fBkg<<endl;
-	cout<<"fBkgErr: "<<fBkgErr<<endl;
+
+	double fBkgSBL = fBkgSBL_->getVal();
+	double fBkgSBR = fBkgSBR_->getVal();
+	double fBkgSBLErr = fBkgSBL_->getError();
+	double fBkgSBRErr = fBkgSBR_->getError();
+	//double fPromptSBL = fPromptSBL_->getVal();
+	//double fPromptSBR = fPromptSBR_->getVal();
+	//double fPromptSBLErr = fPromptSBL_->getError();
+	//double fPromptSBRErr = fPromptSBR_->getError();
 
 	double fBkgSSDR_SBL = fBkgSSDR_SBL_->getVal();
 	double fBkgSSDRErr_SBL = fBkgSSDR_SBL_->getError();
@@ -698,6 +708,15 @@ void plotLifeBg(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 
 	RooAddPdf *ModelLifeSBL = (RooAddPdf*)ws->pdf("backgroundlifetimeL");
 	RooAddPdf *ModelLifeSBR = (RooAddPdf*)ws->pdf("backgroundlifetimeR");
+	RooAddPdf *backgroundSSD_SBL = (RooAddPdf*)ws->pdf("backgroundSSD_SBL");
+	RooAddPdf *backgroundSSD_SBR = (RooAddPdf*)ws->pdf("backgroundSSD_SBR");
+	RooAddPdf *backgroundDSD = (RooAddPdf*)ws->pdf("backgroundDSD");
+	RooAddPdf *backgroundFD = (RooAddPdf*)ws->pdf("backgroundFD");
+
+	RooAddModel *Prompt = (RooAddModel*)ws->pdf("TotalPromptLifetime");
+	RooAbsPdf *nonPromptSSD = (RooAbsPdf*)ws->pdf("nonPromptSSD");
+
+
 
 	int parsFit;
 
@@ -725,27 +744,33 @@ void plotLifeBg(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 
 	ctauFrameBkgSBLPull->addPlotable(hpull_ctauBkgSBL,"P");
 
-	ModelLifeSBL->plotOn(ctauFrameBkgSBL,
+	//ModelLifeSBL->plotOn(ctauFrameBkgSBL,
+	backgroundSSD_SBL->plotOn(ctauFrameBkgSBL,
 			ProjWData(*JpsictErr, *dataSBL),
-			Components("backgroundSSD_SBL"),
+			//Components("backgroundSSD_SBL"),
+			Normalization(fBkgSBL*fBkgSSDR_SBL),
 			LineStyle(2),
 			LineColor(kRed),
 			LineWidth(2),
 			NumCPU(1)
 			);
 
-	ModelLifeSBL->plotOn(ctauFrameBkgSBL,
+	//ModelLifeSBL->plotOn(ctauFrameBkgSBL,
+	backgroundFD->plotOn(ctauFrameBkgSBL,
 			ProjWData(*JpsictErr, *dataSBL),
-			Components("backgroundFD"),
+			//Components("backgroundFD"),
+			Normalization(fBkgSBL*(1.-fBkgDSD_SBL-fBkgSSDR_SBL)),
 			LineStyle(2),
 			LineColor(kGreen),
 			LineWidth(2),
 			NumCPU(1)
 			);
 
-	ModelLifeSBL->plotOn(ctauFrameBkgSBL,
+	//ModelLifeSBL->plotOn(ctauFrameBkgSBL,
+	backgroundDSD->plotOn(ctauFrameBkgSBL,
 			ProjWData(*JpsictErr, *dataSBL),
-			Components("backgroundDSD"),
+			//Components("backgroundDSD"),
+			Normalization(fBkgSBL*fBkgDSD_SBL),
 			LineStyle(1),
 			LineColor(kBlack),
 			LineWidth(2),
@@ -780,27 +805,33 @@ void plotLifeBg(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 	}
 	ctauFrameBkgSBRPull->addPlotable(hpull_ctauBkgSBR,"P");
 
-	ModelLifeSBR->plotOn(ctauFrameBkgSBR,
+	//ModelLifeSBR->plotOn(ctauFrameBkgSBR,
+	backgroundSSD_SBR->plotOn(ctauFrameBkgSBR,
 			ProjWData(*JpsictErr, *dataSBR),
-			Components("backgroundSSD_SBR"),
+			//Components("backgroundSSD_SBR"),
+			Normalization(fBkgSBR*fBkgSSDR_SBR),
 			LineStyle(2),
 			LineColor(kRed),
 			LineWidth(2),
 			NumCPU(1)
 			);
 
-	ModelLifeSBR->plotOn(ctauFrameBkgSBR,
+	//ModelLifeSBR->plotOn(ctauFrameBkgSBR,
+	backgroundFD->plotOn(ctauFrameBkgSBR,
 			ProjWData(*JpsictErr, *dataSBR),
-			Components("backgroundFD"),
+			//Components("backgroundFD"),
+			Normalization(fBkgSBR*(1.-fBkgSSDR_SBR-fBkgDSD_SBR)),
 			LineStyle(2),
 			LineColor(kGreen),
 			LineWidth(2),
 			NumCPU(1)
 			);
 
-	ModelLifeSBR->plotOn(ctauFrameBkgSBR,
+	//ModelLifeSBR->plotOn(ctauFrameBkgSBR,
+	backgroundDSD->plotOn(ctauFrameBkgSBR,
 			ProjWData(*JpsictErr, *dataSBR),
-			Components("backgroundDSD"),
+			//Components("backgroundDSD"),
+			Normalization(fBkgSBR*fBkgDSD_SBR),
 			LineStyle(1),
 			LineColor(kBlack),
 			LineWidth(2),
@@ -824,10 +855,10 @@ void plotLifeBg(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 	//TLegend* LifetimeLegendBkgSBL=new TLegend(0.65,0.75,0.88,0.88);
 	//TLegend* LifetimeLegendBkgSBL=new TLegend(0.12,0.75,0.25,0.88);
 	//TLegend* LifetimeLegendBkgSBL=new TLegend(0.12,0.75,0.25,0.88);
-	TLegend* LifetimeLegendBkgSBL=new TLegend(0.12,0.8,0.28,0.93);
+	TLegend* LifetimeLegendBkgSBL=new TLegend(0.11,0.83,0.27,0.96);
 	LifetimeLegendBkgSBL->SetFillColor(kWhite);
 	LifetimeLegendBkgSBL->SetTextFont(42);
-	LifetimeLegendBkgSBL->SetTextSize(0.025);
+	LifetimeLegendBkgSBL->SetTextSize(0.035);
 	LifetimeLegendBkgSBL->SetBorderSize(0.);
 	LifetimeLegendBkgSBL->AddEntry(legendBlue,"sum","l");
 	LifetimeLegendBkgSBL->AddEntry(legendGreenDash,"SSL","l");
@@ -835,10 +866,10 @@ void plotLifeBg(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 	LifetimeLegendBkgSBL->AddEntry(legendBlack,"DS","l");
 
 	//TLegend* LifetimeLegendBkgSBR=new TLegend(0.12,0.75,0.25,0.88);
-	TLegend* LifetimeLegendBkgSBR=new TLegend(0.12,0.8,0.28,0.93);
+	TLegend* LifetimeLegendBkgSBR=new TLegend(0.11,0.83,0.27,0.96);
 	LifetimeLegendBkgSBR->SetFillColor(kWhite);
 	LifetimeLegendBkgSBR->SetTextFont(42);
-	LifetimeLegendBkgSBR->SetTextSize(0.025);
+	LifetimeLegendBkgSBR->SetTextSize(0.035);
 	LifetimeLegendBkgSBR->SetBorderSize(0.);
 	LifetimeLegendBkgSBR->AddEntry(legendBlue,"sum","l");
 	LifetimeLegendBkgSBR->AddEntry(legendGreenDash,"SSL","l");
@@ -852,10 +883,10 @@ void plotLifeBg(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 	latex->SetTextSize(textSize);
 	double step=textSize*1.3;
 
-	gStyle->SetPadBottomMargin(0.12);
-	gStyle->SetPadLeftMargin(0.12);
-	gStyle->SetPadRightMargin(0.05);
-	gStyle->SetPadTopMargin(0.05);
+	gStyle->SetPadBottomMargin(0.11); //0.12
+	gStyle->SetPadLeftMargin(0.08); //0.12
+	gStyle->SetPadRightMargin(0.02); //0.05
+	gStyle->SetPadTopMargin(0.02); //0.05
 
 	TCanvas *c1=new TCanvas("c1","",800,900);
 	c1->SetTickx();
@@ -864,13 +895,13 @@ void plotLifeBg(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 	c1->cd();
 	TPad *pad1 = new TPad("pad1","pad1",0.,0.,1.,0.3);
 	pad1->SetGridy();
-	pad1->SetLeftMargin(0.1);
+	//pad1->SetLeftMargin(0.1);
 	pad1->SetBottomMargin(0.2);
 	pad1->Draw();
 	c1->cd();
 	TPad *pad2 = new TPad("pad2","pad2",0.,0.3,1.,1.);
-	pad2->SetLeftMargin(0.1);
-	pad2->SetBottomMargin(0.1);
+	//pad2->SetLeftMargin(0.1);
+	//pad2->SetBottomMargin(0.1);
 	pad2->Draw();
 
 	//Bkg SBL
@@ -919,6 +950,10 @@ void plotLifeBg(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 		top-=step;
 	}
 	latex->DrawLatex(left,top,Form("#tau_{SSR}   =  %.3f #pm %.3f",bkgTauSSD_SBL, bkgTauSSD_SBLErr));
+	top-=step;
+	latex->DrawLatex(left,top,Form("frac_{Bg}   =  %.3f #pm %.3f",fBkgSBL,fBkgSBLErr));
+	//top-=step;
+	//latex->DrawLatex(left,top,Form("frac_{P}   =  %.3f #pm %.3f",fPromptSBL,fPromptSBLErr));
 	top-=step;
 	top-=step;
 
@@ -972,6 +1007,10 @@ void plotLifeBg(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 		top-=step;
 	}
 	latex->DrawLatex(left,top,Form("#tau_{SSR}   =  %.3f #pm %.3f",bkgTauSSD_SBR, bkgTauSSD_SBRErr));
+	top-=step;
+	latex->DrawLatex(left,top,Form("frac_{Bg}   =  %.3f #pm %.3f",fBkgSBR,fBkgSBRErr));
+	//top-=step;
+	//latex->DrawLatex(left,top,Form("frac_{P}   =  %.3f #pm %.3f",fPromptSBR,fPromptSBRErr));
 	top-=step;
 	top-=step;
 
@@ -1119,28 +1158,22 @@ void plotLifeSig(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 
 	ctauFrameSigPull->addPlotable(hpull_ctauSig,"P");
 
-	//ModelLife->plotOn(ctauFrameSig,
 	Prompt->plotOn(ctauFrameSig,
 			ProjWData(*JpsictErr, *dataSR),
-			//Components("promptLifetime"),
 			Normalization(fPrompt),
 			LineStyle(5),
 			LineColor(kBlue),
 			LineWidth(2), NumCPU(1));
 
-	//ModelLife->plotOn(ctauFrameSig,
 	nonPromptSSD->plotOn(ctauFrameSig,
 			ProjWData(*JpsictErr, *dataSR),
-			//Components("nonPromptSSD"),
 			Normalization(fNonPrompt),
 			LineStyle(2),
 			LineColor(kRed),
 			LineWidth(2), NumCPU(1));
 
-	//ModelLife->plotOn(ctauFrameSig,
 	backgroundlifetime->plotOn(ctauFrameSig,
 			ProjWData(*JpsictErr, *dataSR),
-			//Components("backgroundlifetime"),
 			Normalization(fBkg),
 			LineStyle(7),
 			LineColor(kPink+3),
@@ -1162,10 +1195,11 @@ void plotLifeSig(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 	TH1* legendPink = dataSR->createHistogram("legendPink",JpsiMass,Binning(50)) ; legendPink->SetLineColor(kPink+3) ; legendPink->SetLineStyle(7) ; legendPink->SetLineWidth(2) ;
 
 	//TLegend* LifetimeLegendSig=new TLegend(0.25,0.75,0.37,0.88);
-	TLegend* LifetimeLegendSig=new TLegend(0.35,0.8,0.47,0.93);
+	//TLegend* LifetimeLegendSig=new TLegend(0.35,0.8,0.47,0.96);
+	TLegend* LifetimeLegendSig=new TLegend(0.31,0.8,0.43,0.96);
 	LifetimeLegendSig->SetFillColor(kWhite);
 	LifetimeLegendSig->SetTextFont(42);
-	LifetimeLegendSig->SetTextSize(0.025);
+	LifetimeLegendSig->SetTextSize(0.035);
 	LifetimeLegendSig->SetBorderSize(0.);
 	LifetimeLegendSig->AddEntry(legendBlue,"sum","l");
 	LifetimeLegendSig->AddEntry(legendBlueDash,"prompt","l");
@@ -1179,10 +1213,10 @@ void plotLifeSig(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 	latex->SetTextSize(textSize);
 	double step=textSize*1.3;
 
-	gStyle->SetPadBottomMargin(0.12);
-	gStyle->SetPadLeftMargin(0.12);
-	gStyle->SetPadRightMargin(0.05);
-	gStyle->SetPadTopMargin(0.05);
+	gStyle->SetPadBottomMargin(0.11); //0.12
+	gStyle->SetPadLeftMargin(0.08); //0.12
+	gStyle->SetPadRightMargin(0.02); //0.05
+	gStyle->SetPadTopMargin(0.02); //0.05
 
 	TCanvas *c1=new TCanvas("c1","",800,900);
 	c1->SetTickx();
@@ -1191,13 +1225,13 @@ void plotLifeSig(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 	c1->cd();
 	TPad *pad1 = new TPad("pad1","pad1",0.,0.,1.,0.3);
 	pad1->SetGridy();
-	pad1->SetLeftMargin(0.1);
+	//pad1->SetLeftMargin(0.1);
 	pad1->SetBottomMargin(0.2);
 	pad1->Draw();
 	c1->cd();
 	TPad *pad2 = new TPad("pad2","pad2",0.,0.3,1.,1.);
-	pad2->SetLeftMargin(0.1);
-	pad2->SetBottomMargin(0.1);
+	//pad2->SetLeftMargin(0.1);
+	//pad2->SetBottomMargin(0.1);
 	pad2->Draw();
 
 	double expectProbP = 0.95;
@@ -1398,28 +1432,22 @@ void plotLifeSig_linear(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 	}
 	ctauFrameSigPull->addPlotable(hpull_ctauSig,"P");
 
-	//ModelLife->plotOn(ctauFrameSig,
 	Prompt->plotOn(ctauFrameSig,
 			ProjWData(*JpsictErr, *dataSR),
-			//Components("promptLifetime"),
 			Normalization(fPrompt),
 			LineStyle(5),
 			LineColor(kBlue),
 			LineWidth(2), NumCPU(1));
 
-	//ModelLife->plotOn(ctauFrameSig,
 	nonPromptSSD->plotOn(ctauFrameSig,
 			ProjWData(*JpsictErr, *dataSR),
-			//Components("nonPromptSSD"),
 			Normalization(fNonPrompt),
 			LineStyle(2),
 			LineColor(kRed),
 			LineWidth(2), NumCPU(1));
 
-	//ModelLife->plotOn(ctauFrameSig,
 	backgroundlifetime->plotOn(ctauFrameSig,
 			ProjWData(*JpsictErr, *dataSR),
-			//Components("backgroundlifetime"),
 			Normalization(fBkg),
 			LineStyle(7),
 			LineColor(kPink+3),
@@ -1439,14 +1467,13 @@ void plotLifeSig_linear(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 	TH1* legendGreenDash = dataSR->createHistogram("legendGreenDash",JpsiMass,Binning(50)) ; legendGreenDash->SetLineColor(kGreen) ; legendGreenDash->SetLineStyle(2) ; legendGreenDash->SetLineWidth(2) ;
 	TH1* legendPink = dataSR->createHistogram("legendPink",JpsiMass,Binning(50)) ; legendPink->SetLineColor(kPink+3) ; legendPink->SetLineStyle(7) ; legendPink->SetLineWidth(2) ;
 
-	////TLegend* LifetimeLegendSig=new TLegend(0.65,0.7,0.88,0.88);
-	////TLegend* LifetimeLegendSig=new TLegend(0.48,0.75,0.6,0.88);
 	//TLegend* LifetimeLegendSig=new TLegend(0.43,0.75,0.55,0.88);
 	//TLegend* LifetimeLegendSig=new TLegend(0.12,0.75,0.25,0.88);
+	//TLegend* LifetimeLegendSig=new TLegend(0.12,0.8,0.25,0.93);
 	TLegend* LifetimeLegendSig=new TLegend(0.12,0.8,0.25,0.93);
 	LifetimeLegendSig->SetFillColor(kWhite);
 	LifetimeLegendSig->SetTextFont(42);
-	LifetimeLegendSig->SetTextSize(0.025);
+	LifetimeLegendSig->SetTextSize(0.035);
 	LifetimeLegendSig->SetBorderSize(0.);
 	LifetimeLegendSig->AddEntry(legendBlue,"sum","l");
 	LifetimeLegendSig->AddEntry(legendBlueDash,"prompt","l");
@@ -1461,10 +1488,10 @@ void plotLifeSig_linear(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 	latex->SetTextSize(textSize);
 	double step=textSize*1.3;
 
-	gStyle->SetPadBottomMargin(0.12);
-	gStyle->SetPadLeftMargin(0.12);
-	gStyle->SetPadRightMargin(0.05);
-	gStyle->SetPadTopMargin(0.05);
+	gStyle->SetPadBottomMargin(0.11); //0.12
+	gStyle->SetPadLeftMargin(0.1); //0.12
+	gStyle->SetPadRightMargin(0.02); //0.05
+	gStyle->SetPadTopMargin(0.05); //0.05
 
 	TCanvas *c1=new TCanvas("c1","",800,900);
 	c1->SetTickx();
@@ -1473,13 +1500,13 @@ void plotLifeSig_linear(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 	c1->cd();
 	TPad *pad1 = new TPad("pad1","pad1",0.,0.,1.,0.3);
 	pad1->SetGridy();
-	pad1->SetLeftMargin(0.1);
+	//pad1->SetLeftMargin(0.1);
 	pad1->SetBottomMargin(0.2);
 	pad1->Draw();
 	c1->cd();
 	TPad *pad2 = new TPad("pad2","pad2",0.,0.3,1.,1.);
-	pad2->SetLeftMargin(0.1);
-	pad2->SetBottomMargin(0.1);
+	//pad2->SetLeftMargin(0.1);
+	//pad2->SetBottomMargin(0.1);
 	pad2->Draw();
 
 	double expectProbP = 0.95;
