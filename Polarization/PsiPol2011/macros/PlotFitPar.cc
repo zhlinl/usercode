@@ -75,18 +75,18 @@ int main(int argc, char* argv[]){
 		fromSplit("doCtauUncer", arg, doCtauUncer);
 	}
 
-	//PlotMassPar(nState);
+	PlotMassPar(nState);
 	PlotLifePar(nState);
 	if(nState==4)
 		PlotBFrac_1S(nState);
 	if(nState==5)
 		PlotBFrac_2S(nState);
 
-	//double nSigma=2.5;
-	//if(nState==4) nSigma=2.5;
-	//if(nState==5) nSigma=2.0;
-	//evaluateCtauCut(nSigma, nState, 0, doCtauUncer);
-	//evaluateCtauCut(nSigma, nState, 1, doCtauUncer);
+	double nSigma=2.5;
+	if(nState==4) nSigma=2.5;
+	if(nState==5) nSigma=2.0;
+	evaluateCtauCut(nSigma, nState, 0, doCtauUncer);
+	evaluateCtauCut(nSigma, nState, 1, doCtauUncer);
 
 	return 0;
 }
