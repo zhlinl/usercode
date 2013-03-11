@@ -207,7 +207,7 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 
 	// pdf
 	RooAbsPdf *bkgMass = (RooAbsPdf*)ws->pdf("bkgMassShape");
-	RooAbsPdf *signalMass = (RooAbsPdf*)ws->pdf("massFull");
+	RooAbsPdf *signalMass = (RooAbsPdf*)ws->pdf("sigMassShape");
 	RooAbsPdf *PRpdf = (RooAbsPdf*)ws->pdf("TotalPromptLifetime");
 	RooAbsPdf *NPpdf = (RooAbsPdf*)ws->pdf("nonPromptSSD");
 	RooAbsPdf *BGpdf = (RooAbsPdf*)ws->pdf("backgroundlifetime");
@@ -571,35 +571,30 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 			7, onia::pTRange[rapBin-1][ptBin-1], onia::pTRange[rapBin-1][ptBin],
 			2, onia::rapForPTRange[rapBin-1], onia::rapForPTRange[rapBin],
 			7, massMinSR, massMaxSR); // signal mass window!
-			//7, massMinL, massMaxR);
 	hBG_pTRapMass_L->Sumw2();
 
 	TH3D* hBG_pTRapMass_R = new TH3D("hBG_pTRapMass_R", ";p_{T} [GeV/c]; |y|; M [GeV]",
 			7, onia::pTRange[rapBin-1][ptBin-1], onia::pTRange[rapBin-1][ptBin],
 			2, onia::rapForPTRange[rapBin-1], onia::rapForPTRange[rapBin],
 			7, massMinSR, massMaxSR); // signal mass window!
-			//7, massMinL, massMaxR); // signal mass window!
 	hBG_pTRapMass_R->Sumw2();
 
 	TH3D* hBG_pTRapMass_highct_L = new TH3D("hBG_pTRapMass_highct_L", ";p_{T} [GeV/c]; |y|; M [GeV]",
 			7, onia::pTRange[rapBin-1][ptBin-1], onia::pTRange[rapBin-1][ptBin],
 			2, onia::rapForPTRange[rapBin-1], onia::rapForPTRange[rapBin],
 			7, massMinSR, massMaxSR);
-			//7, massMinL, massMaxR);
 	hBG_pTRapMass_highct_L->Sumw2();
 
 	TH3D* hBG_pTRapMass_highct_R = new TH3D("hBG_pTRapMass_highct_R", ";p_{T} [GeV/c]; |y|; M [GeV]",
 			7, onia::pTRange[rapBin-1][ptBin-1], onia::pTRange[rapBin-1][ptBin],
 			2, onia::rapForPTRange[rapBin-1], onia::rapForPTRange[rapBin],
 			7, massMinSR, massMaxSR);
-			//7, massMinL, massMaxR);
 	hBG_pTRapMass_highct_R->Sumw2();
 
 	TH3D* hNP_pTRapMass = new TH3D("hNP_pTRapMass_NP", ";p_{T} [GeV/c]; |y|; M [GeV]",
 			7, onia::pTRange[rapBin-1][ptBin-1], onia::pTRange[rapBin-1][ptBin],
 			2, onia::rapForPTRange[rapBin-1], onia::rapForPTRange[rapBin],
 			7, massMinSR, massMaxSR);
-			//7, massMinL, massMaxR);
 	hNP_pTRapMass->Sumw2();
 
 	//------------------------------------------------------------------------------------------------
@@ -751,7 +746,7 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 					if(PolNP)
 						hBG_pTRapMass_highct_L->Fill(jpsi->Pt(), TMath::Abs(jpsi->Rapidity()), funcBG->GetRandom(massMinSR, massMaxSR));
 					else
-						hBG_pTRapMass_highct_L->Fill(jpsi->Pt(), TMath::Abs(jpsi->Rapidity()), funcSig->GetRandom(massMinSR, massMaxSR)); // to be checked, should be funcBG->GetRandom()?
+						hBG_pTRapMass_highct_L->Fill(jpsi->Pt(), TMath::Abs(jpsi->Rapidity()), funcSig->GetRandom(massMinSR, massMaxSR));
 					pT_highct_L->Fill(jpsi->Pt());
 					rap_highct_L->Fill(TMath::Abs(jpsi->Rapidity()));
 				}
@@ -760,7 +755,7 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 					if(PolNP)
 						hBG_pTRapMass_highct_R->Fill(jpsi->Pt(), TMath::Abs(jpsi->Rapidity()), funcBG->GetRandom(massMinSR, massMaxSR));
 					else
-					 	hBG_pTRapMass_highct_R->Fill(jpsi->Pt(), TMath::Abs(jpsi->Rapidity()), funcSig->GetRandom(massMinSR, massMaxSR)); // to be checked, should be funcBG->GetRandom()?
+						hBG_pTRapMass_highct_R->Fill(jpsi->Pt(), TMath::Abs(jpsi->Rapidity()), funcSig->GetRandom(massMinSR, massMaxSR));
 					pT_highct_R->Fill(jpsi->Pt());
 					rap_highct_R->Fill(TMath::Abs(jpsi->Rapidity()));
 				}
@@ -846,16 +841,23 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 			nBinsPhiNPBG = nBinsPhi, nBinsCosthNPBG = nBinsCosth;
 
 	bool binningDone=false;
-	//average events per-bin cell
-	double Naverge = 0;
-	Naverge = (double)IntBG/((double)nBinsPhi*nBinsCosth*coverage/2.);
-	std::cout << "average cell coverage: " << Naverge << std::endl;
-	if(Naverge>10){
-		binningDone=true;
-	}
-	cout<<"binningDone: "<<binningDone<<endl;
 
-	if(Naverge<10){
+	////average events per-bin cell
+	////default
+	double MinAverage=10;
+	int nBinsPhiMin=4;
+	int nBinsCosthMin=4;
+
+	double Naverage = 0;
+	Naverage = (double)IntBG/((double)nBinsPhi*nBinsCosth*coverage/2.);
+	std::cout << "average cell coverage: " << Naverage << std::endl;
+
+	if(Naverage>=MinAverage) {
+		binningDone=true;
+		std::cout << "binningDone!!!" << std::endl;
+	}
+
+	if(!binningDone){
 		cout<<"-----------------------------------"<<endl;
 		cout<<"old nBinsCosth: "<<nBinsCosth<<endl;
 		cout<<"old nBinsPhi: "<<nBinsPhi<<endl;
@@ -866,46 +868,43 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 		cout<<"-----------------------------------"<<endl;
 		//Val: set here nBinsPhi to the lowest 2^n, such that nBinsPhi > nBinsCosth*coverage/2 (nBinsCosth*coverage/2 is what I call 'effective' bins in costh). Making nPhiBins here bigger makes ensures that there is maximally a factor of 2 in between nPhiBins and nCosthBins, as nBinsPhi is cut in half first.
 
-		int nBinsPhiMin=4;
-		int nBinsCosthMin=4;
-
 		//BG
 		nBinsCosthBG=nBinsCosth;
 		nBinsPhiBG=nBinsPhi; //Val: added this line
-		double NavergeBG=0.;
+		double NaverageBG=0.;
 		for(int i=0; i<500; i++){
 			if(i%50==0) cout<<"i: "<<i<<endl;
 			if(nBinsPhiBG/2<nBinsPhiMin && nBinsCosthBG/2<nBinsCosthMin) break; // If the mimimum number of bins for both phi and costh are reached, stop the loop
 
 			//Change the binning, first in phi, then in costh:
 			if(nBinsPhiBG/2>=nBinsPhiMin) nBinsPhiBG=nBinsPhiBG/2;  //This ensures a mimimum number of bins in phi, e.g. 4
-			NavergeBG = (double)IntBG/((double)nBinsPhiBG*nBinsCosthBG*coverage/2.);
-			if(NavergeBG>10) break;
+			NaverageBG = (double)IntBG/((double)nBinsPhiBG*nBinsCosthBG*coverage/2.);
+			if(NaverageBG>10) break;
 
 			if(nBinsCosthBG/2>=nBinsCosthMin) nBinsCosthBG=nBinsCosthBG/2; //This ensures a mimimum number of bins in costh, e.g. 4
-			NavergeBG = (double)IntBG/((double)nBinsPhiBG*nBinsCosthBG*coverage/2.);
-			if(NavergeBG>10) break;
+			NaverageBG = (double)IntBG/((double)nBinsPhiBG*nBinsCosthBG*coverage/2.);
+			if(NaverageBG>10) break;
 		}
-		cout<<"NavergeBG: "<<NavergeBG<<endl;
+		cout<<"NaverageBG: "<<NaverageBG<<endl;
 
 		//NPBG
 		nBinsCosthNPBG=nBinsCosth;
 		nBinsPhiNPBG=nBinsPhi; //Val: added this line
-		double NavergeNPBG=0.;
+		double NaverageNPBG=0.;
 		for(int i=0; i<500; i++){
 			if(i%50==0) cout<<"i: "<<i<<endl;
 			if(nBinsPhiNPBG/2<nBinsPhiMin && nBinsCosthNPBG/2<nBinsCosthMin) break; // If the mimimum number of bins for both phi and costh are reached, stop the loop
 
 			//Change the binning, first in phi, then in costh:
 			if(nBinsPhiNPBG/2>=nBinsPhiMin) nBinsPhiNPBG=nBinsPhiNPBG/2;  //This ensures a mimimum number of bins in phi, e.g. 4
-			NavergeNPBG = (double)IntNPBG/((double)nBinsPhiNPBG*nBinsCosthNPBG*coverage/2.);
-			if(NavergeNPBG>10) break; //Val
+			NaverageNPBG = (double)IntNPBG/((double)nBinsPhiNPBG*nBinsCosthNPBG*coverage/2.);
+			if(NaverageNPBG>10) break; //Val
 
 			if(nBinsCosthNPBG/2>=nBinsCosthMin) nBinsCosthNPBG=nBinsCosthNPBG/2; //This ensures a mimimum number of bins in costh, e.g. 4
-			NavergeNPBG = (double)IntNPBG/((double)nBinsPhiNPBG*nBinsCosthNPBG*coverage/2.);
-			if(NavergeNPBG>10) break;
+			NaverageNPBG = (double)IntNPBG/((double)nBinsPhiNPBG*nBinsCosthNPBG*coverage/2.);
+			if(NaverageNPBG>10) break;
 		}
-		cout<<"NavergeNPBG: "<<NavergeNPBG<<endl;
+		cout<<"NaverageNPBG: "<<NaverageNPBG<<endl;
 
 	}
 

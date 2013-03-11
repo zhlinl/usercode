@@ -22,11 +22,11 @@ void massFit(const std::string &infilename, int rapBin, int ptBin, int nState){
 	//signal (prompt+noprompt) 
 	ws->factory("RooCBShape::massCBShape(JpsiMass,CBmass[3.1,3.05,3.15],CBsigma[0.02,0.0001,0.1],CBalpha[1,.0001,6],CBn[10,.0001,60])");
 	ws->factory("RooCBShape::massCBShape2(JpsiMass,CBmass,CBsigma2[0.02,0.0001,0.1],CBalpha,CBn)");
-	ws->factory("SUM::massFull(fracCB1[0.5,0.,1.]*massCBShape, massCBShape2)");
+	ws->factory("SUM::sigMassShape(fracCB1[0.5,0.,1.]*massCBShape, massCBShape2)");
 	//backgrond
 	ws->factory("RooExponential::bkgMassShape(JpsiMass,bkgLambda[0,-5,5])");
 	//full Mass shape
-	ws->factory("SUM::massModel(fracBkg[0.1,0.,1.]*bkgMassShape, massFull)");
+	ws->factory("SUM::massModel(fracBkg[0.1,0.,1.]*bkgMassShape, sigMassShape)");
 
 	ws->Print("v");
 
@@ -96,7 +96,7 @@ void massFit(const std::string &infilename, int rapBin, int ptBin, int nState){
 	RooArgSet *NLLs = new RooArgSet();
 	RooAbsReal *MassNLL = NULL; 
 
-	MassNLL = (RooAbsReal *)MPdf->createNLL(*data, NumCPU(2));
+	MassNLL = (RooAbsReal *)MPdf->createNLL(*data, NumCPU(4));
 
 	NLLs->add(*MassNLL);
 
