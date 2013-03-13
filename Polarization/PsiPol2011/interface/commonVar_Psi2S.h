@@ -50,7 +50,7 @@ namespace onia{
   double phiPolMin = -180., phiPolMax = 180.;
 
   //phase space limiting cuts:
-  double rap = 1.8;
+  double rap = 1.5;
 
   //some make up to use the same colour and marker for each pT and rapidity bin
   //in every plotting macro:
