@@ -8,70 +8,15 @@
 using namespace RooFit;
 using namespace std;
 
+int order(int n);
+int findEvenNum(double number);
 vector<double> calculateInte(RooWorkspace *ws, RooDataSet *dataJpsictErr, double ctCutMin, double ctCutMax);
-
-//======================
-int order(int n){
-	int total=1;
-	for(int i=0;i<n;i++)
-		total=total*2;
-	return total;
-}
-int findEvenNum(double number){
-	int thisNum=0;
-	for(int n=0;n<100;n++){
-		if(number >= order(n) && number <= order(n+1)){
-			thisNum=order(n+1);
-			break;
-		}
-	}
-	return thisNum;
-}
-
-//======================
-TH2D* ReSetBin(TH2D* hist, int nBinX, int nBinY, const std::stringstream& name, const std::stringstream& title){
-	TH2D *tempHist = (TH2D*)hist->Clone("temp_BG_cosThetaPhiL");
-	delete hist;
-	hist = new TH2D(name.str().c_str(), title.str().c_str(),
-			nBinX, onia::cosTMin, onia::cosTMax, nBinY, onia::phiPolMin, onia::phiPolMax);
-	hist->Sumw2();
-	TAxis *Xold = tempHist->GetXaxis();
-	TAxis *Yold = tempHist->GetYaxis();
-	TAxis *Xnew = hist->GetXaxis();
-	TAxis *Ynew = hist->GetYaxis();
-	for(int binX = 1; binX <= Xnew->GetNbins(); binX++){
-		for(int binY = 1; binY <= Ynew->GetNbins(); binY++){
-			double centerX = Xnew->GetBinCenter(binX);
-			double centerY = Ynew->GetBinCenter(binY);
-
-			//find the corresponding bin and bin error
-			double binCont=0.,binErr=0.;
-			bool findBin=false;
-			for(int BinX = 1; BinX <= Xold->GetNbins(); BinX++){
-				for(int BinY = 1; BinY <= Yold->GetNbins(); BinY++){
-					double lowX = Xold->GetBinLowEdge(BinX);
-					double upX  = Xold->GetBinUpEdge(BinX);
-					double lowY = Yold->GetBinLowEdge(BinY);
-					double upY  = Yold->GetBinUpEdge(BinY);
-					if(centerX > lowX && centerX < upX && centerY > lowY && centerY < upY){
-						binCont = tempHist->GetBinContent(BinX,BinY);
-						binErr = tempHist->GetBinError(BinX,BinY);
-						findBin=true;
-					}
-					if(findBin) break;
-				}//BinY
-			}//BinX
-			//done
-			hist->SetBinContent(binX,binY,binCont);
-			hist->SetBinError(binX,binY,binErr);
-		}//binY
-	}//binX
-
-	return hist;
-}
+TH2D *subtract2D(TH2D* hist1, TH2D* hist2);
+TH3D *subtract3D(TH3D* hist1, TH3D* hist2);
+TH2D* ReSetBin(TH2D* hist, int nBinX, int nBinY, const std::stringstream& name, const std::stringstream& title);
 
 //---------------------------------------------------------------------------------------------------------------
-void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, bool MC, bool doCtauUncer, bool PolLSB, bool PolRSB, bool PolNP, int ctauScen, int FracLSB){
+void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, bool folding, bool MC, bool doCtauUncer, bool PolLSB, bool PolRSB, bool PolNP, int ctauScen, int FracLSB, bool forceBinning){
 
 	const std::string
 		datafilename = "tmpFiles/selEvents_data.root",
@@ -115,15 +60,21 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 	TH2D *hBGinNP_cosThetaPhiL[onia::kNbFrames];
 	TH2D *hBGinNP_cosThetaPhiR[onia::kNbFrames];
 	TH2D *hTBG_cosThetaPhi[onia::kNbFrames];
+	TH2D *hSR_cosThetaPhiL[onia::kNbFrames];
+	TH2D *hSR_cosThetaPhiR[onia::kNbFrames];
+	TH2D *hSR_cosThetaPhi[onia::kNbFrames];
 
 	for(int iFrame = 0; iFrame < onia::kNbFrames; iFrame++){
 		//book the 2D (cosTheta, phi) histos for the L and R mass sideband
-		std::stringstream nameL, nameR, nameNP, nameBGinNPL, nameBGinNPR, title;
+		std::stringstream nameL, nameR, nameNP, nameBGinNPL, nameBGinNPR, nameSRL, nameSRR, nameSR, title;
 		nameL << "hBG_cosThetaPhi_" << onia::frameLabel[iFrame] << "_L";
 		nameR << "hBG_cosThetaPhi_" << onia::frameLabel[iFrame] << "_R";
 		nameNP << "hNPBG_cosThetaPhi_" << onia::frameLabel[iFrame];
 		nameBGinNPL << "hBGinNP_cosThetaPhi_" << onia::frameLabel[iFrame] << "_L";
 		nameBGinNPR << "hBGinNP_cosThetaPhi_" << onia::frameLabel[iFrame] << "_R";
+		nameSRL << "hSR_cosThetaPhi_" << onia::frameLabel[iFrame] << "_L";
+		nameSRR << "hSR_cosThetaPhi_" << onia::frameLabel[iFrame] << "_R";
+		nameSR << "hSR_cosThetaPhi_" << onia::frameLabel[iFrame];
 		title << ";cos#theta_{"<< onia::frameLabel[iFrame] << "};#phi_{" << onia::frameLabel[iFrame] << "} [deg]";
 		hBG_cosThetaPhiL[iFrame] = new TH2D(nameL.str().c_str(), title.str().c_str(),
 				onia::kNbBinsCosT, onia::cosTMin, onia::cosTMax, onia::kNbBinsPhiPol, onia::phiPolMin, onia::phiPolMax);
@@ -142,6 +93,9 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 		hBGinNP_cosThetaPhiR[iFrame] = new TH2D(nameBGinNPR.str().c_str(), title.str().c_str(),
 				onia::kNbBinsCosT, onia::cosTMin, onia::cosTMax, onia::kNbBinsPhiPol, onia::phiPolMin, onia::phiPolMax);
 		hBGinNP_cosThetaPhiR[iFrame]->Sumw2();
+		hSR_cosThetaPhi[iFrame] = new TH2D(nameSR.str().c_str(), title.str().c_str(),
+				onia::kNbBinsCosT, onia::cosTMin, onia::cosTMax, onia::kNbBinsPhiPol, onia::phiPolMin, onia::phiPolMax);
+		hSR_cosThetaPhi[iFrame]->Sumw2();
 
 	} // iFrame
 
@@ -277,7 +231,6 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 	double mean_RSB = mean_RSB_ws->getVal();
 	double fracLSB = 1 - (mean - mean_LSB)/(mean_RSB - mean_LSB);
 	if(FracLSB!=-1) fracLSB = double(FracLSB);
-	std::cout << " fracLSB: " << fracLSB <<std::endl;
 
 	RooRealVar* fBkg_ws = (RooRealVar*)ws->var("FracBkg");
 	double fBkg = fBkg_ws->getVal();
@@ -296,7 +249,7 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 	// calculate entries in signal region
 	double nP = fP1*entries;
 	double nNP = fNP1*entries;
-	double nBG = fBkg*entries;
+	double nBG =  fBkg*entries;
 
 	std::cout << "-------------------------------------------------------------\n" <<
 		"total number of events in signal region: " << entries << "\n" <<
@@ -326,9 +279,9 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 	double l_pdecay = 0., scale = 1.;
 	if(nState==4) l_pdecay = L_decay * mass / meanPt ;
 	if(nState==5) {
-		if(rapBin == 1) scale = 1.21; //1.20
-		if(rapBin == 2) scale = 1.29; //1.28
-		if(rapBin ==3) scale = 1.31;  //1.43
+		//if(rapBin == 1) scale = 1.19; //1.21
+		//if(rapBin == 2) scale = 1.27; //1.29
+		//if(rapBin == 3) scale = 1.28; //1.31
 		l_pdecay = scale * L_decay * 3.092 / meanPt ;
 	}
 	std::cout << "l_pdecay: " << l_pdecay << std::endl;
@@ -352,8 +305,6 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 		if(nState==5) nSigma = 2.0;
 	} //more can be added if need
 
-	std::cout << "nSigma: " << nSigma << std::endl;
-
 	double ctauCut = nSigma*l_pdecay;
 	double ctCutMinPR = -ctauCut, ctCutMaxPR = ctauCut;
 	double ctCutMinNP =  ctauCut, ctCutMaxNP = 6.;
@@ -365,6 +316,7 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 	double fBGinP = InteRltsPR[2];
 
 	std::cout << "-------------------------------------------------------------\n" <<
+		nSigma << " sigma used for ctau cut" << "\n" <<
 		"ctau cut at " << ctauCut << "\n" <<
 		"fraction of prompt events within ctau cut: " << fPinP << " \n" <<
 		"fraction of non prompt events within ctau cut: " << fNPinP << " \n" <<
@@ -383,6 +335,8 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 	double fNPB    = 0;  // non prompt background events in prompt region
 	double fBGsig  = 0;  // background in prompt signal region
 	double fTBGsig = 0;  // total background fraction
+	double fSRinPLSB = 0; // signal contamination in the left sideband
+	double fSRinPRSB = 0; // signal contamination in the right sideband
 
 	// for MC set fractions to 0.001 except prompt fraction
 	if(MC || PolLSB || PolRSB){
@@ -390,7 +344,11 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 		fP      = 0.999;
 		fNPB    = 0.001;
 		fBGsig  = 0.001;
-		fTBGsig = 0.001;
+		fSRinPLSB = 0.000001;
+		fSRinPRSB = 0.000001;
+		if(PolLSB) fTBGsig = fSRinPLSB;
+		else if(PolRSB) fTBGsig = fSRinPRSB;
+		else fTBGsig = 0.001;
 	}
 	// use real fractions for data
 	else{
@@ -597,6 +555,12 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 			7, massMinSR, massMaxSR);
 	hNP_pTRapMass->Sumw2();
 
+	TH3D* hSR_pTRapMass = new TH3D("hSR_pTRapMass_NP", ";p_{T} [GeV/c]; |y|; M [GeV]",
+			7, onia::pTRange[rapBin-1][ptBin-1], onia::pTRange[rapBin-1][ptBin],
+			2, onia::rapForPTRange[rapBin-1], onia::rapForPTRange[rapBin],
+			7, massMinSR, massMaxSR);
+	hSR_pTRapMass->Sumw2();
+
 	//------------------------------------------------------------------------------------------------
 	// loop through tree, fill background histos and save data in pt and y bins
 	int index = -1;
@@ -667,7 +631,7 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 			//---------------------------- mass histograms for background model ------------------------------
 			// for MC: fill mass histograms with random mass from signal region
 			// fill rapidity and pT histograms with all events
-			if(MC || PolLSB || PolRSB){
+			if(MC){
 				pT_L->Fill(jpsi->Pt());
 				pT_R->Fill(jpsi->Pt());
 				pT_highct_L->Fill(jpsi->Pt());
@@ -679,50 +643,26 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 				rap_highct_R->Fill(TMath::Abs(jpsi->Rapidity()));
 				rap_NP->Fill(TMath::Abs(jpsi->Rapidity()));
 
-				if(MC){
-					hNP_pTRapMass->Fill(jpsi->Pt(), TMath::Abs(jpsi->Rapidity()), gRandom->Uniform(massMinSR, massMaxSR));
-					// split events up to fill in left and right background histograms
-					// not all events are filled to be able to put together background histogram
-					if(i%3==0){
-						hBG_pTRapMass_L->Fill(jpsi->Pt(), TMath::Abs(jpsi->Rapidity()), gRandom->Uniform(massMinSR, massMaxSR));
-						hBG_pTRapMass_highct_L->Fill(jpsi->Pt(), TMath::Abs(jpsi->Rapidity()), gRandom->Uniform(massMinSR, massMaxSR));
-					}
-					else if(i%5==0){
-						hBG_pTRapMass_R->Fill(jpsi->Pt(), TMath::Abs(jpsi->Rapidity()), gRandom->Uniform(massMinSR, massMaxSR));
-						hBG_pTRapMass_highct_R->Fill(jpsi->Pt(), TMath::Abs(jpsi->Rapidity()), gRandom->Uniform(massMinSR, massMaxSR));
-					}
+				hNP_pTRapMass->Fill(jpsi->Pt(), TMath::Abs(jpsi->Rapidity()), gRandom->Uniform(massMinSR, massMaxSR));
+				hSR_pTRapMass->Fill(jpsi->Pt(), TMath::Abs(jpsi->Rapidity()), gRandom->Uniform(massMinSR, massMaxSR));
+				// split events up to fill in left and right background histograms
+				// not all events are filled to be able to put together background histogram
+				if(i%3==0){
+					hBG_pTRapMass_L->Fill(jpsi->Pt(), TMath::Abs(jpsi->Rapidity()), gRandom->Uniform(massMinSR, massMaxSR));
+					hBG_pTRapMass_highct_L->Fill(jpsi->Pt(), TMath::Abs(jpsi->Rapidity()), gRandom->Uniform(massMinSR, massMaxSR));
 				}
-
-				else if(PolLSB){
-					hNP_pTRapMass->Fill(jpsi->Pt(), TMath::Abs(jpsi->Rapidity()), gRandom->Uniform(massMinL, massMaxL));
-					if(i%3==0){
-						hBG_pTRapMass_L->Fill(jpsi->Pt(), TMath::Abs(jpsi->Rapidity()), gRandom->Uniform(massMinL, massMaxL));
-						hBG_pTRapMass_highct_L->Fill(jpsi->Pt(), TMath::Abs(jpsi->Rapidity()), gRandom->Uniform(massMinL, massMaxL));
-					}
-					else if(i%5==0){
-						hBG_pTRapMass_R->Fill(jpsi->Pt(), TMath::Abs(jpsi->Rapidity()), gRandom->Uniform(massMinL, massMaxL));
-						hBG_pTRapMass_highct_R->Fill(jpsi->Pt(), TMath::Abs(jpsi->Rapidity()), gRandom->Uniform(massMinL, massMaxL));
-					}
+				else if(i%5==0){
+					hBG_pTRapMass_R->Fill(jpsi->Pt(), TMath::Abs(jpsi->Rapidity()), gRandom->Uniform(massMinSR, massMaxSR));
+					hBG_pTRapMass_highct_R->Fill(jpsi->Pt(), TMath::Abs(jpsi->Rapidity()), gRandom->Uniform(massMinSR, massMaxSR));
 				}
-
-				else if(PolRSB){
-					hNP_pTRapMass->Fill(jpsi->Pt(), TMath::Abs(jpsi->Rapidity()), gRandom->Uniform(massMinR, massMaxR));
-					if(i%3==0){
-						hBG_pTRapMass_L->Fill(jpsi->Pt(), TMath::Abs(jpsi->Rapidity()), gRandom->Uniform(massMinR, massMaxR));
-						hBG_pTRapMass_highct_L->Fill(jpsi->Pt(), TMath::Abs(jpsi->Rapidity()), gRandom->Uniform(massMinR, massMaxR));
-					}
-					else if(i%5==0){
-						hBG_pTRapMass_R->Fill(jpsi->Pt(), TMath::Abs(jpsi->Rapidity()), gRandom->Uniform(massMinR, massMaxR));
-						hBG_pTRapMass_highct_R->Fill(jpsi->Pt(), TMath::Abs(jpsi->Rapidity()), gRandom->Uniform(massMinR, massMaxR));
-					}
-				}
-			} // if(MC || PolLSB || PolRSB)
+			} // if (MC)
 
 			else{
 				// store cosTheta and phi distributions of the background
 				// events gets index 0 if it is in the left sideband and 1 if it is in the right one
 				// events with index 2 are from the high ctau non prompt region
 				// events with index 3 and 4 are from the high ctau region from left and right sideband
+				// events with index 5 are from the prompt signal region
 				if(jpsi->M() >= massMinL && jpsi->M() < massMaxL && TMath::Abs(jpsict) < ctauCut){
 					index = 0;
 					hBG_pTRapMass_L->Fill(jpsi->Pt(), TMath::Abs(jpsi->Rapidity()), funcBG->GetRandom(massMinSR, massMaxSR));
@@ -759,14 +699,43 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 					pT_highct_R->Fill(jpsi->Pt());
 					rap_highct_R->Fill(TMath::Abs(jpsi->Rapidity()));
 				}
+				else if(jpsi->M() >= massMinSR && jpsi->M() < massMaxSR && jpsict < ctauCut){
+					index = 5;
+					hSR_pTRapMass->Fill(jpsi->Pt(), TMath::Abs(jpsi->Rapidity()), funcBG->GetRandom(massMinSR, massMaxSR));
+				}
+
 				else continue;
 			}// else (filling data histograms)
 
+			///////////////////////
 			calcPol(*lepP, *lepN);
+			///////////////////////
 
 			for(int iFrame = 0; iFrame < onia::kNbFrames; iFrame++){
-				if(MC || PolLSB || PolRSB){
+
+				// folding in phi
+				double phiFolded = thisPhi[iFrame];
+				double thetaAdjusted = thisCosTh[iFrame];
+				if(thisPhi[iFrame] > -90. && thisPhi[iFrame] < 0.) phiFolded *= -1;
+				else if(thisPhi[iFrame] > 90 && thisPhi[iFrame] < 180){
+					phiFolded = 180. - thisPhi[iFrame];
+					thetaAdjusted *= -1;
+				}
+				else if(thisPhi[iFrame] > -180. && thisPhi[iFrame] < -90.){
+					phiFolded = 180. + thisPhi[iFrame];
+					thetaAdjusted *= -1;
+				}
+
+				// if bool folding is true, folding is applied to all background histograms
+				if(folding){
+					thisPhi[iFrame] = phiFolded;
+					thisCosTh[iFrame] = thetaAdjusted;
+				}
+
+				// filling histograms
+				if(MC){
 					hNPBG_cosThetaPhi[iFrame]->Fill(thisCosTh[iFrame], thisPhi[iFrame]);
+					hSR_cosThetaPhi[iFrame]->Fill(thisCosTh[iFrame], thisPhi[iFrame]);
 					if(i%3==0){
 						hBG_cosThetaPhiL[iFrame]->Fill(thisCosTh[iFrame], thisPhi[iFrame]);
 						hBGinNP_cosThetaPhiL[iFrame]->Fill(thisCosTh[iFrame], thisPhi[iFrame]);
@@ -783,6 +752,7 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 					else if(index == 2) hNPBG_cosThetaPhi[iFrame]->Fill(thisCosTh[iFrame], thisPhi[iFrame]);
 					else if(index == 3) hBGinNP_cosThetaPhiL[iFrame]->Fill(thisCosTh[iFrame], thisPhi[iFrame]);
 					else if(index == 4) hBGinNP_cosThetaPhiR[iFrame]->Fill(thisCosTh[iFrame], thisPhi[iFrame]);
+					else if(index == 5) hSR_cosThetaPhi[iFrame]->Fill(thisCosTh[iFrame], thisPhi[iFrame]);
 				}
 
 			} // iFrame
@@ -790,7 +760,7 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 		} // if(onia...)
 	} // i
 
-	cout<<"total events in PRSR: "<<count<<endl;
+	std::cout << "total events in PRSR: " << count << std::endl;
 
 	// fill histograms with number of events for MC
 	if(MC){
@@ -804,7 +774,7 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 
 	//---------------- binning algorithm
 	int nBinsPhi = 16, nBinsCosth = 160;
-	int totalBins=0, filledBins=0;
+	int totalBins = 0, filledBins = 0;
 	for(int binCosth = 0; binCosth < hBGinNP_cosThetaPhiR[2]->GetNbinsX(); binCosth++){
 		for(int binPhi = 0; binPhi < hBGinNP_cosThetaPhiR[2]->GetNbinsY(); binPhi++){
 			totalBins++;
@@ -813,12 +783,18 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 			if(binContent>0) filledBins++;
 		}
 	}
-	std::cout << "filled bins: " << filledBins << " total bins: " << totalBins << std::endl;
+
 	double coverage = 2*(double)filledBins/(double)totalBins;
 	nBinsCosth = 16*2/coverage;
-	cout<<"coverage: "<<coverage<<endl;
-	cout<<"nBinsPhi: "<<nBinsPhi<<endl;
-	cout<<"nBinsCosth: "<<nBinsCosth<<endl;
+
+	std::cout << "------------------------------------------------" << "\n"
+		<< "Starting binning algorithm" << "\n"
+		<< "filled bins: " << filledBins << "\n"
+		<< "total bins: " << totalBins << "\n"
+		<< "bin coverage: " << coverage << "\n"
+		<< "starting point for binning in phi: " << nBinsPhi << "\n"
+		<< "starting point for binning in cosTheta: " << nBinsCosth << "\n"
+		<< "------------------------------------------------" <<std::endl;
 
 	// calculate the integral of the lowstatBG histo (calculate all integrals of the 4 BG regions, and use the one with the smallest integral)
 	int IntBG = hBGinNP_cosThetaPhiR[2]->Integral();
@@ -837,94 +813,129 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 
 	int IntNPBG = hNPBG_cosThetaPhi[2]->Integral();
 
-	int nBinsPhiBG = nBinsPhi, nBinsCosthBG = nBinsCosth,
-			nBinsPhiNPBG = nBinsPhi, nBinsCosthNPBG = nBinsCosth;
+	int nBinsPhiBG = nBinsPhi,
+			nBinsCosthBG = nBinsCosth,
+			nBinsPhiNPBG = nBinsPhi,
+			nBinsCosthNPBG = nBinsCosth;
 
-	bool binningDone=false;
-
-	////average events per-bin cell
-	////default
-	double MinAverage=10;
-	int nBinsPhiMin=4;
-	int nBinsCosthMin=4;
-
+	// calculate average events per-bin cell for background histo
 	double Naverage = 0;
 	Naverage = (double)IntBG/((double)nBinsPhi*nBinsCosth*coverage/2.);
 	std::cout << "average cell coverage: " << Naverage << std::endl;
 
-	if(Naverage>=MinAverage) {
-		binningDone=true;
-		std::cout << "binningDone!!!" << std::endl;
+	// if average events per bin is bigger than 10, no rebinning is needed
+	if(Naverage > 10){
+		std::cout << "Rebinning is not necessary in this case." << "\n"
+			<< "Ending binning algorithm." << "\n"
+			<< "------------------------------------------------" << std::endl;
 	}
+	// otherwise rebin
+	else{
+		std::cout << "------------------------------------------------" << "\n"
+			<< "old cosTheta binning: " << nBinsCosth << "\n"
+			<< "old phi binning: " << nBinsPhi << std::endl;
 
-	if(!binningDone){
-		cout<<"-----------------------------------"<<endl;
-		cout<<"old nBinsCosth: "<<nBinsCosth<<endl;
-		cout<<"old nBinsPhi: "<<nBinsPhi<<endl;
+		//set nBinsPhi to the lowest 2^n, such that nBinsPhi > nBinsCosth*coverage/2
 		nBinsCosth = findEvenNum((double)nBinsCosth);
 		nBinsPhi = findEvenNum(nBinsCosth*coverage/2.);
-		cout<<"new nBinsCosth: "<<nBinsCosth<<endl;
-		cout<<"new nBinsPhi: "<<nBinsPhi<<endl;
-		cout<<"-----------------------------------"<<endl;
-		//Val: set here nBinsPhi to the lowest 2^n, such that nBinsPhi > nBinsCosth*coverage/2 (nBinsCosth*coverage/2 is what I call 'effective' bins in costh). Making nPhiBins here bigger makes ensures that there is maximally a factor of 2 in between nPhiBins and nCosthBins, as nBinsPhi is cut in half first.
+
+		std::cout << "closest 2^n number to cosTheta bins: " << nBinsCosth << "\n"
+			<< "lowest 2^n number so that phi bins > cosTheta bins * coverage/2: " << nBinsPhi << "\n"
+			<< "------------------------------------------------" << std::endl;
+
+		// set minimum binning
+		int nBinsPhiMin = 8,
+				nBinsCosthMin = 8;
+		if(folding) nBinsPhiMin = 16;
 
 		//BG
-		nBinsCosthBG=nBinsCosth;
-		nBinsPhiBG=nBinsPhi; //Val: added this line
-		double NaverageBG=0.;
-		for(int i=0; i<500; i++){
-			if(i%50==0) cout<<"i: "<<i<<endl;
-			if(nBinsPhiBG/2<nBinsPhiMin && nBinsCosthBG/2<nBinsCosthMin) break; // If the mimimum number of bins for both phi and costh are reached, stop the loop
+		nBinsCosthBG = nBinsCosth;
+		nBinsPhiBG = nBinsPhi;
+		double NaverageBG = 0.;
+
+		for(int i = 0; i < 500; i++){
+
+			std::cout << "looping for correct binning in background histogram" << std::endl;
+			// If the mimimum number of bins for both phi and costh are reached, stop the loop
+			if(nBinsPhiBG/2 < nBinsPhiMin && nBinsCosthBG/2 < nBinsCosthMin) break;
 
 			//Change the binning, first in phi, then in costh:
-			if(nBinsPhiBG/2>=nBinsPhiMin) nBinsPhiBG=nBinsPhiBG/2;  //This ensures a mimimum number of bins in phi, e.g. 4
+			if(nBinsPhiBG/2 >= nBinsPhiMin) nBinsPhiBG = nBinsPhiBG/2;  //This ensures a mimimum number of bins in phi, e.g. 4
 			NaverageBG = (double)IntBG/((double)nBinsPhiBG*nBinsCosthBG*coverage/2.);
-			if(NaverageBG>10) break;
+			std::cout << "average bin content per cell after " << i << " phi rebinning: " << NaverageBG << std::endl;
+			if(NaverageBG > 10) break;
 
-			if(nBinsCosthBG/2>=nBinsCosthMin) nBinsCosthBG=nBinsCosthBG/2; //This ensures a mimimum number of bins in costh, e.g. 4
+			if(nBinsCosthBG/2 >= nBinsCosthMin) nBinsCosthBG = nBinsCosthBG/2; //This ensures a mimimum number of bins in costh, e.g. 4
 			NaverageBG = (double)IntBG/((double)nBinsPhiBG*nBinsCosthBG*coverage/2.);
-			if(NaverageBG>10) break;
+			std::cout << "average bin content per cell after " << i << " cosTheta rebinning: " << NaverageBG << std::endl;
+			if(NaverageBG > 10) break;
 		}
-		cout<<"NaverageBG: "<<NaverageBG<<endl;
+		std::cout << "average bin content per cell exceeds 10: " << NaverageBG << "\n"
+			<< "phi bins = " << nBinsPhiBG << ", cosTheta bins = " << nBinsCosthBG << "\n"
+			<< "------------------------------------------------" << std::endl;
 
 		//NPBG
 		nBinsCosthNPBG=nBinsCosth;
-		nBinsPhiNPBG=nBinsPhi; //Val: added this line
+		nBinsPhiNPBG=nBinsPhi;
 		double NaverageNPBG=0.;
-		for(int i=0; i<500; i++){
-			if(i%50==0) cout<<"i: "<<i<<endl;
-			if(nBinsPhiNPBG/2<nBinsPhiMin && nBinsCosthNPBG/2<nBinsCosthMin) break; // If the mimimum number of bins for both phi and costh are reached, stop the loop
+
+		for(int i = 0; i < 500; i++){
+
+			std::cout << "looping for correct binning in non prompt histogram" << std::endl;
+			// If the mimimum number of bins for both phi and costh are reached, stop the loop
+			if(nBinsPhiNPBG/2 < nBinsPhiMin && nBinsCosthNPBG/2 < nBinsCosthMin) break;
 
 			//Change the binning, first in phi, then in costh:
-			if(nBinsPhiNPBG/2>=nBinsPhiMin) nBinsPhiNPBG=nBinsPhiNPBG/2;  //This ensures a mimimum number of bins in phi, e.g. 4
+			if(nBinsPhiNPBG/2 >= nBinsPhiMin) nBinsPhiNPBG = nBinsPhiNPBG/2;  //This ensures a mimimum number of bins in phi, e.g. 4
 			NaverageNPBG = (double)IntNPBG/((double)nBinsPhiNPBG*nBinsCosthNPBG*coverage/2.);
-			if(NaverageNPBG>10) break; //Val
+			std::cout << "average bin content per cell after " << i << " phi rebinning :" << NaverageNPBG << std::endl;
+			if(NaverageNPBG > 10) break;
 
-			if(nBinsCosthNPBG/2>=nBinsCosthMin) nBinsCosthNPBG=nBinsCosthNPBG/2; //This ensures a mimimum number of bins in costh, e.g. 4
+			if(nBinsCosthNPBG/2 >= nBinsCosthMin) nBinsCosthNPBG = nBinsCosthNPBG/2; //This ensures a mimimum number of bins in costh, e.g. 4
 			NaverageNPBG = (double)IntNPBG/((double)nBinsPhiNPBG*nBinsCosthNPBG*coverage/2.);
-			if(NaverageNPBG>10) break;
+			std::cout << "average bin content per cell after " << i << " cosTheta rebinning: " << NaverageNPBG << std::endl;
+			if(NaverageNPBG > 10) break;
 		}
-		cout<<"NaverageNPBG: "<<NaverageNPBG<<endl;
+		std::cout << "average bin content per cell exceeds 10: " << NaverageNPBG << "\n"
+			<< "phi bins = " << nBinsPhiNPBG << ", cosTheta bins = " << nBinsCosthNPBG << "\n"
+			<< "------------------------------------------------" << std::endl;
 
-	}
+		// when forceBinning, set binning of Psi1S consistently to non prompt binning and Psi2S consistently to background binning
+		if(forceBinning){
 
-	cout<<"final binning for NPBG....."<<endl;
-	cout<<"nBinsPhiNPBG: "<<nBinsPhiNPBG<<endl;
-	cout<<"nBinsCosthNPBG: "<<nBinsCosthNPBG<<endl;
+			if(nState==4){
+				std::cout << "Force consistent binning equal to binning of non prompt histogram" << std::endl;
+				nBinsPhiBG = nBinsPhiNPBG;
+				nBinsCosthBG = nBinsCosthNPBG;
+			}
+			else if(nState==5){
+				std::cout << "Force consistent binning equal to binning of background histogram" << std::endl;
+				nBinsPhiNPBG = nBinsPhiBG;
+				nBinsCosthNPBG = nBinsCosthBG;
+			}
 
-	cout<<"final binning for BG....."<<endl;
-	cout<<"nBinsPhiBG: "<<nBinsPhiBG<<endl;
-	cout<<"nBinsCosthBG: "<<nBinsCosthBG<<endl;
+		} // if(forceBinning)
+
+	} // else Naverage < 10
+
+	std::cout << "final binning for background histogram: " << "\n"
+		<< "phi bins: " << nBinsPhiBG << "\n"
+		<< "cosTheta bins: " << nBinsCosthBG << "\n"
+		<< "final binning for non prompt histogram" << "\n"
+		<< "phi bins: " << nBinsPhiNPBG << "\n"
+		<< "cosTheta bins: " << nBinsCosthNPBG << "\n"
+		<< "------------------------------------------------" << std::endl;
 
 	//loop again with new binning
 	for(int iFrame = 0; iFrame < onia::kNbFrames; iFrame++){
 		//book the 2D (cosTheta, phi) histos for the L and R mass sideband
-		std::stringstream nameL, nameR, nameNP, nameBGinNPL, nameBGinNPR, title;
+		std::stringstream nameL, nameR, nameNP, nameBGinNPL, nameBGinNPR, nameSR, title;
 		nameL << "hBG_cosThetaPhi_" << onia::frameLabel[iFrame] << "_L";
 		nameR << "hBG_cosThetaPhi_" << onia::frameLabel[iFrame] << "_R";
 		nameNP << "hNPBG_cosThetaPhi_" << onia::frameLabel[iFrame];
 		nameBGinNPL << "hBGinNP_cosThetaPhi_" << onia::frameLabel[iFrame] << "_L";
 		nameBGinNPR << "hBGinNP_cosThetaPhi_" << onia::frameLabel[iFrame] << "_R";
+		nameSR << "hSR_cosThetaPhi_" << onia::frameLabel[iFrame];
 		title << ";cos#theta_{"<< onia::frameLabel[iFrame] << "};#phi_{" << onia::frameLabel[iFrame] << "} [deg]";
 
 		delete hBG_cosThetaPhiL[iFrame];
@@ -950,20 +961,25 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 				nBinsCosthBG, onia::cosTMin, onia::cosTMax, nBinsPhiBG, onia::phiPolMin, onia::phiPolMax);
 		hBGinNP_cosThetaPhiR[iFrame]->Sumw2();
 
+		delete hSR_cosThetaPhi[iFrame];
+		hSR_cosThetaPhi[iFrame] = new TH2D(nameSR.str().c_str(), title.str().c_str(),
+				nBinsCosthBG, onia::cosTMin, onia::cosTMax, nBinsPhiBG, onia::phiPolMin, onia::phiPolMax);
+		hSR_cosThetaPhi[iFrame]->Sumw2();
+
 	} // iFrame
 
 	for(int i = 0; i < n; i++){
 
 		long iEntry = intree->LoadTree(i);
 		intree->GetEntry(iEntry);
-		if(i % 100000 == 0) {std::cout << "entry " << i << " out of " << n << std::endl;}
+		if(i % 100000 == 0) std::cout << "entry " << i << " out of " << n << std::endl;
 
 		if(jpsi->Pt() >= onia::pTRange[rapBin-1][ptBin-1] &&
 				jpsi->Pt() < onia::pTRange[rapBin-1][ptBin] &&
 				TMath::Abs(jpsi->Rapidity()) >= onia::rapForPTRange[rapBin-1] &&
 				TMath::Abs(jpsi->Rapidity()) < onia::rapForPTRange[rapBin]){
 
-			if(!MC && !PolLSB && !PolRSB){
+			if(!MC){
 				if(jpsi->M() >= massMinL && jpsi->M() < massMaxL && TMath::Abs(jpsict) < ctauCut)
 					index = 0;
 				else if(jpsi->M() >= massMinR && jpsi->M() <= massMaxR && TMath::Abs(jpsict) < ctauCut)
@@ -974,14 +990,40 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 					index = 3;
 				else if(jpsi->M() >= massMinR && jpsi->M() <= massMaxR && jpsict >= ctauCut)
 					index = 4;
+				else if(jpsi->M() >= massMinSR && jpsi->M() < massMaxSR && jpsict < ctauCut)
+					index = 5;
 				else continue;
 			}
 
+			////////////////////////
 			calcPol(*lepP, *lepN);
+			////////////////////////
 
 			for(int iFrame = 0; iFrame < onia::kNbFrames; iFrame++){
-				if(MC || PolLSB || PolRSB){
+
+				// folding in phi
+				double phiFolded = thisPhi[iFrame];
+				double thetaAdjusted = thisCosTh[iFrame];
+				if(thisPhi[iFrame] > -90. && thisPhi[iFrame] < 0.) phiFolded *= -1;
+				else if(thisPhi[iFrame] > 90 && thisPhi[iFrame] < 180){
+					phiFolded = 180. - thisPhi[iFrame];
+					thetaAdjusted *= -1;
+				}
+				else if(thisPhi[iFrame] > -180. && thisPhi[iFrame] < -90.){
+					phiFolded = 180. + thisPhi[iFrame];
+					thetaAdjusted *= -1;
+				}
+
+				// if folding is true, apply folding in phi
+				if(folding){
+					thisPhi[iFrame] = phiFolded;
+					thisCosTh[iFrame] = thetaAdjusted;
+				}
+
+				// filling histograms
+				if(MC){
 					hNPBG_cosThetaPhi[iFrame]->Fill(thisCosTh[iFrame], thisPhi[iFrame]);
+					hSR_cosThetaPhi[iFrame]->Fill(thisCosTh[iFrame], thisPhi[iFrame]);
 					if(i%3==0){
 						hBG_cosThetaPhiL[iFrame]->Fill(thisCosTh[iFrame], thisPhi[iFrame]);
 						hBGinNP_cosThetaPhiL[iFrame]->Fill(thisCosTh[iFrame], thisPhi[iFrame]);
@@ -997,6 +1039,7 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 					if(index == 2) hNPBG_cosThetaPhi[iFrame]->Fill(thisCosTh[iFrame], thisPhi[iFrame]);
 					if(index == 3) hBGinNP_cosThetaPhiL[iFrame]->Fill(thisCosTh[iFrame], thisPhi[iFrame]);
 					if(index == 4) hBGinNP_cosThetaPhiR[iFrame]->Fill(thisCosTh[iFrame], thisPhi[iFrame]);
+					if(index == 5) hSR_cosThetaPhi[iFrame]->Fill(thisCosTh[iFrame], thisPhi[iFrame]);
 				}
 			} // iFrame
 		} // if(onia...)
@@ -1008,9 +1051,25 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 	//----------------------------------------------------------------------------------------------------
 	// write background histos to file
 	// 3D (pT, |y|, M) histos
-	// add left and right sideband of low ctau region to combinatorial background histogram
 	hBG_pTRapMass_L->Write();
 	hBG_pTRapMass_R->Write();
+	hSR_pTRapMass->Write();
+
+	// subtract signal contamination from left sideband
+	std::string namepTrapMassSRL = "SRinLSB_pTrapMass";
+	TH3D* hSR_pTRapMass_L = (TH3D*) hSR_pTRapMass->Clone(namepTrapMassSRL.c_str());
+	hSR_pTRapMass_L->Scale(fSRinPLSB/(1.*hSR_pTRapMass_L->Integral()));
+	hBG_pTRapMass_L->Scale(1./(1.*hBG_pTRapMass_L->Integral()));
+	hBG_pTRapMass_L = subtract3D(hBG_pTRapMass_L, hSR_pTRapMass_L);
+
+	// subtract signal contamination from right sideband
+	std::string namepTrapMassSRR = "SRinRSB_pTrapMass";
+	TH3D* hSR_pTRapMass_R = (TH3D*) hSR_pTRapMass->Clone(namepTrapMassSRR.c_str());
+	hSR_pTRapMass_R->Scale(fSRinPRSB/(1.*hSR_pTRapMass_R->Integral()));
+	hBG_pTRapMass_R->Scale(1./(1.*hBG_pTRapMass_R->Integral()));
+	hBG_pTRapMass_R = subtract3D(hBG_pTRapMass_R, hSR_pTRapMass_R);
+
+	// add left and right sideband of low ctau region to combinatorial background histogram
 	hBG_pTRapMass_L->Scale(fracLSB/(1.*hBG_pTRapMass_L->Integral()));
 	hBG_pTRapMass_R->Scale((1.-fracLSB)/(1.*hBG_pTRapMass_R->Integral()));
 	std::string namepTrapMasslowct = "comb_background_pTrapMass";
@@ -1034,45 +1093,44 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 	hBG_pTRapMass_highct->Scale(fBGinNP/(1.*hBG_pTRapMass_highct->Integral()));
 	std::string namepTrapMassNPS = "NPS_highct_pTrapMass";
 	TH3D* hNPS_pTRapMass = (TH3D*) hNP_pTRapMass->Clone(namepTrapMassNPS.c_str());
-	// subtraction (add -1) does not seem to work for 2D histograms
-	// do manual subtraction
-	int nx = hNPS_pTRapMass->GetXaxis()->GetNbins();
-	int ny = hNPS_pTRapMass->GetYaxis()->GetNbins();
-	int nz = hNPS_pTRapMass->GetZaxis()->GetNbins();
-	for (int j = 0; j <= nx; j++){
-		for (int k = 0; k <= ny; k++){
-			for(int l = 0; l <= nz; l++){
-				double c1 = hNPS_pTRapMass->GetBinContent(j,k,l);
-				if (c1 > 0) {
-					double c2 = hBG_pTRapMass_highct->GetBinContent(j,k,l);
-					double c3 = c1 - 1.*c2;
-					if(c3 < 0) c3 = 0;
-					hNPS_pTRapMass->SetBinContent(j,k,l,c3);
-				}
-			}
-		}
-	}
+	hNPS_pTRapMass = subtract3D(hNPS_pTRapMass, hBG_pTRapMass_highct);
 	hNPS_pTRapMass->Write();
 
 	// create total background
 	std::string namepTrapMass = "background_pTrapMass";
 	TH3D* hBG_pTRapMass = new TH3D();
 	// for non prompt polarization: total background = high ct background
-	if(PolNP){
-		hBG_pTRapMass = (TH3D*) hBG_pTRapMass_highct->Clone(namepTrapMass.c_str());
-		hBG_pTRapMass->Write();
+	if(PolLSB || PolRSB){
+		hSR_pTRapMass->Scale(1./(1.*hSR_pTRapMass->Integral()));
+		hBG_pTRapMass = (TH3D*) hSR_pTRapMass->Clone(namepTrapMass.c_str());
 	}
+	else if(PolNP)
+		hBG_pTRapMass = (TH3D*) hBG_pTRapMass_highct->Clone(namepTrapMass.c_str());
 	// add low ct background and non prompt background
 	else{
 		hNPS_pTRapMass->Scale(fNPB/(1.*hNPS_pTRapMass->Integral()));
 		hBG_pTRapMass = (TH3D*) hNPS_pTRapMass->Clone(namepTrapMass.c_str());
 		hBG_pTRapMass_lowct->Scale(fBGsig/(1.*hBG_pTRapMass_lowct->Integral()));
 		hBG_pTRapMass->Add(hBG_pTRapMass_lowct);
-		hBG_pTRapMass->Write();
 	}
+	hBG_pTRapMass->Write();
+
 
 	double meanPT = 0;
 	// mean pT histos
+	pT_PSR->Scale(1./(1.*pT_PSR->Integral()));
+	TH1D* pT_SRL = (TH1D*) pT_PSR->Clone();
+	pT_SRL->Scale(fSRinPLSB/(1.*pT_SRL->Integral()));
+	pT_L->Scale(1./(1.*pT_L->Integral()));
+	pT_L->Add(pT_SRL, -1.);
+	if(PolLSB) meanPT = pT_L->GetMean();
+
+	TH1D* pT_SRR = (TH1D*) pT_PSR->Clone();
+	pT_SRR->Scale(fSRinPRSB/(1.*pT_SRR->Integral()));
+	pT_R->Scale(1./(1.*pT_R->Integral()));
+	pT_R->Add(pT_SRR, -1.);
+	if(PolRSB) meanPT = pT_R->GetMean();
+
 	pT_L->Scale(fracLSB/(1.*pT_L->Integral()));
 	pT_R->Scale((1.-fracLSB)/(1.*pT_R->Integral()));
 	pT_L->Add(pT_R);
@@ -1090,9 +1148,8 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 	pT_NP->Scale(fNPB/(1.*pT_NP->Integral()));
 	pT_L->Add(pT_NP);
 
-	pT_PSR->Scale(1./(1.*pT_PSR->Integral()));
 	pT_PSR->Add(pT_L, -1.);
-	if(!PolNP) meanPT = pT_PSR->GetMean();
+	if(!PolNP && !PolLSB && !PolRSB) meanPT = pT_PSR->GetMean();
 
 	std::stringstream meanPTname;
 	meanPTname << ";;mean p_{T}";
@@ -1102,6 +1159,19 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 
 	// mean y histos
 	double meanY = 0;
+	rap_PSR->Scale(1./(1.*rap_PSR->Integral()));
+	TH1D* rap_SRL = (TH1D*) rap_PSR->Clone();
+	rap_SRL->Scale(fSRinPLSB/(1.*rap_SRL->Integral()));
+	rap_L->Scale(1./(1.*rap_L->Integral()));
+	rap_L->Add(rap_SRL, -1.);
+	if(PolLSB) meanY = rap_L->GetMean();
+
+	TH1D* rap_SRR = (TH1D*) rap_PSR->Clone();
+	rap_SRR->Scale(fSRinPRSB/(1.*rap_SRR->Integral()));
+	rap_R->Scale(1./(1.*rap_R->Integral()));
+	rap_R->Add(rap_SRR, -1.);
+	if(PolRSB) meanY = rap_R->GetMean();
+
 	rap_L->Scale(fracLSB/(1.*rap_L->Integral()));
 	rap_R->Scale((1.-fracLSB)/(1.*rap_R->Integral()));
 	rap_L->Add(rap_R);
@@ -1119,9 +1189,8 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 	rap_NP->Scale(fNPB/(1.*rap_NP->Integral()));
 	rap_L->Add(rap_NP);
 
-	rap_PSR->Scale(1./(1.*rap_PSR->Integral()));
 	rap_PSR->Add(rap_L, -1.);
-	if(!PolNP) meanY = rap_PSR->GetMean();
+	if(!PolNP && !PolLSB && !PolRSB) meanY = rap_PSR->GetMean();
 
 	std::stringstream meanYname;
 	meanYname << ";;mean |y|";
@@ -1134,6 +1203,7 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 	if(ResetBin){
 		cout<<"Resetting bins...."<<endl;
 		for(int iFrame = 0; iFrame < onia::kNbFrames; iFrame++){
+
 			std::stringstream nameL, nameR, nameNP, nameBGinNPL, nameBGinNPR, title;
 			nameL << "hBG_cosThetaPhi_" << onia::frameLabel[iFrame] << "_L";
 			nameR << "hBG_cosThetaPhi_" << onia::frameLabel[iFrame] << "_R";
@@ -1157,8 +1227,23 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 		hBGinNP_cosThetaPhiL[iFrame]->Write();
 		hBGinNP_cosThetaPhiR[iFrame]->Write();
 		hNPBG_cosThetaPhi[iFrame]->Write();
+		hSR_cosThetaPhi[iFrame]->Write();
 
 		// combinatorial background in signal region (prompt region)
+		// subtract signal contamination in left and right sideband
+		std::stringstream nameSRL, nameSRR;
+		nameSRL << "hSR_cosThetaPhi_" << onia::frameLabel[iFrame] << "_L";
+		nameSRR << "hSR_cosThetaPhi_" << onia::frameLabel[iFrame] << "_R";
+		hSR_cosThetaPhiL[iFrame] = (TH2D*)hSR_cosThetaPhi[iFrame]->Clone(nameSRL.str().c_str());
+		hSR_cosThetaPhiL[iFrame]->Scale(fSRinPLSB/(1.*hSR_cosThetaPhiL[iFrame]->Integral()));
+		hBG_cosThetaPhiL[iFrame]->Scale(1./(1.*hBG_cosThetaPhiL[iFrame]->Integral()));
+		hBG_cosThetaPhiL[iFrame] = subtract2D(hBG_cosThetaPhiL[iFrame], hSR_cosThetaPhiL[iFrame]);
+
+		hSR_cosThetaPhiR[iFrame] = (TH2D*)hSR_cosThetaPhi[iFrame]->Clone(nameSRR.str().c_str());
+		hSR_cosThetaPhiR[iFrame]->Scale(fSRinPRSB/(1.*hSR_cosThetaPhiR[iFrame]->Integral()));
+		hBG_cosThetaPhiR[iFrame]->Scale(1./(1.*hBG_cosThetaPhiR[iFrame]->Integral()));
+		hBG_cosThetaPhiR[iFrame] = subtract2D(hBG_cosThetaPhiR[iFrame], hSR_cosThetaPhiR[iFrame]);
+
 		// combination of left and right sideband
 		hBG_cosThetaPhiL[iFrame]->Scale(fracLSB/(1.*hBG_cosThetaPhiL[iFrame]->Integral()));
 		hBG_cosThetaPhiR[iFrame]->Scale((1.-fracLSB)/(1.*hBG_cosThetaPhiR[iFrame]->Integral()));
@@ -1185,40 +1270,163 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 		std::stringstream nameNPS;
 		nameNPS << "background_NPSR_costhphi" << onia::frameLabel[iFrame];
 		hNPS_cosThetaPhi[iFrame] = (TH2D *) hNPBG_cosThetaPhi[iFrame]->Clone(nameNPS.str().c_str());
-		// subtraction (add -1.) does not seem to work for 3D histograms
-		// do manual subtraction
-		nx = hNPS_cosThetaPhi[iFrame]->GetXaxis()->GetNbins();
-		ny = hNPS_cosThetaPhi[iFrame]->GetYaxis()->GetNbins();
-		for (int j = 0; j <= nx; j++){
-			for (int k = 0; k <= ny; k++){
-				double c1 = hNPS_cosThetaPhi[iFrame]->GetBinContent(j,k);
-				if (c1 > 0){
-					double c2 = hBGinNP_cosThetaPhi[iFrame]->GetBinContent(j,k);
-					// value must be above 0, otherwise set 0
-					double c3 = c1 - 1.*c2;
-					if(c3 < 0) c3 = 0;
-					hNPS_cosThetaPhi[iFrame]->SetBinContent(j,k,c3);
-				}
-			} // k
-		} // j
+		hNPS_cosThetaPhi[iFrame] = subtract2D(hNPS_cosThetaPhi[iFrame], hBGinNP_cosThetaPhi[iFrame]);
 		hNPS_cosThetaPhi[iFrame]->Write();
 
 		// total background
-		std::stringstream nameTBG;
+		std::stringstream nameTBG, nameTBGfolded, nameTBGunfolded;
 		nameTBG << "background_costhphi" << onia::frameLabel[iFrame];
+		nameTBGfolded << "background_folded_costhphi" << onia::frameLabel[iFrame];
+		nameTBGunfolded << "background_unfolded_costhphi" << onia::frameLabel[iFrame];
 		// for non promp polarization: only use high ctau background
-		if(PolNP){
-			hTBG_cosThetaPhi[iFrame] = (TH2D *) hBGinNP_cosThetaPhi[iFrame]->Clone(nameTBG.str().c_str());
-			hTBG_cosThetaPhi[iFrame]->Write();
+		if(PolLSB || PolRSB){
+			hSR_cosThetaPhi[iFrame]->Scale(1./(1.*hSR_cosThetaPhi[iFrame]->Integral()));
+			hTBG_cosThetaPhi[iFrame] = (TH2D *) hSR_cosThetaPhi[iFrame]->Clone(nameTBGfolded.str().c_str());
 		}
+		else if(PolNP)
+			hTBG_cosThetaPhi[iFrame] = (TH2D *) hBGinNP_cosThetaPhi[iFrame]->Clone(nameTBGfolded.str().c_str());
 		else{
 			// fNPBG * (hNPS_cosThetaPhi)_norm + fBGsig * (hBG_cosThetaPhi)_norm
 			hBG_cosThetaPhi[iFrame]->Scale(fBGsig/(1.*hBG_cosThetaPhi[iFrame]->Integral()));
 			hNPS_cosThetaPhi[iFrame]->Scale(fNPB/(1.*hNPS_cosThetaPhi[iFrame]->Integral()));
-			hTBG_cosThetaPhi[iFrame] = (TH2D *) hNPS_cosThetaPhi[iFrame]->Clone(nameTBG.str().c_str());
+			hTBG_cosThetaPhi[iFrame] = (TH2D *) hNPS_cosThetaPhi[iFrame]->Clone(nameTBGfolded.str().c_str());
 			hTBG_cosThetaPhi[iFrame]->Add(hBG_cosThetaPhi[iFrame]);
-			hTBG_cosThetaPhi[iFrame]->Write();
 		}
+		// write folded histogram to file
+		hTBG_cosThetaPhi[iFrame]->Write();
+
+		// get binning of total background histogram
+		int nx = hTBG_cosThetaPhi[iFrame]->GetXaxis()->GetNbins();
+		int ny = hTBG_cosThetaPhi[iFrame]->GetYaxis()->GetNbins();
+		int yPhi = ny/4;
+
+		// unfold the total background histogram
+		if(folding){
+
+			if(iFrame == 0){
+				std::cout << "---------------------------------------------------" << "\n"
+					<< "Total background histogram" << "\n"
+					<< "number of cosTheta bins: " << nx << "\n"
+					<< "number of phi bins: " << ny << "\n"
+					<< "phi bins " << 2*yPhi+1 << " to " << 3*yPhi << " are filled." << "\n"
+					<< "---------------------------------------------------" << std::endl;
+			}
+
+			for (int j = 0; j <= nx; j++){
+				for (int k = 2*yPhi+1; k <= 3*yPhi; k++){
+
+					double c = hTBG_cosThetaPhi[iFrame]->GetBinContent(j,k);
+					double e = hTBG_cosThetaPhi[iFrame]->GetBinError(j,k);
+
+					// set bin content and error of phiFolded in the other 3 (not yet filled) phi regions
+					hTBG_cosThetaPhi[iFrame]->SetBinContent(j,k+yPhi,c);
+					hTBG_cosThetaPhi[iFrame]->SetBinContent(j,k-yPhi,c);
+					hTBG_cosThetaPhi[iFrame]->SetBinContent(j,k-2*yPhi,c);
+					hTBG_cosThetaPhi[iFrame]->SetBinError(j,k+yPhi,e);
+					hTBG_cosThetaPhi[iFrame]->SetBinError(j,k-yPhi,e);
+					hTBG_cosThetaPhi[iFrame]->SetBinError(j,k-2*yPhi,e);
+
+				}
+			}
+		} // folding
+		// write unfolded histogram to file
+		hTBG_cosThetaPhi[iFrame]->SetName(nameTBGunfolded.str().c_str());
+		hTBG_cosThetaPhi[iFrame]->Write();
+
+		std::stringstream title, nameSR;
+		title << ";cos#theta_{"<< onia::frameLabel[iFrame] << "};#phi_{" << onia::frameLabel[iFrame] << "} [deg]";
+		nameSR << "hSR_rebinned_cosThetaPhi_" << onia::frameLabel[iFrame];
+		// set binning of background histogram to 32 x 16 if smaller than 32 x 16
+		if(nx < 32) nx = 32;
+		else if(ny < 16) ny = 16;
+		hTBG_cosThetaPhi[iFrame] = ReSetBin(hTBG_cosThetaPhi[iFrame], nx, ny, nameTBG, title);
+
+		if(iFrame == 0){
+			std::cout << "----------------------------------------------" << "\n"
+				<< "Final binning of total background histogram: " << "\n"
+				<< "cosTheta: " << nx << "\n"
+				<< "phi: " << ny << "\n"
+				<< "----------------------------------------------" << std::endl;
+		}
+
+		//------------ Normalization issue: set bins that are not filled in hSR to 0 in hTBG
+		hSR_cosThetaPhi[iFrame] = (TH2D*)hTBG_cosThetaPhi[iFrame]->Clone(nameSR.str().c_str());
+
+		// delete contents of hSR and fill it with events from prompt signal region
+		for (int j = 0; j <= nx; j++){
+			for (int k = 0; k <= ny; k++){
+				hSR_cosThetaPhi[iFrame]->SetBinContent(j,k,0);
+				hSR_cosThetaPhi[iFrame]->SetBinError(j,k,0);
+			}
+		}
+
+	} // iFrame
+
+	// loop through tree and fill hSR histogram
+	std::cout << "Filling prompt signal region histogram" << std::endl;
+	for(int i = 0; i < n; i++){
+
+		long iEntry = intree->LoadTree(i);
+		intree->GetEntry(iEntry);
+		if(i % 100000 == 0) std::cout << "entry " << i << " out of " << n << std::endl;
+
+		if(jpsi->Pt() >= onia::pTRange[rapBin-1][ptBin-1] &&
+				jpsi->Pt() < onia::pTRange[rapBin-1][ptBin] &&
+				TMath::Abs(jpsi->Rapidity()) >= onia::rapForPTRange[rapBin-1] &&
+				TMath::Abs(jpsi->Rapidity()) < onia::rapForPTRange[rapBin]){
+
+			if(PolLSB){
+				if(jpsi->M() >= massMinL && jpsi->M() < massMaxL && jpsict < ctauCut)
+					calcPol(*lepP, *lepN);
+			}
+			else if(PolRSB){
+				if(jpsi->M() >= massMinR && jpsi->M() <= massMaxR && jpsict < ctauCut)
+					calcPol(*lepP, *lepN);
+			}
+			else if(PolNP){
+				if(jpsi->M() >= massMinSR && jpsi->M() <= massMaxSR && jpsict >= ctauCut)
+					calcPol(*lepP, *lepN);
+			}
+			else{
+				if(jpsi->M() >= massMinSR && jpsi->M() < massMaxSR && jpsict < ctauCut)
+					calcPol(*lepP, *lepN);
+			}
+
+			for(int iFrame = 0; iFrame < onia::kNbFrames; iFrame++){
+				hSR_cosThetaPhi[iFrame]->Fill(thisCosTh[iFrame], thisPhi[iFrame]);
+			} // iFrame
+		} // if(onia...)
+	} // for(int i ..)
+
+	// set bins in hTBG_cosThetaPhi to 0 when bin is 0 in hSR_cosThetaPhi
+	std::cout << "Setting bins in total background histogram to 0 when they are unfilled in prompt signal region histogram:" << std::endl;
+	for(int iFrame = 0; iFrame < onia::kNbFrames; iFrame++){
+
+		hSR_cosThetaPhi[iFrame]->Write();
+
+		int nx = hTBG_cosThetaPhi[iFrame]->GetXaxis()->GetNbins();
+		int ny = hTBG_cosThetaPhi[iFrame]->GetYaxis()->GetNbins();
+		int zeroBins = 0;
+
+		for (int j = 0; j <= nx; j++){
+			for (int k = 0; k <= ny; k++){
+				double c1 = hSR_cosThetaPhi[iFrame]->GetBinContent(j,k);
+				double c2 = hTBG_cosThetaPhi[iFrame]->GetBinContent(j,k);
+				if (c1 == 0 && c2 != 0){
+					hTBG_cosThetaPhi[iFrame]->SetBinContent(j,k,0);
+					hTBG_cosThetaPhi[iFrame]->SetBinError(j,k,0);
+					zeroBins++;
+					std::cout << "bin " << j << ", " << k << " was set to 0" << std::endl;
+				}
+			} // k
+		} // j
+		std::cout << "In the " << onia::frameLabel[iFrame] << " frame, " << zeroBins << " of " << nx*ny << " bins were set to 0." << std::endl;
+
+		// write final background histogram to file
+		std::stringstream nameTBG;
+		nameTBG << "background_costhphi" << onia::frameLabel[iFrame];
+		hTBG_cosThetaPhi[iFrame]->SetName(nameTBG.str().c_str());
+		hTBG_cosThetaPhi[iFrame]->Write();
 
 	}// iFrame
 
@@ -1294,4 +1502,115 @@ vector<double> calculateInte(RooWorkspace *ws, RooDataSet *dataJpsictErr, double
 	return InteRlts;
 }
 
+//=================================================
+// manual subtraction
+TH3D *subtract3D(TH3D* hist1, TH3D* hist2){
 
+	int nx = hist1->GetXaxis()->GetNbins();
+	int ny = hist1->GetYaxis()->GetNbins();
+	int nz = hist1->GetZaxis()->GetNbins();
+
+	for (int j = 0; j <= nx; j++){
+		for (int k = 0; k <= ny; k++){
+			for(int l = 0; l <= nz; l++){
+
+				double c1 = hist1->GetBinContent(j,k,l);
+				if (c1 > 0) {
+					double c2 = hist2->GetBinContent(j,k,l);
+					double c3 = c1 - 1.*c2;
+					if(c3 < 0) c3 = 0;
+					hist1->SetBinContent(j,k,l,c3);
+					hist1->SetBinError(j,k,l, TMath::Sqrt(c3));
+				}
+
+			} // j
+		} // k
+	} // l
+
+	return hist1;
+}
+
+//=================================================
+TH2D *subtract2D(TH2D* hist1, TH2D* hist2){
+
+	int nx = hist1->GetXaxis()->GetNbins();
+	int ny = hist1->GetYaxis()->GetNbins();
+
+	for (int j = 0; j <= nx; j++){
+		for (int k = 0; k <= ny; k++){
+			double c1 = hist1->GetBinContent(j,k);
+			if (c1 > 0) {
+				double c2 = hist2->GetBinContent(j,k);
+				double c3 = c1 - 1.*c2;
+				if(c3 < 0) c3 = 0;
+				hist1->SetBinContent(j,k,c3);
+				hist1->SetBinError(j,k, TMath::Sqrt(c3));
+			}
+		}
+	}
+
+	return hist1;
+}
+
+
+//=================================================
+TH2D* ReSetBin(TH2D* hist, int nBinX, int nBinY, const std::stringstream& name, const std::stringstream& title){
+	TH2D *tempHist = (TH2D*)hist->Clone("temp_BG_cosThetaPhiL");
+	delete hist;
+	hist = new TH2D(name.str().c_str(), title.str().c_str(),
+			nBinX, onia::cosTMin, onia::cosTMax, nBinY, onia::phiPolMin, onia::phiPolMax);
+	hist->Sumw2();
+	TAxis *Xold = tempHist->GetXaxis();
+	TAxis *Yold = tempHist->GetYaxis();
+	TAxis *Xnew = hist->GetXaxis();
+	TAxis *Ynew = hist->GetYaxis();
+	for(int binX = 1; binX <= Xnew->GetNbins(); binX++){
+		for(int binY = 1; binY <= Ynew->GetNbins(); binY++){
+			double centerX = Xnew->GetBinCenter(binX);
+			double centerY = Ynew->GetBinCenter(binY);
+
+			//find the corresponding bin and bin error
+			double binCont=0.,binErr=0.;
+			bool findBin=false;
+			for(int BinX = 1; BinX <= Xold->GetNbins(); BinX++){
+				for(int BinY = 1; BinY <= Yold->GetNbins(); BinY++){
+					double lowX = Xold->GetBinLowEdge(BinX);
+					double upX  = Xold->GetBinUpEdge(BinX);
+					double lowY = Yold->GetBinLowEdge(BinY);
+					double upY  = Yold->GetBinUpEdge(BinY);
+					if(centerX > lowX && centerX < upX && centerY > lowY && centerY < upY){
+						binCont = tempHist->GetBinContent(BinX,BinY);
+						binErr = tempHist->GetBinError(BinX,BinY);
+						findBin=true;
+					}
+					if(findBin) break;
+				}//BinY
+			}//BinX
+			//done
+			hist->SetBinContent(binX,binY,binCont);
+			hist->SetBinError(binX,binY,binErr);
+		}//binY
+	}//binX
+
+	return hist;
+}
+
+
+//=================================================
+int order(int n){
+	int total=1;
+	for(int i=0;i<n;i++)
+		total=total*2;
+	return total;
+}
+
+int findEvenNum(double number){
+	int thisNum=0;
+	for(int n=0;n<100;n++){
+		if(number >= order(n) && number <= order(n+1)){
+			thisNum=order(n+1);
+			break;
+		}
+	}
+	return thisNum;
+}
