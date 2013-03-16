@@ -16,7 +16,7 @@ TH3D *subtract3D(TH3D* hist1, TH3D* hist2);
 TH2D* ReSetBin(TH2D* hist, int nBinX, int nBinY, const std::stringstream& name, const std::stringstream& title);
 
 //---------------------------------------------------------------------------------------------------------------
-void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, bool folding, bool MC, bool doCtauUncer, bool PolLSB, bool PolRSB, bool PolNP, int ctauScen, int FracLSB, bool forceBinning){
+void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, bool folding, bool MC, bool doCtauUncer, bool PolLSB, bool PolRSB, bool PolNP, int ctauScen, int FracLSB, bool forceBinning, bool normApproach){
 
 	const std::string
 		datafilename = "tmpFiles/selEvents_data.root",
@@ -111,7 +111,7 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 	TH1D* rap_R   = new TH1D( "rapRSB", "rapRSB", nBins, onia::rapForPTRange[rapBin-1], onia::rapForPTRange[rapBin]);
 	TH1D* rap_highct_L   = new TH1D( "rap_highct_LSB", "rap_highct_LSB", nBins, onia::rapForPTRange[rapBin-1], onia::rapForPTRange[rapBin]);
 	TH1D* rap_highct_R   = new TH1D( "rap_highct_RSB", "rap_highct_RSB", nBins, onia::rapForPTRange[rapBin-1], onia::rapForPTRange[rapBin]);
-	TH1D* rap_NP   = new TH1D( "rapNP", "rapNP", nBins, onia::rapForPTRange[rapBin-1], onia::rapForPTRange[rapBin]);
+	TH1D* rap_NP   = new TH1D( "rapNP", "rapNP",nBins, onia::rapForPTRange[rapBin-1], onia::rapForPTRange[rapBin]);
 	TH1D* rap_PSR   = new TH1D( "rapPSR", "rapPSR", nBins, onia::rapForPTRange[rapBin-1], onia::rapForPTRange[rapBin]);
 
 	//------------------------------------------------------------------------------------------------
@@ -161,10 +161,15 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 
 	// pdf
 	RooAbsPdf *bkgMass = (RooAbsPdf*)ws->pdf("bkgMassShape");
-	RooAbsPdf *signalMass = (RooAbsPdf*)ws->pdf("sigMassShape");
+	RooAbsPdf *signalMass = (RooAbsPdf*)ws->pdf("sigMassShape"); //massFull
 	RooAbsPdf *PRpdf = (RooAbsPdf*)ws->pdf("TotalPromptLifetime");
 	RooAbsPdf *NPpdf = (RooAbsPdf*)ws->pdf("nonPromptSSD");
 	RooAbsPdf *BGpdf = (RooAbsPdf*)ws->pdf("backgroundlifetime");
+	RooAbsPdf *BGpdfLSB = (RooAbsPdf*)ws->pdf("backgroundlifetimeLpre");
+	RooAbsPdf *LSBpdf = (RooAbsPdf*)ws->pdf("backgroundlifetimeL");
+	RooAbsPdf *BGpdfRSB = (RooAbsPdf*)ws->pdf("backgroundlifetimeRpre");
+	RooAbsPdf *RSBpdf = (RooAbsPdf*)ws->pdf("backgroundlifetimeR");
+	RooAbsPdf *lifetime = (RooAbsPdf*)ws->pdf("fulllifetime");
 
 	// load snapshot with all results
 	std::stringstream masssnapshotname;
@@ -245,11 +250,28 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 	RooRealVar* fP_ws = (RooRealVar*)varlist.find("fPrompt");
 	double fP1 = fP_ws->getVal();
 	double fNP1 = 1 - fBkg - fP1;
+	// for signal contamination
+	RooAbsReal* fPLSB_ws = (RooAbsReal*)ws->function("fPromptSBL");
+	double fPLSB = fPLSB_ws->getVal();
+	RooRealVar* fBkgLSB_ws = (RooRealVar*)varlist.find("fBkgSBL");
+	double fBkgLSB = fBkgLSB_ws->getVal();
+	double fNPLSB = 1. - fPLSB - fBkgLSB;
+	RooAbsReal* fPRSB_ws = (RooAbsReal*)ws->function("fPromptSBR");
+	double fPRSB = fPRSB_ws->getVal();
+	RooRealVar* fBkgRSB_ws = (RooRealVar*)varlist.find("fBkgSBR");
+	double fBkgRSB = fBkgRSB_ws->getVal();
+	double fNPRSB = 1. - fPRSB - fBkgRSB;
+	std::cout << "-------------------------------------------------------------\n"
+		<< "fit parameters for signal contamination: \n" 
+		<< "LSB: fP = " << fPLSB << ", fBkg = " << fBkgLSB << ", fNP = " << fNPLSB << "\n"
+		<< "RSB: fP = " << fPRSB << ", fBkg = " << fBkgRSB << ", fNP = " << fNPRSB << "\n"
+		<< "fP/fNP = " << fPLSB/fNPLSB << " (LSB) = " << fPRSB/fNPRSB << " (RSB) \n"
+		<< "-------------------------------------------------------------" << std::endl;
 
 	// calculate entries in signal region
 	double nP = fP1*entries;
 	double nNP = fNP1*entries;
-	double nBG =  fBkg*entries;
+	double nBG = fBkg*entries;
 
 	std::cout << "-------------------------------------------------------------\n" <<
 		"total number of events in signal region: " << entries << "\n" <<
@@ -271,20 +293,22 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 	double meanPt = getMeanPt(rapBin,ptBin,infilename.c_str());
 
 	// define sigma of prompt p.d.f., got from fit the trend
-	//define function y = a + b * pT
+	// define function y = a + b * pT
 	double a = 0.073, b = 0.0027;
 	//proper decay length
 	double L_decay = a + b * meanPt;
 	//pseudo-proper decay length
-	double l_pdecay = 0., scale = 1.;
-	if(nState==4) l_pdecay = L_decay * mass / meanPt ;
-	if(nState==5) {
-		//if(rapBin == 1) scale = 1.19; //1.21
-		//if(rapBin == 2) scale = 1.27; //1.29
-		//if(rapBin == 3) scale = 1.28; //1.31
-		l_pdecay = scale * L_decay * 3.092 / meanPt ;
-	}
-	std::cout << "l_pdecay: " << l_pdecay << std::endl;
+	double l_pdecay = L_decay * mass / meanPt ;
+
+	// used before new lifetime model
+	//double l_pdecay = 0., scale = 1.;
+	//if(nState==4) l_pdecay = L_decay * mass / meanPt ;
+	//if(nState==5) {
+	//    if(rapBin == 1) scale = 1.19; // values for new lifetime model; old value: 1.21 - first bin (7-10) was deleted
+	//    if(rapBin == 2) scale = 1.27; // old value 1.29
+	//    if(rapBin == 3) scale = 1.28; // old value: 1.31
+	//    l_pdecay = scale * L_decay * 3.092 / meanPt ;
+	//}
 
 	double nSigma = 0.;
 
@@ -309,34 +333,76 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 	double ctCutMinPR = -ctauCut, ctCutMaxPR = ctauCut;
 	double ctCutMinNP =  ctauCut, ctCutMaxNP = 6.;
 
+	// histogram method
 	// calculate fractions in prompt signal region
-	vector<double> InteRltsPR = calculateInte(ws,dataJpsictErr,ctCutMinPR,ctCutMaxPR);
-	double fPinP  = InteRltsPR[0];
-	double fNPinP = InteRltsPR[1];
-	double fBGinP = InteRltsPR[2];
+	//vector<double> InteRltsPR = calculateInte(ws,dataJpsictErr,ctCutMinPR,ctCutMaxPR);
+	//double fPinP  = InteRltsPR[0];
+	//double fNPinP = InteRltsPR[1];
+	//double fBGinP = InteRltsPR[2];
+
+	// integral method
+	// calculate fractions in the prompt signal region
+	ct->setRange("PR", ctCutMinPR, ctCutMaxPR);
+	// prompt fraction in signal region
+	RooAbsReal* i_fPR = PRpdf->createIntegral(RooArgSet(*ct), NormSet(RooArgSet(*ct)), Range("PR"));
+	double fPinP = i_fPR->getVal();
+	// non prompt fraction in signal region
+	RooAbsReal* i_fNPR = NPpdf->createIntegral(RooArgSet(*ct), NormSet(RooArgSet(*ct)), Range("PR"));
+	double fNPinP = i_fNPR->getVal();
+	// background fraction in signal region
+	RooAbsReal* i_fBkg = BGpdf->createIntegral(RooArgSet(*ct), NormSet(RooArgSet(*ct)), Range("PR"));
+	double fBGinP = i_fBkg->getVal();
+
+	// calculate signal contamination in prompt sidebands
+	// LSB
+	RooAbsReal* i_fBkgLSBtotInP = LSBpdf->createIntegral(RooArgSet(*ct), NormSet(RooArgSet(*ct)), Range("PR"));
+	RooAbsReal* i_fBkgLSBinP = BGpdfLSB->createIntegral(RooArgSet(*ct), NormSet(RooArgSet(*ct)), Range("PR"));
+	// fSRinPLSB = ftot_LSB_ctau - fBkg_LSB_ctau * fBkgLSB
+	double fSRinPLSB = 1 - (i_fBkgLSBinP->getVal() * fBkgLSB)/i_fBkgLSBtotInP->getVal();
+	// RSB
+	RooAbsReal* i_fBkgRSBtotInP = RSBpdf->createIntegral(RooArgSet(*ct), NormSet(RooArgSet(*ct)), Range("PR"));
+	RooAbsReal* i_fBkgRSBinP = BGpdfRSB->createIntegral(RooArgSet(*ct), NormSet(RooArgSet(*ct)), Range("PR"));
+	double fSRinPRSB = 1 - (i_fBkgRSBinP->getVal() * fBkgRSB)/i_fBkgRSBtotInP->getVal();
 
 	std::cout << "-------------------------------------------------------------\n" <<
 		nSigma << " sigma used for ctau cut" << "\n" <<
+		"pseudo proper decay length: " << l_pdecay << "\n" << 
 		"ctau cut at " << ctauCut << "\n" <<
 		"fraction of prompt events within ctau cut: " << fPinP << " \n" <<
 		"fraction of non prompt events within ctau cut: " << fNPinP << " \n" <<
 		"fraction of background events within ctau cut: " << fBGinP << " \n" <<
+		"-------------------------------------------------------------\n" <<
+		"signal contamination in \n" <<
+		"LSB: " << fSRinPLSB << "\n" <<
+		"RSB: " << fSRinPRSB << "\n" <<
 		"-------------------------------------------------------------\n" << std::endl;
 
 	//------------------------------------------------------------------------------------------------
+	// histogram method
 	// calculate fractions in non prompt signal region
-	vector<double> InteRltsNP = calculateInte(ws,dataJpsictErr,ctCutMinNP,ctCutMaxNP);
-	double fPbkg  = InteRltsNP[0];
-	double fNPbkg = InteRltsNP[1];
-	double fBGbkg = InteRltsNP[2];
+	//vector<double> InteRltsNP = calculateInte(ws,dataJpsictErr,ctCutMinNP,ctCutMaxNP);
+	//double fPbkg  = InteRltsNP[0];
+	//double fNPbkg = InteRltsNP[1];
+	//double fBGbkg = InteRltsNP[2];
+
+	// integal method
+	// integral of all PDFs over non prompt region
+	ct->setRange("NPR", ctCutMinNP, ctCutMaxNP);
+	// prompt fraction in non prompt region
+	RooAbsReal* i_fPRinNP = PRpdf->createIntegral(RooArgSet(*ct), NormSet(RooArgSet(*ct)), Range("NPR"));
+	double fPbkg = i_fPRinNP->getVal();
+	// non prompt fraction in signal region
+	RooAbsReal* i_fNPRinNP = NPpdf->createIntegral(RooArgSet(*ct), NormSet(RooArgSet(*ct)), Range("NPR"));
+	double fNPbkg = i_fNPRinNP->getVal();
+	// background fraction in signal region
+	RooAbsReal* i_fBkgInNP = BGpdf->createIntegral(RooArgSet(*ct), NormSet(RooArgSet(*ct)), Range("NPR"));
+	double fBGbkg = i_fBkgInNP->getVal();
 
 	double fBGinNP = 0;  // comb. background fraction in high ctau signal region
 	double fP      = 0;  // prompt fraction in prompt signal region
 	double fNPB    = 0;  // non prompt background events in prompt region
 	double fBGsig  = 0;  // background in prompt signal region
 	double fTBGsig = 0;  // total background fraction
-	double fSRinPLSB = 0; // signal contamination in the left sideband
-	double fSRinPRSB = 0; // signal contamination in the right sideband
 
 	// for MC set fractions to 0.001 except prompt fraction
 	if(MC || PolLSB || PolRSB){
@@ -430,15 +496,34 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 				double fracGauss2_ = ((RooRealVar*)args->find("fracGauss2"))->getVal();
 				ws->var("fracGauss2")->setVal(fracGauss2_);
 
-				fracP1 = fPrompt_; fracBkg = fBkg_; fracNP1 =  1.-fracP1-fracBkg;
-				vector<double> InteRltsTemp = calculateInte(ws,dataJpsictErr,ctCutMinPR,ctCutMaxPR);
-				IntePR    = InteRltsTemp[0];
-				InteNP    = InteRltsTemp[1];
-				InteBG    = InteRltsTemp[2];
+				fracP1 = fPrompt_; 
+				fracBkg = fBkg_; 
+				fracNP1 =  1.-fracP1-fracBkg;
 
-				promptFrac    = IntePR * fracP1;
-				nonpromptFrac = InteNP * fracNP1;
-				bkgFrac       = InteBG * fracBkg;
+				// histogram method
+				//vector<double> InteRltsTemp = calculateInte(ws,dataJpsictErr,ctCutMinPR,ctCutMaxPR);
+				//IntePR    = InteRltsTemp[0];
+				//InteNP    = InteRltsTemp[1];
+				//InteBG    = InteRltsTemp[2];
+				//
+				//promptFrac    = IntePR * fracP1;
+				//nonpromptFrac = InteNP * fracNP1;
+				//bkgFrac       = InteBG * fracBkg;
+
+				// integral method
+				// prompt fraction in signal region
+				i_fPR = PRpdf->createIntegral(RooArgSet(*ct), NormSet(RooArgSet(*ct)), Range("PR"));
+				double fPR = i_fPR->getVal();
+				// non prompt fraction in signal region
+				i_fNPR = NPpdf->createIntegral(RooArgSet(*ct), NormSet(RooArgSet(*ct)), Range("PR"));
+				double fNPR = i_fNPR->getVal();
+				// background fraction in signal region
+				i_fBkg = BGpdf->createIntegral(RooArgSet(*ct), NormSet(RooArgSet(*ct)), Range("PR"));
+				double fBkgInSR = i_fBkg->getVal();
+
+				promptFrac = fPR * fracP1;
+				nonpromptFrac = fNPR * fracNP1;
+				bkgFrac = fBkgInSR * fracBkg;
 
 				histPFracDist->Fill(promptFrac);
 				histNPFracDist->Fill(nonpromptFrac);
@@ -448,11 +533,13 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 			fPerr  = histPFracDist->GetRMS() /(fNPinP*fNP1 + fPinP*fP1 + fBGinP*fBkg);
 			fNPerr = histNPFracDist->GetRMS()/(fNPinP*fNP1 + fPinP*fP1 + fBGinP*fBkg);
 			fBGerr = histBGFracDist->GetRMS()/(fNPinP*fNP1 + fPinP*fP1 + fBGinP*fBkg);
+
 		} // doCtauUncer
 	} // if(!MC && ...)
 
 	// calculate error on total background fraction
 	double fTBGerr = TMath::Sqrt(TMath::Power(fNPerr,2) + TMath::Power(fBGerr,2));
+	std::cout << "error on total background fraction: " << fTBGerr << std::endl;
 
 	output->cd();
 
@@ -555,7 +642,7 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 			7, massMinSR, massMaxSR);
 	hNP_pTRapMass->Sumw2();
 
-	TH3D* hSR_pTRapMass = new TH3D("hSR_pTRapMass_NP", ";p_{T} [GeV/c]; |y|; M [GeV]",
+	TH3D* hSR_pTRapMass = new TH3D("hSR_pTRapMass", ";p_{T} [GeV/c]; |y|; M [GeV]",
 			7, onia::pTRange[rapBin-1][ptBin-1], onia::pTRange[rapBin-1][ptBin],
 			2, onia::rapForPTRange[rapBin-1], onia::rapForPTRange[rapBin],
 			7, massMinSR, massMaxSR);
@@ -567,10 +654,6 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 	int n = intree->GetEntries();
 	int MCevents = 0;
 	int count=0;
-
-	//// for 1S, rap1,pt 1 2 3 4; rap2,pt 1 2 3 4, not use the full statistics
-	//if(nState==4 && ((rapBin==1 && ptBin<5)||(rapBin==2 && ptBin<5)))
-	//  n = n / (6-ptBin);
 
 	for(int i = 0; i < n; i++){
 
@@ -786,6 +869,10 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 
 	double coverage = 2*(double)filledBins/(double)totalBins;
 	nBinsCosth = 16*2/coverage;
+	// find 2^n closest to nBinsCosth, but above the actual number
+	nBinsCosth = findEvenNum((double)nBinsCosth);
+	// set maximum binning to 64
+	if(nBinsCosth > 64) nBinsCosth = 64;
 
 	std::cout << "------------------------------------------------" << "\n"
 		<< "Starting binning algorithm" << "\n"
@@ -819,8 +906,7 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 			nBinsCosthNPBG = nBinsCosth;
 
 	// calculate average events per-bin cell for background histo
-	double Naverage = 0;
-	Naverage = (double)IntBG/((double)nBinsPhi*nBinsCosth*coverage/2.);
+	double Naverage = (double)IntBG/((double)nBinsPhi*nBinsCosth*coverage/2.);
 	std::cout << "average cell coverage: " << Naverage << std::endl;
 
 	// if average events per bin is bigger than 10, no rebinning is needed
@@ -836,7 +922,6 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 			<< "old phi binning: " << nBinsPhi << std::endl;
 
 		//set nBinsPhi to the lowest 2^n, such that nBinsPhi > nBinsCosth*coverage/2
-		nBinsCosth = findEvenNum((double)nBinsCosth);
 		nBinsPhi = findEvenNum(nBinsCosth*coverage/2.);
 
 		std::cout << "closest 2^n number to cosTheta bins: " << nBinsCosth << "\n"
@@ -888,7 +973,7 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 			//Change the binning, first in phi, then in costh:
 			if(nBinsPhiNPBG/2 >= nBinsPhiMin) nBinsPhiNPBG = nBinsPhiNPBG/2;  //This ensures a mimimum number of bins in phi, e.g. 4
 			NaverageNPBG = (double)IntNPBG/((double)nBinsPhiNPBG*nBinsCosthNPBG*coverage/2.);
-			std::cout << "average bin content per cell after " << i << " phi rebinning :" << NaverageNPBG << std::endl;
+			std::cout << "average bin content per cell after " << i << " phi rebinning: " << NaverageNPBG << std::endl;
 			if(NaverageNPBG > 10) break;
 
 			if(nBinsCosthNPBG/2 >= nBinsCosthMin) nBinsCosthNPBG = nBinsCosthNPBG/2; //This ensures a mimimum number of bins in costh, e.g. 4
@@ -1299,6 +1384,7 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 		int nx = hTBG_cosThetaPhi[iFrame]->GetXaxis()->GetNbins();
 		int ny = hTBG_cosThetaPhi[iFrame]->GetYaxis()->GetNbins();
 		int yPhi = ny/4;
+		int xCosTheta = nx/2;
 
 		// unfold the total background histogram
 		if(folding){
@@ -1318,13 +1404,19 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 					double c = hTBG_cosThetaPhi[iFrame]->GetBinContent(j,k);
 					double e = hTBG_cosThetaPhi[iFrame]->GetBinError(j,k);
 
+					// flip in cosTheta
+					double l = nx + 1 - j;
+
 					// set bin content and error of phiFolded in the other 3 (not yet filled) phi regions
-					hTBG_cosThetaPhi[iFrame]->SetBinContent(j,k+yPhi,c);
-					hTBG_cosThetaPhi[iFrame]->SetBinContent(j,k-yPhi,c);
-					hTBG_cosThetaPhi[iFrame]->SetBinContent(j,k-2*yPhi,c);
-					hTBG_cosThetaPhi[iFrame]->SetBinError(j,k+yPhi,e);
-					hTBG_cosThetaPhi[iFrame]->SetBinError(j,k-yPhi,e);
-					hTBG_cosThetaPhi[iFrame]->SetBinError(j,k-2*yPhi,e);
+					// 90 - 180: flip phi (upwards), flip cosTheta
+					hTBG_cosThetaPhi[iFrame]->SetBinContent(l,6*yPhi+1-k,c);
+					hTBG_cosThetaPhi[iFrame]->SetBinError(l,6*yPhi+1-k,e);
+					// 0 - -90: flip phi (downwards)
+					hTBG_cosThetaPhi[iFrame]->SetBinContent(j,ny+1-k,c);
+					hTBG_cosThetaPhi[iFrame]->SetBinError(j,ny+1-k,e);
+					// -90 - -180: flip cosTheta, shift phi
+					hTBG_cosThetaPhi[iFrame]->SetBinContent(l,k-2*yPhi,c);
+					hTBG_cosThetaPhi[iFrame]->SetBinError(l,k-2*yPhi,e);
 
 				}
 			}
@@ -1333,12 +1425,20 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 		hTBG_cosThetaPhi[iFrame]->SetName(nameTBGunfolded.str().c_str());
 		hTBG_cosThetaPhi[iFrame]->Write();
 
+		if(!normApproach){
+			hTBG_cosThetaPhi[iFrame]->SetName(nameTBG.str().c_str());
+			hTBG_cosThetaPhi[iFrame]->Write();
+		}
+
 		std::stringstream title, nameSR;
 		title << ";cos#theta_{"<< onia::frameLabel[iFrame] << "};#phi_{" << onia::frameLabel[iFrame] << "} [deg]";
 		nameSR << "hSR_rebinned_cosThetaPhi_" << onia::frameLabel[iFrame];
-		// set binning of background histogram to 32 x 16 if smaller than 32 x 16
-		if(nx < 32) nx = 32;
-		else if(ny < 16) ny = 16;
+		// in case of normalization approach
+		// set binning of background histogram to 16 x 16 if smaller than 16 x 16
+		if(normApproach){
+			if(nx < 16) nx = 16;
+			if(ny < 16) ny = 16;
+		}
 		hTBG_cosThetaPhi[iFrame] = ReSetBin(hTBG_cosThetaPhi[iFrame], nx, ny, nameTBG, title);
 
 		if(iFrame == 0){
@@ -1376,25 +1476,34 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 				TMath::Abs(jpsi->Rapidity()) < onia::rapForPTRange[rapBin]){
 
 			if(PolLSB){
-				if(jpsi->M() >= massMinL && jpsi->M() < massMaxL && jpsict < ctauCut)
+				if(jpsi->M() >= massMinL && jpsi->M() < massMaxL && jpsict < ctauCut){
 					calcPol(*lepP, *lepN);
+					for(int iFrame = 0; iFrame < onia::kNbFrames; iFrame++)
+						hSR_cosThetaPhi[iFrame]->Fill(thisCosTh[iFrame], thisPhi[iFrame]);
+				}
 			}
 			else if(PolRSB){
-				if(jpsi->M() >= massMinR && jpsi->M() <= massMaxR && jpsict < ctauCut)
+				if(jpsi->M() >= massMinR && jpsi->M() <= massMaxR && jpsict < ctauCut){
 					calcPol(*lepP, *lepN);
+					for(int iFrame = 0; iFrame < onia::kNbFrames; iFrame++)
+						hSR_cosThetaPhi[iFrame]->Fill(thisCosTh[iFrame], thisPhi[iFrame]);
+				}
 			}
 			else if(PolNP){
-				if(jpsi->M() >= massMinSR && jpsi->M() <= massMaxSR && jpsict >= ctauCut)
+				if(jpsi->M() >= massMinSR && jpsi->M() <= massMaxSR && jpsict >= ctauCut){
 					calcPol(*lepP, *lepN);
+					for(int iFrame = 0; iFrame < onia::kNbFrames; iFrame++)
+						hSR_cosThetaPhi[iFrame]->Fill(thisCosTh[iFrame], thisPhi[iFrame]);
+				}
 			}
 			else{
-				if(jpsi->M() >= massMinSR && jpsi->M() < massMaxSR && jpsict < ctauCut)
+				if(jpsi->M() >= massMinSR && jpsi->M() < massMaxSR && jpsict < ctauCut){
 					calcPol(*lepP, *lepN);
+					for(int iFrame = 0; iFrame < onia::kNbFrames; iFrame++)
+						hSR_cosThetaPhi[iFrame]->Fill(thisCosTh[iFrame], thisPhi[iFrame]);
+				}
 			}
 
-			for(int iFrame = 0; iFrame < onia::kNbFrames; iFrame++){
-				hSR_cosThetaPhi[iFrame]->Fill(thisCosTh[iFrame], thisPhi[iFrame]);
-			} // iFrame
 		} // if(onia...)
 	} // for(int i ..)
 
@@ -1422,11 +1531,14 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 		} // j
 		std::cout << "In the " << onia::frameLabel[iFrame] << " frame, " << zeroBins << " of " << nx*ny << " bins were set to 0." << std::endl;
 
-		// write final background histogram to file
-		std::stringstream nameTBG;
-		nameTBG << "background_costhphi" << onia::frameLabel[iFrame];
-		hTBG_cosThetaPhi[iFrame]->SetName(nameTBG.str().c_str());
-		hTBG_cosThetaPhi[iFrame]->Write();
+		// in case of normalization approach:
+		//write final background histogram with bins set to 0 to file
+		if(normApproach){
+			std::stringstream nameTBG;
+			nameTBG << "background_costhphi" << onia::frameLabel[iFrame];
+			hTBG_cosThetaPhi[iFrame]->SetName(nameTBG.str().c_str());
+			hTBG_cosThetaPhi[iFrame]->Write();
+		}
 
 	}// iFrame
 
