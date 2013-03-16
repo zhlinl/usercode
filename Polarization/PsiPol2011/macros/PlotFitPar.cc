@@ -16,7 +16,7 @@ void PlotBFrac_2S(int  nState=5);
 double ctMin = -2., ctMax = 6.;
 int fineBins=8000;
 double legendsize=0.035;
-vector<double> getSigma(RooWorkspace *ws, int rapBin, int ptBin);
+vector<double> getSigma(RooWorkspace *ws, RooDataSet *dataJpsictErr, int rapBin, int ptBin);
 void evaluate(double nSigma=2.5, int nState=4, int type=0, bool doCtauUncer=false); 
 // type=0: PR(-ctau,ctau); type=1: NP(ctau,+infinity)
 void plotEval(double nSigma=2.5, int nState=4, int type=0); 
@@ -75,17 +75,17 @@ int main(int argc, char* argv[]){
 		fromSplit("doCtauUncer", arg, doCtauUncer);
 	}
 
-	PlotMassPar(nState);
-	PlotLifePar(nState);
-	if(nState==4)
-		PlotBFrac_1S(nState);
-	if(nState==5)
-		PlotBFrac_2S(nState);
+	//PlotMassPar(nState);
+	//PlotLifePar(nState);
+	//if(nState==4)
+	//	PlotBFrac_1S(nState);
+	//if(nState==5)
+	//	PlotBFrac_2S(nState);
 
 	double nSigma=2.5;
 	if(nState==4) nSigma=2.5;
 	if(nState==5) nSigma=2.0;
-	evaluateCtauCut(nSigma, nState, 0, doCtauUncer);
+	//evaluateCtauCut(nSigma, nState, 0, doCtauUncer);
 	evaluateCtauCut(nSigma, nState, 1, doCtauUncer);
 
 	return 0;
@@ -262,27 +262,33 @@ void PlotMassPar(int  nState){
 			evtBkgSB[rapBin-1][ptBin-1]    = nEntries*fracBkg*(FracBkgSBL+FracBkgSBR);
 			evtBkgSBErr[rapBin-1][ptBin-1] = nEntries*fracBkgErr*(FracBkgSBL+FracBkgSBR);
 
-			//// fracSigInLSB: signal fraction in LSB
+			//// fracSigInL(R)SB: signal fraction in L(R)SB
 			RooRealVar *signalInSBL = (RooRealVar*)sigMassShape->createIntegral(JpsiMass,NormSet(JpsiMass),Range("SBL"));
-			RooRealVar *fullInSBL = (RooRealVar*)massPdf->createIntegral(JpsiMass,NormSet(JpsiMass),Range("SBL"));
-			double SignalInSBL = signalInSBL->getVal();
-			double FullInSBL   = fullInSBL  ->getVal();
-			fracSigInLSB[rapBin-1][ptBin-1]    = SignalInSBL * (1-fracBkg) / FullInSBL ;
-			fracSigInLSBErr[rapBin-1][ptBin-1] = SignalInSBL * fracBkgErr  / FullInSBL ;
-			evtInLSB[rapBin-1][ptBin-1] = nEntries*fracBkg*FracBkgSBL;
-
-			//// fracSigInRSB: signal fraction in LSB
 			RooRealVar *signalInSBR = (RooRealVar*)sigMassShape->createIntegral(JpsiMass,NormSet(JpsiMass),Range("SBR"));
+			RooRealVar *fullInSBL = (RooRealVar*)massPdf->createIntegral(JpsiMass,NormSet(JpsiMass),Range("SBL"));
 			RooRealVar *fullInSBR = (RooRealVar*)massPdf->createIntegral(JpsiMass,NormSet(JpsiMass),Range("SBR"));
+
+			double SignalInSBL = signalInSBL->getVal();
 			double SignalInSBR = signalInSBR->getVal();
+			double FullInSBL   = fullInSBL  ->getVal();
 			double FullInSBR   = fullInSBR  ->getVal();
-			fracSigInRSB[rapBin-1][ptBin-1]    = SignalInSBR * (1-fracBkg) / FullInSBR ;
-			fracSigInRSBErr[rapBin-1][ptBin-1] = SignalInSBR *fracBkgErr   / FullInSBR ;
+
+			//fracSigInLSB[rapBin-1][ptBin-1]    = SignalInSBL * (1-fracBkg) / FullInSBL ;
+			//fracSigInRSB[rapBin-1][ptBin-1]    = SignalInSBR * (1-fracBkg) / FullInSBR ;
+			//fracSigInLSBErr[rapBin-1][ptBin-1] = SignalInSBL * fracBkgErr  / FullInSBL ;
+			//fracSigInRSBErr[rapBin-1][ptBin-1] = SignalInSBR *fracBkgErr   / FullInSBR ;
+
+			evtInLSB[rapBin-1][ptBin-1] = nEntries * FracBkgSBL * fracBkg;
 
 			fracBkgInLSB[rapBin-1][ptBin-1] = FracBkgSBL * fracBkg / FullInSBL ;
 			fracBkgInRSB[rapBin-1][ptBin-1] = FracBkgSBR * fracBkg / FullInSBR ;
 			fracBkgInLSBErr[rapBin-1][ptBin-1] = FracBkgSBL * fracBkgErr / FullInSBL ; 
 			fracBkgInRSBErr[rapBin-1][ptBin-1] = FracBkgSBR * fracBkgErr / FullInSBR ; 
+
+			fracSigInLSB[rapBin-1][ptBin-1]    = 1. - fracBkgInLSB[rapBin-1][ptBin-1];
+			fracSigInRSB[rapBin-1][ptBin-1]    = 1. - fracBkgInRSB[rapBin-1][ptBin-1];
+			fracSigInLSBErr[rapBin-1][ptBin-1] = fracBkgInLSBErr[rapBin-1][ptBin-1];
+			fracSigInRSBErr[rapBin-1][ptBin-1] = fracBkgInRSBErr[rapBin-1][ptBin-1];
 
 			fracLSB[rapBin-1][ptBin-1]  = calcuFracL(ws, Mean, SigmaWei);
 
@@ -470,7 +476,7 @@ void PlotMassPar(int  nState){
 
 	Xmin = 6.;    Xmax = 72.;
 	Ymin = 3.085; Ymax = 3.095;
-  if(nState==5) {Ymin = 3.674; Ymax = 3.685;}
+	if(nState==5) {Ymin = 3.674; Ymax = 3.685;}
 
 	graph_mean[0]->SetTitle("");
 	graph_mean[0]->GetXaxis()->SetTitle("p_{T} (GeV)");
@@ -3029,7 +3035,7 @@ void PlotBFrac_2S(int nState){
 
 //===============================================
 void evaluateCtauCut(double nSigma, int nState, int type, bool doCtauUncer){ // type=0: PR(-ctau,ctau); type=1: NP(ctau,+infinity)
-	//evaluate(nSigma, nState, type, doCtauUncer); 
+	evaluate(nSigma, nState, type, doCtauUncer); 
 	plotEval(nSigma, nState, type);
 }
 
@@ -3091,6 +3097,7 @@ void evaluate(double nSigma, int nState, int type, bool doCtauUncer){ // type=0:
 	TH1F *histPRFracDist[RapBins][PtBins];
 	TH1F *histNPFracDist[RapBins][PtBins];
 	TH1F *histBGFracDist[RapBins][PtBins];
+	TH1F *histCtFracDist[RapBins][PtBins];
 
 	double PRinNumerator[RapBins][PtBins];
 	double NPinNumerator[RapBins][PtBins];
@@ -3217,17 +3224,22 @@ void evaluate(double nSigma, int nState, int type, bool doCtauUncer){ // type=0:
 			cout<<"Jpsict.getMax(): "<<Jpsict.getMax()<<endl;
 
 			int NumEvt = 0., maxEvt = 100000;
-			if(data->numEntries() < maxEvt)
-				NumEvt = data->numEntries();
-			else
-				NumEvt = maxEvt;
+			if(dataSR->numEntries() < maxEvt) NumEvt = dataSR->numEntries();
+			else NumEvt = maxEvt;
 			//Jpsict error distributions, asumming that it is same for BG, P, and NP
-			RooDataSet *dataJpsictErr = (RooDataSet*)data->reduce(SelectVars(RooArgSet(JpsictErr)),
+			RooDataSet *dataJpsictErr = (RooDataSet*)dataSR->reduce(SelectVars(RooArgSet(JpsictErr)),
 					EventRange(0,NumEvt),Name("dataJpsictErr"));
 
-			//////////////calculate sigma of prompt p.d.f
+			////////////////calculate sigma of prompt p.d.f
+			//RooDataSet *dataSRFit=(RooDataSet *)ws->data(Form("data_rap%d_pt%d_SR",rapBin,ptBin));
+			//int NumEvt = 0., maxEvt = 100000;
+			//if(dataSRFit->numEntries() < maxEvt) NumEvt = dataSRFit->numEntries();
+			//else NumEvt = maxEvt;
+			//RooDataSet *dataJpsictErrFit = (RooDataSet*)dataSRFit->reduce(SelectVars(RooArgSet(JpsictErr)),
+			//		EventRange(0,NumEvt),Name("dataJpsictErr"));
+
 			vector<double> SigmaP;
-			SigmaP = getSigma(ws, rapBin, ptBin);
+			SigmaP = getSigma(ws, dataJpsictErr, rapBin, ptBin);
 
 			sigmaP[rapBin-1][ptBin-1]    = SigmaP[0];
 			sigmaPErr[rapBin-1][ptBin-1] = SigmaP[1];
@@ -3235,7 +3247,7 @@ void evaluate(double nSigma, int nState, int type, bool doCtauUncer){ // type=0:
 			//sigma of pseudo-proper decay length
 			sigmaP_L[rapBin-1][ptBin-1]    = SigmaP[0] * pT[rapBin-1][ptBin-1] / Mean;
 			sigmaP_LErr[rapBin-1][ptBin-1] = sigmaP_L[rapBin-1][ptBin-1] *
-				sqrt(pow(SigmaP[1]/SigmaP[0],2) + pow(MeanErr/Mean,2));
+				sqrt(pow(sigmaPErr[rapBin-1][ptBin-1]/sigmaP[rapBin-1][ptBin-1],2) + pow(MeanErr/Mean,2));
 
 			//define function y = a + b * pT
 			double a = 0.073, b = 0.0027;
@@ -3245,13 +3257,14 @@ void evaluate(double nSigma, int nState, int type, bool doCtauUncer){ // type=0:
 			double l_pdecay =0., scale = 1.;
 			if(nState==4) l_pdecay = L_decay * Mean / pT[rapBin-1][ptBin-1];
 			else if(nState==5){
-				if(rapBin == 1) scale = 1.19; //1.21;
-				if(rapBin == 2) scale = 1.27; //1.29;
-				if(rapBin == 3) scale = 1.28; //1.31; 
+				//if(rapBin == 1) scale = 1.23; //1.21;
+				//if(rapBin == 2) scale = 1.31; //1.29;
+				//if(rapBin == 3) scale = 1.32; //1.31; 
 				l_pdecay = scale * L_decay * 3.092 / pT[rapBin-1][ptBin-1];
 			}
 			cout<<"l_pdecay: "<<l_pdecay<<endl;
-			sigmaP[rapBin-1][ptBin-1] = l_pdecay;
+			//sigmaP[rapBin-1][ptBin-1] = l_pdecay;
+			//sigmaPErr[rapBin-1][ptBin-1] = 0;
 			////////////////////////////////////////////////
 
 			//ctCut define as nSigma * sigma
@@ -3311,21 +3324,24 @@ void evaluate(double nSigma, int nState, int type, bool doCtauUncer){ // type=0:
 				double rangeWindowPR = 0.02;
 				double rangeWindowNP = 0.01;
 				double rangeWindowBG = 0.02;
+				double rangeWindowCt = 0.05;
 				histPRFracDist[rapBin-1][ptBin-1] = new TH1F(Form("histPRFracDist_rap%d_pt%d",rapBin,ptBin),"",
 						50,numeratorPR-rangeWindowPR,numeratorPR+rangeWindowPR);
 				histNPFracDist[rapBin-1][ptBin-1] = new TH1F(Form("histNPFracDist_rap%d_pt%d",rapBin,ptBin),"",
 						50,numeratorNP-rangeWindowNP, numeratorNP+rangeWindowNP);
 				histBGFracDist[rapBin-1][ptBin-1] = new TH1F(Form("histBGFracDist_rap%d_pt%d",rapBin,ptBin),"",
 						50,numeratorBG-rangeWindowBG, numeratorBG+rangeWindowBG);
+				histCtFracDist[rapBin-1][ptBin-1] = new TH1F(Form("histCtFracDist_rap%d_pt%d",rapBin,ptBin),"",
+						50,sigmaP[rapBin-1][ptBin-1]-rangeWindowCt, sigmaP[rapBin-1][ptBin-1]+rangeWindowCt);
 				histPRFracDist[rapBin-1][ptBin-1]->SetXTitle("Prompt fraction");
 				histNPFracDist[rapBin-1][ptBin-1]->SetXTitle("Non-prompt fraction");
-				histBGFracDist[rapBin-1][ptBin-1]->SetXTitle("BG fraction");
+				histCtFracDist[rapBin-1][ptBin-1]->SetXTitle("Ct RMS");
 
 				RooFitResult* fitRlt = (RooFitResult*)ws->obj(Form("l_fitresult_rap%d_pt%d",rapBin,ptBin));
 				if(!fitRlt) { cout<<">>=======Error: no Fit result object in workspace=========="<<endl; continue; }
 				fitRlt->Print();
-				int nEvents = 200;
-				if(nState==4) nEvents = 100;
+				int nEvents = 50; //200
+				//if(nState==4) nEvents = 50; //100
 				//-------------parameters---------------------
 				//  bkgTauDSD        3.8546e-03 +/-  9.93e-04
 				//  bkgTauFD         1.0575e-01 +/-  1.80e-02
@@ -3334,6 +3350,8 @@ void evaluate(double nSigma, int nState, int type, bool doCtauUncer){ // type=0:
 				//  fBkg             3.5902e-01 +/-  7.51e-03
 				//  fBkgDSD_SBL      4.1656e-01 +/-  1.95e-02
 				//  fBkgDSD_SBR      6.7681e-01 +/-  2.14e-02
+				//  fBkgSBL          9.6721e-01 +/-  5.53e-03 //new
+				//  fBkgSBR          9.9624e-01 +/-  5.67e-03 //new
 				//  fBkgSSDR_SBL     5.6511e-01 +/-  1.81e-02
 				//  fBkgSSDR_SBR     2.9558e-01 +/-  1.83e-02
 				//  fPrompt          2.2219e-01 +/-  9.67e-03
@@ -3346,6 +3364,8 @@ void evaluate(double nSigma, int nState, int type, bool doCtauUncer){ // type=0:
 				RooRealVar bkgTauSSD_SBR(*ws->var("bkgTauSSD_SBR"));
 				RooRealVar fBkgDSD_SBL(*ws->var("fBkgDSD_SBL"));
 				RooRealVar fBkgDSD_SBR(*ws->var("fBkgDSD_SBR"));
+				RooRealVar fBkgSBL(*ws->var("fBkgSBL"));
+				RooRealVar fBkgSBR(*ws->var("fBkgSBR"));
 				RooRealVar fBkgSSDR_SBL(*ws->var("fBkgSSDR_SBL")); // fixed when pT bin > 7 for 1S
 				RooRealVar fBkgSSDR_SBR(*ws->var("fBkgSSDR_SBR")); // fixed when pT bin > 7 for 1S
 				RooRealVar fPrompt(*ws->var("fPrompt"));
@@ -3356,12 +3376,12 @@ void evaluate(double nSigma, int nState, int type, bool doCtauUncer){ // type=0:
 				RooArgSet *paraVars = new RooArgSet(bkgTauDSD,bkgTauFD,bkgTauSSD_SBL,bkgTauSSD_SBR,
 						fBkgDSD_SBL,fBkgDSD_SBR, fBkgSSDR_SBL,fBkgSSDR_SBR,
 						nonPromptTau);
-				paraVars->add(RooArgSet(fPrompt,fBkg,fracGauss2));
+				paraVars->add(RooArgSet(fPrompt,fBkg,fracGauss2,fBkgSBL,fBkgSBR));
 
 				RooAbsPdf *multiVarPdf = (RooAbsPdf*)fitRlt->createHessePdf(*paraVars);
 				RooDataSet *multiVarData = (RooDataSet*)multiVarPdf->generate(*paraVars,nEvents);
 				for(int n = 0; n < nEvents; n++) {
-					if(n%40==0) cout<<(double)n/nEvents*100<<"%"<<endl;
+					if(n%5==0) cout<<(double)n/nEvents*100<<"%"<<endl;
 					RooArgSet* args = (RooArgSet*)(multiVarData->get(n));
 
 					double bkgTauFD_ = ((RooRealVar*)args->find("bkgTauFD"))->getVal();
@@ -3372,6 +3392,10 @@ void evaluate(double nSigma, int nState, int type, bool doCtauUncer){ // type=0:
 					ws->var("bkgTauSSD_SBR")->setVal(bkgTauSSD_SBR_);
 					double fBkgDSD_SBL_ = ((RooRealVar*)args->find("fBkgDSD_SBL"))->getVal();
 					ws->var("fBkgDSD_SBL")->setVal(fBkgDSD_SBL_);
+					double fBkgSBL_ = ((RooRealVar*)args->find("fBkgSBL"))->getVal();
+					ws->var("fBkgSBL")->setVal(fBkgSBL_);
+					double fBkgSBR_ = ((RooRealVar*)args->find("fBkgSBR"))->getVal();
+					ws->var("fBkgSBR")->setVal(fBkgSBR_);
 					double fBkgDSD_SBR_ = ((RooRealVar*)args->find("fBkgDSD_SBR"))->getVal();
 					ws->var("fBkgDSD_SBR")->setVal(fBkgDSD_SBR_);
 					if(!(nState==4 && ptBin > 7)){
@@ -3403,6 +3427,10 @@ void evaluate(double nSigma, int nState, int type, bool doCtauUncer){ // type=0:
 					histPRFracDist[rapBin-1][ptBin-1] -> Fill(numeratorPR);
 					histNPFracDist[rapBin-1][ptBin-1] -> Fill(numeratorNP);
 					histBGFracDist[rapBin-1][ptBin-1] -> Fill(numeratorBG);
+
+					vector<double> SigmaP_Temp;
+					SigmaP_Temp = getSigma(ws, dataJpsictErr, rapBin, ptBin);
+					histCtFracDist[rapBin-1][ptBin-1] -> Fill(SigmaP_Temp[0]);
 				}
 
 				PRinNumeratorErr[rapBin-1][ptBin-1] =  histPRFracDist[rapBin-1][ptBin-1] -> GetRMS();
@@ -3417,8 +3445,14 @@ void evaluate(double nSigma, int nState, int type, bool doCtauUncer){ // type=0:
 				FracPRRelativeErr[rapBin-1][ptBin-1] = FracPRErr[rapBin-1][ptBin-1] / FracPR[rapBin-1][ptBin-1] *100;
 				FracNPRelativeErr[rapBin-1][ptBin-1] = FracNPErr[rapBin-1][ptBin-1] / FracNP[rapBin-1][ptBin-1] *100;
 				FracBGRelativeErr[rapBin-1][ptBin-1] = FracBGErr[rapBin-1][ptBin-1] / FracBG[rapBin-1][ptBin-1] *100;
+
+				sigmaPErr[rapBin-1][ptBin-1] = histCtFracDist[rapBin-1][ptBin-1] -> GetRMS();
 				////done!!!!
 			}
+
+			sigmaP_L[rapBin-1][ptBin-1]    = SigmaP[0] * pT[rapBin-1][ptBin-1] / Mean;
+			sigmaP_LErr[rapBin-1][ptBin-1] = sigmaP_L[rapBin-1][ptBin-1] *
+				sqrt(pow(sigmaPErr[rapBin-1][ptBin-1]/sigmaP[rapBin-1][ptBin-1],2) + pow(MeanErr/Mean,2));
 
 		}
 	}
@@ -3827,7 +3861,8 @@ void plotEval(double nSigma, int nState, int type){
 	//double blX = 0.65, blY = 0.15, trX = 0.85, trY = 0.35;
 	//double blX = 0.7, blY = 0.73, trX = 0.83, trY = 0.84;
 	//double blX = 0.72, blY = 0.75, trX = 0.93, trY = 0.93;
-	double blX = 0.72, blY = 0.75, trX = 0.93, trY = 0.93;
+	//double blX = 0.72, blY = 0.75, trX = 0.93, trY = 0.93;
+	double blX = 0.72, blY = 0.77, trX = 0.93, trY = 0.93;
 	TLegend* legend_rap1=new TLegend(blX,blY,trX,trY);
 	legend_rap1->SetFillColor(kWhite);
 	legend_rap1->SetTextFont(42);
@@ -4185,36 +4220,39 @@ vector<double> calculateInte(RooWorkspace *ws, RooDataSet *dataJpsictErr, double
 	InteRlts.push_back(InteNP);
 	InteRlts.push_back(InteBG);
 
+	//delete PRpdf;
+	//delete NPpdf;
+	//delete BGpdf;
 	delete histPR;
 	delete histNP;
 	delete histBG;
 	delete histPR2D;
 	delete histNP2D;
 	delete histBG2D;
+	delete genDataPR;
+	delete genDataNP;
+	delete genDataBG;
 
 	return InteRlts;
 }
 
 //===================================
-vector<double> getSigma(RooWorkspace *ws, int rapBin, int ptBin){
+vector<double> getSigma(RooWorkspace *ws, RooDataSet *dataJpsictErr, int rapBin, int ptBin){
 	int nbins=200;
 	TGaxis::SetMaxDigits(3);
 	RooRealVar Jpsict(*ws->var("Jpsict"));
 	RooRealVar JpsictErr(*ws->var("JpsictErr"));
-
-	RooDataSet *dataSR=(RooDataSet *)ws->data(Form("data_rap%d_pt%d_SR",rapBin,ptBin));
-
-	int NumEvt = 0., maxEvt = 100000;
-	if(dataSR->numEntries() < maxEvt) NumEvt = dataSR->numEntries();
-	else NumEvt = maxEvt;
-	RooDataSet *dataJpsictErr = (RooDataSet*)dataSR->reduce(SelectVars(RooArgSet(JpsictErr)),
-			EventRange(0,NumEvt),Name("dataJpsictErr"));
-
 	Jpsict.setMin(-.2); Jpsict.setMax(.2);
+
+	//RooDataSet *dataSR=(RooDataSet *)ws->data(Form("data_rap%d_pt%d_SR",rapBin,ptBin));
+	//int NumEvt = 0., maxEvt = 100000;
+	//if(dataSR->numEntries() < maxEvt) NumEvt = dataSR->numEntries();
+	//else NumEvt = maxEvt;
+	//RooDataSet *dataJpsictErr = (RooDataSet*)dataSR->reduce(SelectVars(RooArgSet(JpsictErr)),
+	//		EventRange(0,NumEvt),Name("dataJpsictErr"));
 
 	RooAddModel *Prompt = (RooAddModel*)ws->pdf("TotalPromptLifetime");
 	RooDataSet *data = Prompt->generate(Jpsict,ProtoData(*dataJpsictErr));
-	data->Print();
 
 	TH2F* hist2D = (TH2F*)data->createHistogram("hist2D",Jpsict,Binning(nbins),YVar(JpsictErr,Binning(nbins)));
 	TH1F* hist = (TH1F*)hist2D->ProjectionX();
@@ -4226,11 +4264,17 @@ vector<double> getSigma(RooWorkspace *ws, int rapBin, int ptBin){
 
 	double rms = hist->GetRMS();
 	double rmsE = hist->GetRMSError();
-	cout<<"rms: "<<rms<<endl;
-	cout<<"rmsE: "<<rmsE<<endl;
+	//cout<<"rms: "<<rms<<endl;
+	//cout<<"rmsE: "<<rmsE<<endl;
 
 	vector<double> sigma;
 	sigma.push_back(rms);
 	sigma.push_back(rmsE);
+
+	//delete Prompt;
+	delete hist2D;
+	delete hist;
+	delete data;
+
 	return sigma;
 }
