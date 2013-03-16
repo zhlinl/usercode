@@ -64,7 +64,10 @@ int main(int argc, char* argv[]){
 			 doCtauUncer = false,
 			 PolLSB = false,
 			 PolRSB = false,
-			 PolNP = false;
+			 PolNP = false,
+			 forceBinning = false,
+			 folding = false,
+			 normApproach = false;
 
 	// Loop over argument list
 	for (int i=1; i < argc; i++)
@@ -82,6 +85,9 @@ int main(int argc, char* argv[]){
 		fromSplit("PolLSB", arg, PolLSB);
 		fromSplit("PolRSB", arg, PolRSB);
 		fromSplit("PolNP", arg, PolNP);
+		fromSplit("forceBinning", arg, forceBinning);
+		fromSplit("folding", arg, folding);
+		fromSplit("normApproach", arg, normApproach);
 	}
 
 	std::cout << "-----------------------\n"
@@ -97,7 +103,8 @@ int main(int argc, char* argv[]){
 			temp << "tmpFiles/fit_Psi" << nState-3 << "S_rap" << iRap << "_pt" << iPT << ".root";
 			const std::string infilename = temp.str().c_str();
 
-			bkgHistos(infilename.c_str(), iRap, iPT, nState, MC, doCtauUncer, PolLSB, PolRSB, PolNP, ctauScen, FracLSB);
+			bkgHistos(infilename.c_str(), iRap, iPT, nState, folding, MC, doCtauUncer, PolLSB, PolRSB, PolNP, 
+					ctauScen, FracLSB, forceBinning, normApproach);
 
 		}
 	}

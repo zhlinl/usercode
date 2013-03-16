@@ -8,26 +8,29 @@ source /afs/ihep.ac.cn/users/z/zhangll/fs/rootset.sh
 
 Cdir=$PWD
 # input arguments
-for nState in 4;do    #1,2,3,Upsi(1S,2S,3S); 4,Jpsi 5,PsiPrime
-for FidCuts in 11;do    #defines the set of cuts to be used, see macros/polFit/effsAndCuts.h
+for nState in 4 5;do    #1,2,3,Upsi(1S,2S,3S); 4,Jpsi 5,PsiPrime
+for FidCuts in 11;do #defines the set of cuts to be used, see macros/polFit/effsAndCuts.h
 cd $Cdir
 
 
-rapMin=2     #takes bins, not actual values
-rapMax=2     #if you only want to process 1 y bin, rapMax = rapMin
-ptMin=1     #takes bins, not acutal values
-ptMax=1     #if you only want to process 1 pt bin, ptMax = ptMin
+rapMin=1     #takes bins, not actual values
+rapMax=1     #if you only want to process 1 y bin, rapMax = rapMin
+ptMin=5     #takes bins, not acutal values
+ptMax=5     #if you only want to process 1 pt bin, ptMax = ptMin
 Plotting=3   #plotting macro: 1 = plot all, 2 = plot mass, 3 = plot lifetime sidebands, 4 = plot lifetime singal region
 
 rejectCowboys=true
 RequestTrigger=true
 MC=false
-doCtauUncer=false
-PolLSB=false      #measure polarization of the left sideband
-PolRSB=false      #measure polarization of the right sideband
-PolNP=false       #measure polarization of the non prompt events
-ctauScen=0        #0:default(1s:2.5,2s:2.0), 1:(1s:3.5,2s:3.0), 2:(1s:1.5,2s:1.0)
-FracLSB=-1        #-1:defalut, 0, 100
+doCtauUncer=true
+PolLSB=false       #measure polarization of the left sideband
+PolRSB=false       #measure polarization of the right sideband
+PolNP=false        #measure polarization of the non prompt events
+forceBinning=false #set binning of Psi1S consistently to non prompt binning and Psi2S consistently to background binning
+folding=false      #folding is applied to all background histograms
+normApproach=false #normalization 
+ctauScen=0         #0:default(1s:2.5,2s:2.0), 1:(1s:3.5,2s:3.0), 2:(1s:1.5,2s:1.0)
+FracLSB=-1         #-1:defalut, 0, 100
 
 #Define JobID
 #JobID=FrameworkTest_5Dec2012
@@ -135,7 +138,7 @@ cp ../latex/MassLifetime_Psi$[nState-3]S.tex       ${WorkDir}/MassLifetime_Psi$[
 
 cd ${WorkDir}
 
-make
+#make
 
 inputTrees="inputTree=${inputTree1} inputTree=${inputTree2} inputTree=${inputTree3} inputTree=${inputTree4}"
 if [ ${execute_runData} -eq 1 ]
@@ -175,23 +178,23 @@ fi
 
 if [ ${execut_PlotFitPar} -eq 1 ]
 then
-./PlotFitPar nState=${nState} doCtauUncer=${doCtauUncer}
-pdflatex Lifetime_fitParameter.tex
-pdflatex Mass_fitParameter.tex
+#./PlotFitPar nState=${nState} doCtauUncer=${doCtauUncer}
+#pdflatex Lifetime_fitParameter.tex
+#pdflatex Mass_fitParameter.tex
 pdflatex evaluateCtau.tex
 pdflatex evaluateCtau.tex
-pdflatex NumEvents.tex
-pdflatex NumEvents.tex
-mv Lifetime_fitParameter.pdf PDF/Lifetime_fitParameter.pdf
-mv Mass_fitParameter.pdf PDF/Mass_fitParameter.pdf
+#pdflatex NumEvents.tex
+#pdflatex NumEvents.tex
+#mv Lifetime_fitParameter.pdf PDF/Lifetime_fitParameter.pdf
+#mv Mass_fitParameter.pdf PDF/Mass_fitParameter.pdf
 mv evaluateCtau.pdf PDF/evaluateCtau.pdf
-mv NumEvents.pdf PDF/NumEvents.pdf
+#mv NumEvents.pdf PDF/NumEvents.pdf
 fi
 
 if [ ${execute_runBkgHistos} -eq 1 ]
 then
 cp runBkgHistos runBkgHistos_$[nState-3]S_rap${rapMin}_pt${ptMin}
-./runBkgHistos_$[nState-3]S_rap${rapMin}_pt${ptMin} rapMin=${rapMin} rapMax=${rapMax} ptMin=${ptMin} ptMax=${ptMax} nState=${nState} MC=${MC} doCtauUncer=${doCtauUncer} PolLSB=${PolLSB} PolRSB=${PolRSB} PolNP=${PolNP} ctauScen=${ctauScen} FracLSB=${FracLSB}
+./runBkgHistos_$[nState-3]S_rap${rapMin}_pt${ptMin} rapMin=${rapMin} rapMax=${rapMax} ptMin=${ptMin} ptMax=${ptMax} nState=${nState} MC=${MC} doCtauUncer=${doCtauUncer} PolLSB=${PolLSB} PolRSB=${PolRSB} PolNP=${PolNP} ctauScen=${ctauScen} FracLSB=${FracLSB} forceBinning=${forceBinning} folding=${folding} normApproach=${normApproach}
 rm runBkgHistos_$[nState-3]S_rap${rapMin}_pt${ptMin}
 fi
 
@@ -215,16 +218,16 @@ pdflatex cosThetaPhi_$[nState-3]S.tex
 mv cosThetaPhi_$[nState-3]S.pdf PDF/cosThetaPhi_$[nState-3]S.pdf
 fi
 
-rm runData
-rm runWorkspace
-rm runMassFit
-rm runLifetimeFit
-rm runPlotMassLifetime
-rm runBkgHistos
-rm PlotFitPar
-rm PlotCosThetaPhiBG
-rm PlotCosThetaPhiDistribution
-#rm *.tex
+#rm runData
+#rm runWorkspace
+#rm runMassFit
+#rm runLifetimeFit
+#rm runPlotMassLifetime
+#rm runBkgHistos
+#rm PlotFitPar
+#rm PlotCosThetaPhiBG
+#rm PlotCosThetaPhiDistribution
+##rm *.tex
 rm *.aux
 rm *.log
 rm *.so
