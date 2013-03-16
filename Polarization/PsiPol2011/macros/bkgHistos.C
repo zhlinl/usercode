@@ -434,8 +434,7 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 	double fPerr = 0., fNPerr = 0., fBGerr = 0.;
 	if(!MC && !PolLSB && !PolRSB && !PolNP){
 		if(doCtauUncer){
-			int nEvents = 200;
-			if(nState==4) nEvents = 100;
+			int nEvents = 50;
 			double promptFrac = 0, nonpromptFrac = 0, bkgFrac = 0;
 
 			RooRealVar* bkgTauDSD = (RooRealVar*)ws->var("bkgTauDSD");
@@ -444,6 +443,8 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 			RooRealVar* bkgTauSSD_SBR = (RooRealVar*)ws->var("bkgTauSSD_SBR");
 			RooRealVar* fBkgDSD_SBL = (RooRealVar*)ws->var("fBkgDSD_SBL");
 			RooRealVar* fBkgDSD_SBR = (RooRealVar*)ws->var("fBkgDSD_SBR");
+			RooRealVar* fBkgSBL = (RooRealVar*)ws->var("fBkgSBL");
+			RooRealVar* fBkgSBR = (RooRealVar*)ws->var("fBkgSBR");
 			RooRealVar* fBkgSSDR_SBL = (RooRealVar*)ws->var("fBkgSSDR_SBL");
 			RooRealVar* fBkgSSDR_SBR = (RooRealVar*)ws->var("fBkgSSDR_SBR");
 			RooRealVar* fPrompt = (RooRealVar*)ws->var("fPrompt");
@@ -453,7 +454,7 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 			RooArgSet *paraVars = new RooArgSet(*bkgTauDSD,*bkgTauFD,*bkgTauSSD_SBL,*bkgTauSSD_SBR,
 					*fBkgDSD_SBL,*fBkgDSD_SBR, *fBkgSSDR_SBL,*fBkgSSDR_SBR,
 					*nonPromptTau);
-			paraVars->add(RooArgSet(*fPrompt,*fBKG,*fracGauss2));
+			paraVars->add(RooArgSet(*fPrompt,*fBKG,*fracGauss2,*fBkgSBL,*fBkgSBR));
 
 			// create Hesse pdf and generate dataset
 			RooAbsPdf *multiVarPdf = (RooAbsPdf*)result->createHessePdf(*paraVars);
@@ -479,6 +480,10 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 				ws->var("fBkgDSD_SBL")->setVal(fBkgDSD_SBL_);
 				double fBkgDSD_SBR_ = ((RooRealVar*)args->find("fBkgDSD_SBR"))->getVal();
 				ws->var("fBkgDSD_SBR")->setVal(fBkgDSD_SBR_);
+				double fBkgSBL_ = ((RooRealVar*)args->find("fBkgSBL"))->getVal();
+				ws->var("fBkgSBL")->setVal(fBkgSBL_);
+				double fBkgSBR_ = ((RooRealVar*)args->find("fBkgSBR"))->getVal();
+				ws->var("fBkgSBR")->setVal(fBkgSBR_);
 				if(!(nState==4 && ptBin > 7)){
 					double fBkgSSDR_SBL_ = ((RooRealVar*)args->find("fBkgSSDR_SBL"))->getVal();
 					ws->var("fBkgSSDR_SBL")->setVal(fBkgSSDR_SBL_);
