@@ -922,7 +922,7 @@ void polPlot(Char_t *dirstruct = "OutputDirectory_Default",
 	TreeBinIDText1_2D->SetTextSize(CentralsFontSize);
 	if(raplow<0.3) sprintf(text,"|y| < 0.6");
 	if(raplow>0.3 && raplow<0.9) sprintf(text,"0.6 < |y| < 1.2");
-	if(raplow>0.9) sprintf(text,"1.2 < |y| < 1.8");
+	if(raplow>0.9) sprintf(text,"1.2 < |y| < 1.5");
 
 	TreeBinIDText2_2D = new TLatex(xCentrals2D,-0.84,text);
 	TreeBinIDText2_2D->SetTextSize(CentralsFontSize);
@@ -1267,7 +1267,7 @@ void polPlot(Char_t *dirstruct = "OutputDirectory_Default",
 	TreeBinIDText1_2D->SetTextSize(CentralsFontSize);
 	if(raplow<0.3) sprintf(text,"|y| < 0.6");
 	if(raplow>0.3 && raplow<0.9) sprintf(text,"0.6 < |y| < 1.2");
-	if(raplow>0.9) sprintf(text,"1.2 < |y| < 1.8");
+	if(raplow>0.9) sprintf(text,"1.2 < |y| < 1.5");
 	TreeBinIDText2_2D = new TLatex(xCentrals2D,-0.91,text);
 	TreeBinIDText2_2D->SetTextSize(CentralsFontSize);
 	sprintf(text,"%1.0f < p_{T} < %1.0f GeV",ptlow,pthigh);

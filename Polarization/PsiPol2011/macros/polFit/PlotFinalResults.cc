@@ -1441,9 +1441,9 @@ int main(int argc, char** argv) {
 				if(nFrame==1&&rapBin==2) sprintf(ICHEPtext,"CS frame, 0.6 < |#it{y}| < 1.2");
 				if(nFrame==2&&rapBin==2) sprintf(ICHEPtext,"HX frame, 0.6 < |#it{y}| < 1.2");
 				if(nFrame==3&&rapBin==2) sprintf(ICHEPtext,"PX frame, 0.6 < |#it{y}| < 1.2");
-				if(nFrame==1&&rapBin==3) sprintf(ICHEPtext,"CS frame, 1.2 < |#it{y}| < 1.8");
-				if(nFrame==2&&rapBin==3) sprintf(ICHEPtext,"HX frame, 1.2 < |#it{y}| < 1.8");
-				if(nFrame==3&&rapBin==3) sprintf(ICHEPtext,"PX frame, 1.2 < |#it{y}| < 1.8");
+				if(nFrame==1&&rapBin==3) sprintf(ICHEPtext,"CS frame, 1.2 < |#it{y}| < 1.5");
+				if(nFrame==2&&rapBin==3) sprintf(ICHEPtext,"HX frame, 1.2 < |#it{y}| < 1.5");
+				if(nFrame==3&&rapBin==3) sprintf(ICHEPtext,"PX frame, 1.2 < |#it{y}| < 1.5");
 				TLatex *texICHEP4 = new TLatex(xICHEPrap,yMin+(yMax-yMin)*0.925,ICHEPtext);
 				texICHEP4->SetTextSize(ICHEPFontSize)                                                                                                                                                                                                                                             ;
 				texICHEP4->Draw( "same" )                                                                                                                                                                                                                                                 ;
@@ -2280,10 +2280,10 @@ int main(int argc, char** argv) {
 			char texTex[200];
 			if(rapBin==1) sprintf(texTex,"      |#it{y}| < 0.6");
 			if(rapBin==2) sprintf(texTex,"0.6 < |#it{y}| < 1.2");
-			if(rapBin==3) sprintf(texTex,"1.2 < |#it{y}| < 1.8");
+			if(rapBin==3) sprintf(texTex,"1.2 < |#it{y}| < 1.5");
 			if(rapBinComb){ 
 				sprintf(texTex,"      |#it{y}| < 1.2");
-				if(nState>3) sprintf(texTex,"      |#it{y}| < 1.8");
+				if(nState>3) sprintf(texTex,"      |#it{y}| < 1.5");
 			}
 			//TLatex *text = new TLatex(onia::pTRange[rapBin][ptBinMax]*0.8,yMin+(yMax-yMin)*0.066,texTex);
 			TLatex *text = new TLatex(PlotpTMax*0.8,yMin+(yMax-yMin)*0.066,texTex);
@@ -2622,7 +2622,7 @@ int main(int argc, char** argv) {
 						char texTexMP[200];
 						if(rapBin==1) sprintf(texTexMP,"|#it{y}| < 0.6", nState, frameMPtex);
 						if(rapBin==2) sprintf(texTexMP,"0.6 < |#it{y}| < 1.2", nState, frameMPtex);
-						if(rapBin==3) sprintf(texTexMP,"1.2 < |#it{y}| < 1.8", nState, frameMPtex);
+						if(rapBin==3) sprintf(texTexMP,"1.2 < |#it{y}| < 1.5", nState, frameMPtex);
 						TLatex *textMP = new TLatex(xRapText,yMin+(yMax-yMin)*yRapText,texTexMP);
 						textMP->SetTextSize(textSizeRap);
 						if(iPanel==nPanels) textMP->SetTextSize(textSizeRap*(1-lowestBottomMargin));
@@ -5335,7 +5335,7 @@ int main(int argc, char** argv) {
 
 				if(rapBin==1) sprintf(texTex,"      |#it{y}| < 0.6");
 				if(rapBin==2) sprintf(texTex,"0.6 < |#it{y}| < 1.2");
-				if(rapBin==3) sprintf(texTex,"1.2 < |#it{y}| < 1.8");
+				if(rapBin==3) sprintf(texTex,"1.2 < |#it{y}| < 1.5");
 				TLatex *Systtext = new TLatex(onia::pTRange[rapBin][ptBinMax]*0.75,yMin+(yMax-yMin)*0.1,texTex);
 				Systtext->SetTextSize(0.035);
 				Systtext->Draw( "same" );
@@ -5635,7 +5635,7 @@ int main(int argc, char** argv) {
 
 					if(rapBin==1) sprintf(TabRapChar,"|y| < 0.6");
 					if(rapBin==2) sprintf(TabRapChar,"0.6 < |y| < 1.2");
-					if(rapBin==3) sprintf(TabRapChar,"1.2 < |y| < 1.8");
+					if(rapBin==3) sprintf(TabRapChar,"1.2 < |y| < 1.5");
 
 					if(rapBin==1){
 						if(nState<4) // Y
