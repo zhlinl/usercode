@@ -74,7 +74,7 @@ bool isMuonInAcceptance(int iCut, double pT, double eta);
 double singleLeptonEfficiency( double& pT, double& eta, int nEff, TFile *fInEff, TH2D* hEvalEff, bool MCeff, TEfficiency* TEff);
 void EvaluateEffFileName(int nEff, char EffFileName [200], bool singleLeptonEff);
 double DiLeptonEfficiency( double& Dilepton_pT, double& Dilepton_rap, int nDileptonEff, TFile *fInDileptonEff, bool MCeff);
-double EvaluateRhoFactor( double& costh, double& phi, int nEff, TFile* fInRhoFactor, double rap, double pT);
+double EvaluateRhoFactor( double& costh, double& phi, int nEff, TFile* fInRhoFactor, double rap, double pT, bool StatVarRho);
 void FindMPV(TH1* PosteriorDist , double& MPV , double& MPVerrorLow, double& MPVerrorHigh, int MPValgo, int nSigma);
 double DenominatorAmapEfficiency( double& pT, double& eta, int nDenominatorAmap, TFile *fInEff_nDenominatorAmap, TH2D* hEvalEff_nDenominatorAmap, bool MCeff, TEfficiency* TEff_nDenominatorAmap);
 double EvaluateAmap( double& costh_Amap, double& phi_Amap, int nAmap, TFile* fInAmap, double rap, double pT);
@@ -230,7 +230,10 @@ void polFit(int n_sampledPoints=1,
 		int MPValgo=999,
 		bool useAmapApproach=false,
 		int nAmap=999,
-		int nDenominatorAmap=999){
+		int nDenominatorAmap=999,
+		bool StatVarTotBGfraction=false,
+		bool StatVarTotBGmodel=false,
+		bool StatVarRho=false){
 
 	cout<<"/////////////////////////////////"<<endl;
 	cout<<"running polFit.C ........////////"<<endl;
@@ -542,6 +545,20 @@ void polFit(int n_sampledPoints=1,
 
 
   double  f_background = background_fraction->GetBinContent( 1 );
+	cout << "f_background: " << f_background << endl;
+
+	// apply statistical fluctuations on f_background with guassian distribution
+	if(StatVarTotBGfraction && f_background>0.){
+		double  f_backgroundPre    = background_fraction->GetBinContent( 1 );
+		double  f_backgroundPreErr = background_fraction->GetBinError(1);
+
+		do {
+			f_background = gRandom->Gaus( f_backgroundPre, f_backgroundPreErr );
+		} while( f_background <=0. || f_background >= 2. * f_backgroundPre );
+
+	  cout << "after apply statistical fluctuation: \n"
+		 	<< "f_background: " << f_background << endl;
+	}
 
 
 
@@ -858,7 +875,7 @@ void polFit(int n_sampledPoints=1,
     if(nRhoFactor>300 && nRhoFactor<311) {costh_RhoFactor=costh_CS; phi_RhoFactor=phi_CS;}
     if(nRhoFactor>310 && nRhoFactor<321) {costh_RhoFactor=costh_HX; phi_RhoFactor=phi_HX;}
     if(nRhoFactor>320 && nRhoFactor<331) {costh_RhoFactor=costh_PX; phi_RhoFactor=phi_PX;}
-	double RhoFactor = EvaluateRhoFactor( costh_RhoFactor, phi_RhoFactor, nRhoFactor, fInRhoFactor, rap, pT);
+	double RhoFactor = EvaluateRhoFactor( costh_RhoFactor, phi_RhoFactor, nRhoFactor, fInRhoFactor, rap, pT, StatVarRho);
 
 	//cout<<"epsilon: "<<epsilon<<endl;
 	//cout<<"RhoFactor: "<<RhoFactor<<endl;
@@ -1084,7 +1101,7 @@ void polFit(int n_sampledPoints=1,
     if(nRhoFactor>300 && nRhoFactor<311) {costh_RhoFactor=costh_CS; phi_RhoFactor=phi_CS;}
     if(nRhoFactor>310 && nRhoFactor<321) {costh_RhoFactor=costh_HX; phi_RhoFactor=phi_HX;}
     if(nRhoFactor>320 && nRhoFactor<331) {costh_RhoFactor=costh_PX; phi_RhoFactor=phi_PX;}
-	double RhoFactor = EvaluateRhoFactor( costh_RhoFactor, phi_RhoFactor, nRhoFactor, fInRhoFactor, rap, pT);
+	double RhoFactor = EvaluateRhoFactor( costh_RhoFactor, phi_RhoFactor, nRhoFactor, fInRhoFactor, rap, pT, StatVarRho);
 
 
 	if(!useAmapApproach) epsilon = epsilon*DileptonEff*RhoFactor;
@@ -1390,6 +1407,28 @@ void polFit(int n_sampledPoints=1,
 
     double likelihood_BG  = background_costhphiPX->GetBinContent( ibin_costhPX, ibin_phiPX )
                           * background_pTrapMass->GetBinContent( ibin_pT, ibin_rap, ibin_mass );
+		
+	  // apply statistical fluctuations on likelihood_BG with poisson distribution
+		if(StatVarTotBGmodel){
+			double binContent_costhphiPX= background_costhphiPX->GetBinContent( ibin_costhPX, ibin_phiPX );
+			double binError_costhphiPX  = background_costhphiPX->GetBinError  ( ibin_costhPX, ibin_phiPX );
+			double binContent_pTrapMass = background_pTrapMass->GetBinContent( ibin_pT, ibin_rap, ibin_mass );
+			double binError_pTrapMass   = background_pTrapMass->GetBinError   ( ibin_pT, ibin_rap, ibin_mass );
+			cout << "binContent_costhphiPX:" << binContent_costhphiPX << " binError_costhphiPX:" << binError_costhphiPX << endl;
+			cout << "binContent_pTrapMass:" << binContent_pTrapMass << " binError_pTrapMass:" << binError_pTrapMass << endl;
+
+
+			double nPoisson_costhphiPX  = TMath::Power( binContent_costhphiPX / binError_costhphiPX , 2 );
+			double nPoisson_pTrapMass   = TMath::Power( binContent_pTrapMass  / binError_pTrapMass  , 2 );
+			cout << "nPoisson_costhphiPX: " << nPoisson_costhphiPX << " nPoisson_pTrapMass:" << nPoisson_pTrapMass << endl;
+
+			double rnd_costhphiPX = gRandom -> Poisson( nPoisson_costhphiPX );
+			double rnd_pTrapMass  = gRandom -> Poisson( nPoisson_pTrapMass  );
+			cout << "rnd_costhphiPX: " << rnd_costhphiPX << " rnd_pTrapMass:" << rnd_pTrapMass << endl;
+
+			likelihood_BG = likelihood_BG * rnd_costhphiPX * rnd_pTrapMass / ( nPoisson_costhphiPX * nPoisson_pTrapMass ) ;
+
+		}
 
     // total likelihood
 
@@ -1427,7 +1466,7 @@ void polFit(int n_sampledPoints=1,
     if(nRhoFactor>300 && nRhoFactor<311) {costh_RhoFactor=costh_CS; phi_RhoFactor=phi_CS;}
     if(nRhoFactor>310 && nRhoFactor<321) {costh_RhoFactor=costh_HX; phi_RhoFactor=phi_HX;}
     if(nRhoFactor>320 && nRhoFactor<331) {costh_RhoFactor=costh_PX; phi_RhoFactor=phi_PX;}
-	double RhoFactor = EvaluateRhoFactor( costh_RhoFactor, phi_RhoFactor, nRhoFactor, fInRhoFactor, rap, pT);
+	double RhoFactor = EvaluateRhoFactor( costh_RhoFactor, phi_RhoFactor, nRhoFactor, fInRhoFactor, rap, pT, StatVarRho);
 
 
 	if(!useAmapApproach) epsilon = epsilon*DileptonEff*RhoFactor;
@@ -1830,7 +1869,7 @@ void polFit(int n_sampledPoints=1,
     if(nRhoFactor>300 && nRhoFactor<311) {costh_RhoFactor=costh_CS; phi_RhoFactor=phi_CS;}
     if(nRhoFactor>310 && nRhoFactor<321) {costh_RhoFactor=costh_HX; phi_RhoFactor=phi_HX;}
     if(nRhoFactor>320 && nRhoFactor<331) {costh_RhoFactor=costh_PX; phi_RhoFactor=phi_PX;}
-	double RhoFactor = EvaluateRhoFactor( costh_RhoFactor, phi_RhoFactor, nRhoFactor, fInRhoFactor, rap, pT);
+	double RhoFactor = EvaluateRhoFactor( costh_RhoFactor, phi_RhoFactor, nRhoFactor, fInRhoFactor, rap, pT, StatVarRho);
 
 
 	if(!useAmapApproach) epsilon = epsilon*DileptonEff*RhoFactor;

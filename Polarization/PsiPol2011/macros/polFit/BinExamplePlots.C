@@ -65,7 +65,8 @@ void BinExamplePlots(){
 	gROOT->SetBatch();
 
 	char DataID[200];
-	sprintf(DataID,"Psi2S_3.00Sigma_11Dec2012");
+	//sprintf(DataID,"Psi2S_3.00Sigma_11Dec2012");
+	//sprintf(DataID,"Psi2S_ctauScen0_FracLSB-1_rho_20Feb2013");
 
 	bool PlotAcceptance=true;
 
@@ -73,19 +74,53 @@ void BinExamplePlots(){
 	char Fig_directory[200];
 	sprintf(Fig_directory,"FigBuffer/BinExamplePlots");
 	gSystem->mkdir(Fig_directory,true);
-	sprintf(Fig_directory,"FigBuffer/BinExamplePlots/%s",DataID);
-	gSystem->mkdir(Fig_directory,true);
+	//sprintf(Fig_directory,"FigBuffer/BinExamplePlots/%s",DataID);
+	//gSystem->mkdir(Fig_directory,true);
+
+	bool PlotBGnormCorr=true;
+	double normCorr1S[2][12], normCorr1SErr[2][12];
+	double normCorr2S[3][5],  normCorr2SErr[3][5];
+	TGraphErrors *BGnormCorr1S[2];
+	TGraphErrors *BGnormCorr2S[3];
+	double pT1S[2][12]={
+		{11.0099, 12.9394, 14.9263, 16.9274, 18.9324, 20.9341, 23.3586, 27.1481, 32.1847, 37.2121, 44.0308, 56.8306},
+		{10.9643, 12.9246, 14.9218, 16.9219, 18.9241, 20.9311, 23.3568, 27.1473, 32.1828, 37.2213, 44.0189, 56.8043}};
+	double pT1SErr[2][12]={
+		{0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.},
+		{0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.}};
+	double pT2S[3][5]= {
+		{11.8943, 15.7294, 19.7371, 25.1272, 36.1102},
+		{11.7868, 15.7024, 19.7270, 25.1119, 36.1893},
+		{11.7788, 15.7210, 19.7275, 25.1509, 36.1740}};
+	double pT2SErr[3][5]= {
+		{0., 0., 0., 0., 0.},
+		{0., 0., 0., 0., 0.},
+		{0., 0., 0., 0., 0.}};
 
 	int pTmin=6;
 	int pTmax=10;
 	int rapmin=1;
 	int rapmax=2;
-	int nStatemin=5;
+	int nStatemin=4;
 	int nStatemax=5;
-	if(nStatemax==4) {pTmin=1; pTmax=12; rapmin=1; rapmax=2;}
-	if(nStatemin==5) {pTmin=2; pTmax=6; rapmin=1; rapmax=3;}
 
 	for(int iState=nStatemin;iState<nStatemax+1;iState++){
+
+		if(iState==4) {pTmin=5; pTmax=12; rapmin=1; rapmax=2;}
+		if(iState==5) {pTmin=1; pTmax=5; rapmin=1; rapmax=3;}
+
+		//sprintf(DataID,Form("Psi%dS_3.00Sigma_11Dec2012",iState-3));
+		//sprintf(DataID,Form("Psi%dS_ctauScen0_FracLSB-1_rho_25Feb2013",iState-3));
+		//sprintf(DataID,Form("Psi%dS_ctauScen0_FracLSB-1_rho_25Feb2013_massRange",iState-3));
+		//sprintf(DataID,Form("Psi%dS_ctauScen0_FracLSB-1_rho_25Feb2013_massRange_Bin20_2_2",iState-3));
+		//sprintf(DataID,Form("Psi%dS_ctauScen0_FracLSB-1_rho_25Feb2013_massRange_Bin5_8_8",iState-3));
+		//sprintf(DataID,Form("Psi%dS_ctauScen0_FracLSB-1_rho_26Feb2013_BgNoRebin",iState-3));
+		//sprintf(DataID,Form("Psi%dS_ctauScen0_FracLSB-1_16Mar2013",iState-3));
+		sprintf(DataID,Form("Psi%dS_ctauScen0_FracLSB-1_16Mar2013_scaleFracBg",iState-3));
+
+		sprintf(Fig_directory,"FigBuffer/BinExamplePlots/%s",DataID);
+		gSystem->mkdir(Fig_directory,true);
+
 		if(iState<=3) sprintf(directory,"%s/Ups%dS",Fig_directory,iState);
 		if(iState>3) sprintf(directory,"%s/Psi%dS",Fig_directory,iState-3);
 		gSystem->mkdir(directory,true);
@@ -315,9 +350,23 @@ void BinExamplePlots(){
 				if(iState>3) sprintf(savename,"FigBuffer/BinExamplePlots/%s/Psi%dS/SubtractedBackground_rap%d_pT%d.pdf",DataID,iState-3,irapBin,ipTbin);
 				c2->SaveAs(savename);
 
+
+				///////////////////////
+				if(PlotBGnormCorr){
+					if(iState==4){
+						normCorr1S   [irapBin-1][ipTbin-1] = SubtractedBG_test -> GetMean();
+						normCorr1SErr[irapBin-1][ipTbin-1] = SubtractedBG_test -> GetRMS();
+					}
+					if(iState==5){
+						normCorr2S   [irapBin-1][ipTbin-1] = SubtractedBG_test -> GetMean();
+						normCorr2SErr[irapBin-1][ipTbin-1] = SubtractedBG_test -> GetRMS();
+					}
+				}
+				///////////////////////
+
 				if(PlotAcceptance){
 					c2 = new TCanvas("c2","c2",1200,800);
-					SubtractedBG_test->SetXTitle("Metr.Hast. acceptance, CS");
+					MetropolisHastingsAcceptanceCS->SetXTitle("Metr.Hast. acceptance, CS");
 					gPad->SetFillColor(kWhite);
 					MetropolisHastingsAcceptanceCS->SetTitle(0);
 					MetropolisHastingsAcceptanceCS->Draw();
@@ -328,7 +377,7 @@ void BinExamplePlots(){
 
 
 					c2 = new TCanvas("c2","c2",1200,800);
-					SubtractedBG_test->SetXTitle("Metr.Hast. acceptance, HX");
+					MetropolisHastingsAcceptanceHX->SetXTitle("Metr.Hast. acceptance, HX");
 					gPad->SetFillColor(kWhite);
 					MetropolisHastingsAcceptanceHX->SetTitle(0);
 					MetropolisHastingsAcceptanceHX->Draw();
@@ -339,7 +388,7 @@ void BinExamplePlots(){
 
 
 					c2 = new TCanvas("c2","c2",1200,800);
-					SubtractedBG_test->SetXTitle("Metr.Hast. acceptance, PX");
+					MetropolisHastingsAcceptancePX->SetXTitle("Metr.Hast. acceptance, PX");
 					gPad->SetFillColor(kWhite);
 					MetropolisHastingsAcceptancePX->SetTitle(0);
 					MetropolisHastingsAcceptancePX->Draw();
@@ -350,8 +399,97 @@ void BinExamplePlots(){
 				}
 				resultFile->Close();
 
-			}
-		}
-	}
+			}  //ipTbin
+		} //irapBin
+
+	}  //iState
+
+	if(PlotBGnormCorr){
+
+		gStyle->SetPadBottomMargin(0.11);
+		gStyle->SetPadLeftMargin(0.08); 
+		gStyle->SetPadRightMargin(0.02);
+		gStyle->SetPadTopMargin(0.05);
+		gStyle->SetTitleFillColor(10);
+		gStyle->SetTitleBorderSize(1);
+		gStyle->SetOptFit(1);
+		gStyle->SetOptStat(1);
+		gStyle->SetTitleFont(22);
+		gStyle->SetStatFont(22);
+		gStyle->SetStatColor(10);
+		gStyle->SetStatBorderSize(1);
+		gStyle->SetLabelFont(22,"X");
+		gStyle->SetLabelFont(22,"Y");
+		gStyle->SetTitleXOffset(1.2);
+		gStyle->SetTitleYOffset(1.2);
+		gStyle->SetHistLineWidth(2);
+		gStyle->SetStatX(0.9);
+		gStyle->SetStatY(0.9);
+		gStyle->SetTitleX(0.15);
+		gStyle->SetTitleY(0.96);
+
+		TCanvas *c3 = new TCanvas("c3","c3",1200,800);
+		gPad->SetFillColor(kWhite);
+
+		BGnormCorr1S[0] = new TGraphErrors(12,pT1S[0],normCorr1S[0],pT1SErr[0],normCorr1SErr[0]);
+		BGnormCorr1S[1] = new TGraphErrors(12,pT1S[1],normCorr1S[1],pT1SErr[1],normCorr1SErr[1]);
+		BGnormCorr2S[0] = new TGraphErrors(5,pT2S[0],normCorr2S[0],pT2SErr[0],normCorr2SErr[0]);
+		BGnormCorr2S[1] = new TGraphErrors(5,pT2S[1],normCorr2S[1],pT2SErr[1],normCorr2SErr[1]);
+		BGnormCorr2S[2] = new TGraphErrors(5,pT2S[2],normCorr2S[2],pT2SErr[2],normCorr2SErr[2]);
+
+		BGnormCorr1S[0]->SetTitle("");
+		BGnormCorr1S[0]->GetXaxis()->SetTitle("p_{T} (GeV)");
+		BGnormCorr1S[0]->GetYaxis()->SetTitle("BGnormCorr");
+		BGnormCorr1S[0]->GetYaxis()->SetRangeUser(0.6, 1.2);
+		BGnormCorr1S[0]->GetXaxis()->SetLimits(6., 72.);
+
+		BGnormCorr1S[0]->SetMarkerStyle(20);
+		BGnormCorr1S[0]->SetMarkerColor(4);
+		BGnormCorr1S[0]->SetLineColor(4);
+		BGnormCorr1S[1]->SetMarkerStyle(24);
+		BGnormCorr1S[1]->SetMarkerSize(1.2);
+		BGnormCorr1S[1]->SetMarkerColor(4);
+		BGnormCorr1S[1]->SetLineColor(4);
+
+		BGnormCorr2S[0]->SetMarkerStyle(21);
+		BGnormCorr2S[0]->SetMarkerColor(2);
+		BGnormCorr2S[0]->SetLineColor(2);
+		BGnormCorr2S[1]->SetMarkerStyle(25);
+		BGnormCorr2S[1]->SetMarkerSize(1.2);
+		BGnormCorr2S[1]->SetMarkerColor(2);
+		BGnormCorr2S[1]->SetLineColor(2);
+		BGnormCorr2S[2]->SetMarkerStyle(22);
+		BGnormCorr2S[2]->SetMarkerSize(1.2);
+		BGnormCorr2S[2]->SetMarkerColor(kMagenta+1);
+		BGnormCorr2S[2]->SetLineColor(kMagenta+1);
+
+		double blX = 0.7, blY = 0.7, trX = 0.95, trY = 0.93;
+		TLegend* legend=new TLegend(blX,blY,trX,trY);
+		legend->SetFillColor(kWhite);
+		legend->SetTextFont(42);
+		legend->SetTextSize(0.035);
+		legend->SetBorderSize(0.);
+		legend->AddEntry(BGnormCorr1S[0],"J/#psi |y| < 0.6","lp");
+		legend->AddEntry(BGnormCorr1S[1],"J/#psi 0.6 < |y| < 1.2","lp");
+		legend->AddEntry(BGnormCorr2S[0],"#psi(2S) |y| < 0.6","lp");
+		legend->AddEntry(BGnormCorr2S[1],"#psi(2S) 0.6 < |y| < 1.2","lp");
+		legend->AddEntry(BGnormCorr2S[2],"#psi(2S) 1.2 < |y| < 1.5","lp");
+
+		TLine *line = new TLine(6., 1., 72., 1.);
+		line->SetLineWidth(1.5); line->SetLineColor(kBlack); line->SetLineStyle(7);
+
+
+		BGnormCorr1S[0]->Draw("AP");
+		BGnormCorr1S[1]->Draw("P");
+		BGnormCorr2S[0]->Draw("P");
+		BGnormCorr2S[1]->Draw("P");
+		BGnormCorr2S[2]->Draw("P");
+		line->Draw("same");
+		legend->Draw("same");
+
+		c3 -> SaveAs(Form("FigBuffer/BinExamplePlots/%s/BGnormCorr.pdf",DataID));
+
+	} //PlotBGnormCorr
+
 	return;
 }

@@ -1,5 +1,6 @@
 #!/bin/sh
-source /afs/cern.ch/user/z/zhlinl/rootset.sh
+#source /afs/cern.ch/user/z/zhlinl/rootset.sh
+source /afs/ihep.ac.cn/users/z/zhangll/fs/rootset.sh
 
 homedir=$PWD
 cd ${homedir}
@@ -16,17 +17,33 @@ datadir_Start=${basedir}/macros/DataFiles
 #Batch submission system: 0/1
 useBatch=1
 
-fracL=50 #in percent #MC closure: 25 for data sigmas, 50 for MC sigmas
-nSigma=3.00 #needed in 2 decimal accuracy (x.yz)
+#fracL=50 #in percent #MC closure: 25 for data sigmas, 50 for MC sigmas
+#nSigma=3.00 #needed in 2 decimal accuracy (x.yz)
 
 for nState in 5;do
 
-JobID=Psi$[nState-3]S_${nSigma}Sigma_11Dec2012 #Please define nSigma and fracL yourself in the JobID, if needed
+StatVarTotBGfraction=1     #apply statistical fluctuations on f_background
+StatVarTotBGmodel=0        #apply statistical fluctuations on Bg model
+StatVarRho=1               #apply statistical fluctuations on rho factor
 
-rapBinMin=3
-rapBinMax=3
-ptBinMin=1
-ptBinMax=1
+#JobID=Psi$[nState-3]S_${nSigma}Sigma_11Dec2012
+#JobID=Psi$[nState-3]S_${nSigma}Sigma_11Dec2012_noRhoFactor
+#JobID=Psi$[nState-3]S_ctauScen0_FracLSB-1_noRhoFactor
+#JobID=Psi$[nState-3]S_ctauScen0_FracLSB-1_rho_20Feb2013
+#JobID=Psi$[nState-3]S_ctauScen0_FracLSB-1_rho_21Feb2013
+#JobID=Psi$[nState-3]S_ctauScen0_FracLSB-1_rho_25Feb2013
+#JobID=Psi$[nState-3]S_ctauScen0_FracLSB-1_rho_25Feb2013_massRange
+#JobID=Psi$[nState-3]S_ctauScen0_FracLSB-1_rho_25Feb2013_massRange_Bin20_2_2
+#JobID=Psi$[nState-3]S_ctauScen0_FracLSB-1_rho_25Feb2013_massRange_Bin5_8_8
+#JobID=Psi$[nState-3]S_ctauScen0_FracLSB-1_rho_26Feb2013_BgNoRebin
+#JobID=Psi$[nState-3]S_ctauScen0_FracLSB-1_16Mar2013
+#JobID=Psi$[nState-3]S_ctauScen0_FracLSB-1_16Mar2013_scaleFracBg
+JobID=Psi$[nState-3]S_ctauScen0_FracLSB-1_19Mar2013_${StatVarTotBGfraction}FracBg_${StatVarTotBGmodel}BgModel_${StatVarRho}Rho
+
+rapBinMin=1
+rapBinMax=1
+ptBinMin=5
+ptBinMax=5
 
 FidCuts=11
 
@@ -37,19 +54,27 @@ nDileptonEff=1
 UseMCDileptoneff=true
 
 #nRhoFactor=1
-nRhoFactor=325
+#nRhoFactor=325 ## old 
+nRhoFactor=326 ## newest
 
 useAmapApproach=false
 nAmap=1                    #frame/state/sigma/ID ( ID= 2 digits )
-nDenominatorAmap=1		    	#the number here corresponds to the same notation as nEff
+nDenominatorAmap=1		     #the number here corresponds to the same notation as nEff
 
-#nSample=50000
 nSample=20000
 
 nFits=1
 nSkipGen=0
 
-DataID=_FrameworkTest_5Dec2012
+#DataID=_FrameworkTest_5Dec2012
+#DataID=_ctauScen0_FracLSB-1
+#DataID=_ctauScen0_FracLSB-1_21Feb2013 ##with correct PR region definition
+#DataID=_ctauScen0_FracLSB-1_25Feb2013 ##with correct PR region definition
+#DataID=_ctauScen0_FracLSB-1_25Feb2013_Bin20_2_2 ##with correct PR region definition
+#DataID=_ctauScen0_FracLSB-1_25Feb2013_Bin5_8_8 ##with correct PR region definition
+#DataID=_ctauScen0_FracLSB-1_26Feb2013_BgNoRebin ##with correct PR region definition
+DataID=_ctauScen0_FracLSB-1_newMLfit_4Mar2013
+#DataID=_ctauScen0_FracLSB-1_newMLfit_4Mar2013_scaleFracBg
 
 MPValgo=3 		#1...mean,2...gauss,3...gauss-loop with chi2<2
 
@@ -127,7 +152,7 @@ fi
 fi
 
 cp ${storagedir}/${JobID}/polGenRecFitPlot ${storagedir}/${JobID}/polGenRecFitPlot_Psi$[nState-3]S_rap${rap_}_pt${pT_}_Gen${nGen_}
-./polGenRecFitPlot_Psi$[nState-3]S_rap${rap_}_pt${pT_}_Gen${nGen_} ${nGen_}ThisGen ${JobID}=JobID ${storagedir}=storagedir ${basedir}=basedir ${nGenerations}nGenerations ${polScenSig}polScenSig ${frameSig}frameSig ${polScenBkg}polScenBkg ${frameBkg}frameBkg ${rap_}rapBinMin ${rap_}rapBinMax ${pT_}ptBinMin ${pT_}ptBinMax ${nEff}nEff ${nDileptonEff}nDiEff ${FidCuts}FidCuts ${nSample}nSample ${ConstEvents}ConstEvents ${nSkipGen}nSkipGen UseConstEv=${UseConstEv} gen=${gen} rec=${rec} fit=${fit} plot=${plot} ${TreeID}=TreeID ${datadir}=realdatadir UseMCeff=${UseMCeff} UseMCDileptoneff=${UseMCDileptoneff} ${nRhoFactor}nRhoFactor ${MPValgo}MPValgo NewAccCalc=${NewAccCalc} useAmapApproach=${useAmapApproach} ${nAmap}nAmap ${nDenominatorAmap}nDenominatorAmap useBatch=${useBatch}
+./polGenRecFitPlot_Psi$[nState-3]S_rap${rap_}_pt${pT_}_Gen${nGen_} ${nGen_}ThisGen ${JobID}=JobID ${storagedir}=storagedir ${basedir}=basedir ${nGenerations}nGenerations ${polScenSig}polScenSig ${frameSig}frameSig ${polScenBkg}polScenBkg ${frameBkg}frameBkg ${rap_}rapBinMin ${rap_}rapBinMax ${pT_}ptBinMin ${pT_}ptBinMax ${nEff}nEff ${nDileptonEff}nDiEff ${FidCuts}FidCuts ${nSample}nSample ${ConstEvents}ConstEvents ${nSkipGen}nSkipGen UseConstEv=${UseConstEv} gen=${gen} rec=${rec} fit=${fit} plot=${plot} ${TreeID}=TreeID ${datadir}=realdatadir UseMCeff=${UseMCeff} UseMCDileptoneff=${UseMCDileptoneff} ${nRhoFactor}nRhoFactor ${MPValgo}MPValgo NewAccCalc=${NewAccCalc} useAmapApproach=${useAmapApproach} ${nAmap}nAmap ${nDenominatorAmap}nDenominatorAmap useBatch=${useBatch} StatVarTotBGfraction=${StatVarTotBGfraction} StatVarTotBGmodel=${StatVarTotBGmodel} StatVarRho=${StatVarRho}
 rm polGenRecFitPlot_Psi$[nState-3]S_rap${rap_}_pt${pT_}_Gen${nGen_}
 
 
@@ -161,7 +186,7 @@ then
 mv ${resultfilename} results_Psi$[nState-3]S_rap${rap_}_pT${pT_}.root
 
 cp ${storagedir}/${JobID}/polGenRecFitPlot ${storagedir}/${JobID}/polGenRecFitPlot_Psi$[nState-3]S_rap${rap_}_pt${pT_}
-./polGenRecFitPlot_Psi$[nState-3]S_rap${rap_}_pt${pT_} ${nGen_}ThisGen ${JobID}=JobID ${storagedir}=storagedir ${basedir}=basedir ${nGenerations}nGenerations ${polScenSig}polScenSig ${frameSig}frameSig ${polScenBkg}polScenBkg ${frameBkg}frameBkg ${rap_}rapBinMin ${rap_}rapBinMax ${pT_}ptBinMin ${pT_}ptBinMax ${nEff}nEff ${nDileptonEff}nDiEff ${FidCuts}FidCuts ${nSample}nSample ${ConstEvents}ConstEvents ${nSkipGen}nSkipGen UseConstEv=${UseConstEv} gen=false rec=false fit=false plot=true ${TreeID}=TreeID ${datadir}=realdatadir UseMCeff=${UseMCeff} UseMCDileptoneff=${UseMCDileptoneff} ${nRhoFactor}nRhoFactor ${MPValgo}MPValgo scalePlots=true NewAccCalc=${NewAccCalc} useAmapApproach=${useAmapApproach} ${nAmap}nAmap ${nDenominatorAmap}nDenominatorAmap
+./polGenRecFitPlot_Psi$[nState-3]S_rap${rap_}_pt${pT_} ${nGen_}ThisGen ${JobID}=JobID ${storagedir}=storagedir ${basedir}=basedir ${nGenerations}nGenerations ${polScenSig}polScenSig ${frameSig}frameSig ${polScenBkg}polScenBkg ${frameBkg}frameBkg ${rap_}rapBinMin ${rap_}rapBinMax ${pT_}ptBinMin ${pT_}ptBinMax ${nEff}nEff ${nDileptonEff}nDiEff ${FidCuts}FidCuts ${nSample}nSample ${ConstEvents}ConstEvents ${nSkipGen}nSkipGen UseConstEv=${UseConstEv} gen=false rec=false fit=false plot=true ${TreeID}=TreeID ${datadir}=realdatadir UseMCeff=${UseMCeff} UseMCDileptoneff=${UseMCDileptoneff} ${nRhoFactor}nRhoFactor ${MPValgo}MPValgo scalePlots=true NewAccCalc=${NewAccCalc} useAmapApproach=${useAmapApproach} ${nAmap}nAmap ${nDenominatorAmap}nDenominatorAmap ${nState}nState
 rm polGenRecFitPlot_Psi$[nState-3]S_rap${rap_}_pt${pT_}
 
 fi

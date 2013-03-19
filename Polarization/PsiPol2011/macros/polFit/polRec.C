@@ -24,7 +24,7 @@ bool isMuonInAcceptance(int iCut, double pT, double eta);
 double singleLeptonEfficiency( double& pT, double& eta, int nEff, TFile *fInEff, TH2D* hEvalEff, bool MCeff, TEfficiency* TEff);
 void EvaluateEffFileName(int nEff, char EffFileName [200], bool singleLeptonEff);
 double DiLeptonEfficiency( double& Dilepton_pT, double& Dilepton_rap, int nDileptonEff, TFile *fInDileptonEff, bool MCeff);
-double EvaluateRhoFactor( double& costh, double& phi, int nEff, TFile* fInRhoFactor, double rap, double pT);
+double EvaluateRhoFactor( double& costh, double& phi, int nEff, TFile* fInRhoFactor, double rap, double pT, bool StatVarRho);
 double DenominatorAmapEfficiency( double& pT, double& eta, int nDenominatorAmap, TFile *fInEff_nDenominatorAmap, TH2D* hEvalEff_nDenominatorAmap, bool MCeff, TEfficiency* TEff_nDenominatorAmap);
 double EvaluateAmap( double& costh_Amap, double& phi_Amap, int nAmap, TFile* fInAmap, double rap, double pT);
 
@@ -48,7 +48,8 @@ void polRec(double rapdilepton_min = 1,
 		int pTbin=999,
 		bool useAmapApproach=false,
 		int nAmap=999,
-		int nDenominatorAmap=999){
+		int nDenominatorAmap=999,
+		bool StatVarRho=false){
 
 	cout<<"/////////////////////////////////"<<endl;
 	cout<<"running polRec.C ........////////"<<endl;
@@ -350,11 +351,16 @@ void polRec(double rapdilepton_min = 1,
 
 	// background distributions
 
-	const int nbinth   = 15;
-	const int nbinph   = 15;
+	//const int nbinth   = 15;
+	//const int nbinph   = 15;
+	//// binning of costh and phi same as data Bg histogram
+	const int nbinth   = ToyMC::binCosth[rapBin-1][pTbin-1];
+	const int nbinph   = ToyMC::binPhi[rapBin-1][pTbin-1];
 	const int nbinpT   =  7;
 	const int nbinrap  =  2;
 	const int nbinmass =  7;
+	std::cout << "nbinth: " << nbinth << std::endl;
+	std::cout << "nbinph: " << nbinph << std::endl;
 
 	TH2D* background_costhphiPX = new TH2D( "background_costhphiPHX", "", nbinth,    -1.,    1.,
 			nbinph,   -180.,  180.  );
@@ -450,7 +456,7 @@ void polRec(double rapdilepton_min = 1,
 		if(nRhoFactor>300 && nRhoFactor<311) {costh_RhoFactor=costh_CS; phi_RhoFactor=phi_CS;}
 		if(nRhoFactor>310 && nRhoFactor<321) {costh_RhoFactor=costh_HX; phi_RhoFactor=phi_HX;}
 		if(nRhoFactor>320 && nRhoFactor<331) {costh_RhoFactor=costh_PX; phi_RhoFactor=phi_PX;}
-		double RhoFactor = EvaluateRhoFactor( costh_RhoFactor, phi_RhoFactor, nRhoFactor, fInRhoFactor, rap, pT);
+		double RhoFactor = EvaluateRhoFactor( costh_RhoFactor, phi_RhoFactor, nRhoFactor, fInRhoFactor, rap, pT, StatVarRho);
 
 		double epsilon = effP*effN;
 

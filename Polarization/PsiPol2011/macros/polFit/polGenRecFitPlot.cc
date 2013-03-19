@@ -61,6 +61,9 @@ int main(int argc, char** argv) {
 	bool deletePseudoData=false;
 	bool useAmapApproach=false;
 	bool useBatch=false;
+	bool StatVarTotBGfraction=false;
+	bool StatVarTotBGmodel=false;
+	bool StatVarRho=false;
 
 	double n_sigmas_signal = 3.;
 
@@ -109,6 +112,9 @@ int main(int argc, char** argv) {
 		if(std::string(argv[i]).find("scalePlots=true") != std::string::npos) {scalePlots=true; cout<<"run polGen.C"<<endl;}
 		if(std::string(argv[i]).find("useAmapApproach=true") != std::string::npos) {useAmapApproach=true; cout<<"use new A-map approach to calculate dimuon efficiencies"<<endl;}
 		if(std::string(argv[i]).find("useBatch=1") != std::string::npos) {useBatch=true; cout<<"use batch submission system"<<endl;}
+		if(std::string(argv[i]).find("StatVarTotBGfraction=1") != std::string::npos) {StatVarTotBGfraction=true; cout<<"apply statistical fluctuations on f_background"<<endl;}
+		if(std::string(argv[i]).find("StatVarTotBGmodel=1") != std::string::npos) {StatVarTotBGmodel=true; cout<<"apply statistical fluctuations on Bg model"<<endl;}
+		if(std::string(argv[i]).find("StatVarRho=1") != std::string::npos) {StatVarRho=true; cout<<"apply statistical fluctuations on rho factor"<<endl;}
 
 		if(std::string(argv[i]).find("JobID") != std::string::npos) {char* JobIDchar = argv[i]; char* JobIDchar2 = strtok (JobIDchar, "="); JobID = JobIDchar2; cout<<"JobID = "<<JobID<<endl;}
 		if(std::string(argv[i]).find("basedir") != std::string::npos) {char* basedirchar = argv[i]; char* basedirchar2 = strtok (basedirchar, "="); basedir = basedirchar2; cout<<"basedir = "<<basedir<<endl;}
@@ -383,8 +389,8 @@ int main(int argc, char** argv) {
 	cout<<"basestruct: "<<basestruct<<endl;
 
 	if(gen)polGen(raplow,raphigh,ptlow,pthigh,mass_signal_peak,mass_signal_sigma,n_sigmas_signal,n_events,f_BG,lambda_theta_sig_,lambda_phi_sig_,lambda_thetaphi_sig_,lambda_theta_bkg_,lambda_phi_bkg_,lambda_thetaphi_bkg_,frameSig,frameBkg,iGen,nState,OutputDirectory);
-	if(rec)polRec(raplow,raphigh,ptlow,pthigh,mass_signal_peak,mass_signal_sigma,n_sigmas_signal,nRecEff,nRecDileptonEff,nRecRhoFactor,FidCuts,OutputDirectory, false, effDir, MCReceff, MCDileptonReceff, iRap, iPt, useAmapApproach, nAmap, nDenominatorAmap);
-	if(fit)polFit(nSample,FidCuts, nEff, nDileptonEff, nRhoFactor, OutputDirectory, realdatadir, TreeBinID, TreeBinID_dataFile, RealData, effDir, MCeff, MCDileptoneff, iRap, iPt, NewAccCalc, MPValgo, useAmapApproach, nAmap, nDenominatorAmap);
+	if(rec)polRec(raplow,raphigh,ptlow,pthigh,mass_signal_peak,mass_signal_sigma,n_sigmas_signal,nRecEff,nRecDileptonEff,nRecRhoFactor,FidCuts,OutputDirectory, false, effDir, MCReceff, MCDileptonReceff, iRap, iPt, useAmapApproach, nAmap, nDenominatorAmap, StatVarRho);
+	if(fit)polFit(nSample,FidCuts, nEff, nDileptonEff, nRhoFactor, OutputDirectory, realdatadir, TreeBinID, TreeBinID_dataFile, RealData, effDir, MCeff, MCDileptoneff, iRap, iPt, NewAccCalc, MPValgo, useAmapApproach, nAmap, nDenominatorAmap, StatVarTotBGfraction, StatVarTotBGmodel, StatVarRho);
 	if(plot)polPlot(OutputDirectory, TreeBinID, RealData, MPValgo, scalePlots, nTotalFits, nState, ptlow, pthigh, raplow, raphigh);
 
 	//sprintf(dirstruct,"%s/Generation%d",rapptstruct,iGen+nSkipGen);

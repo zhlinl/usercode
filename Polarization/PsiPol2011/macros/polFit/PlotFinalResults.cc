@@ -434,7 +434,7 @@ int main(int argc, char** argv) {
 	TCanvas *MPcanvasCDF;
 
 	//================================================================
-	//==need to be changed for different rap bins(Psi1S:2, Psi2S:3)===
+	//==need to be changed for different rap bins(Psi1S:4, Psi2S:5)===
 	//================================================================
 
 	for(int iLam = 1; iLam<iParameters+1; iLam++){
@@ -787,6 +787,7 @@ int main(int argc, char** argv) {
 			for(int ptBin = ptBinMin; ptBin < ptBinMax+1; ptBin++) {
 
 				graphDefaultRes->GetPoint(ptBin-1,ptCentre_[pt],lmean[pt]);
+				cout<<"debug: ptCentre_["<<pt<<"]: "<<ptCentre_[pt]<<endl;
 				ptCentreErr_high[pt]=graphDefaultRes->GetErrorXhigh(ptBin-1);
 				ptCentreErr_low[pt]=graphDefaultRes->GetErrorXlow(ptBin-1);
 				lmean_errhigh[pt]=graphDefaultRes->GetErrorYhigh(ptBin-1);
@@ -5187,12 +5188,13 @@ int main(int argc, char** argv) {
 				double ParametrizedFontSize[8]={0.05,0.05,0.05,0.05,0.04,0.04,0.03,0.03};
 				double LegendYmin[8]={0.8,0.75,0.7,0.65,0.65,0.6,0.6,0.6};
 
-				double LegendXmin=0.6;
+				//double LegendXmin=0.6;
+				double LegendXmin=0.5; // for FrameworkIII
 				if(ExtendLegendInX) LegendXmin=0.25;
 
 				TLegend* plotLegend=new TLegend(LegendXmin,LegendYmin[nSystematics-1],0.95,0.9);
 				plotLegend->SetFillColor(kWhite);
-				//		plotLegend->SetTextFont(72);
+				//plotLegend->SetTextFont(72);
 				plotLegend->SetTextSize(ParametrizedFontSize[nSystematics-1]);
 				plotLegend->SetBorderSize(1);
 				char legendentry[200];
@@ -5200,9 +5202,11 @@ int main(int argc, char** argv) {
 
 				double lineWidth=3;
 				sprintf(drawGraphStyle,"LX");
+				//sprintf(drawGraphStyle,"PE");
 
 				TH1F *SystHisto = new TH1F;
-				SystHisto = SystCanvas->DrawFrame(onia::pTRange[rapBin][ptBinMin-1],yMin,onia::pTRange[rapBin][ptBinMax],yMax);
+				//SystHisto = SystCanvas->DrawFrame(onia::pTRange[rapBin][ptBinMin-1],yMin,onia::pTRange[rapBin][ptBinMax],yMax);
+			  SystHisto = SystCanvas->DrawFrame(PlotpTMin,yMin,PlotpTMax,yMax); //to be consistant for Psi 1S and 2S
 				SystHisto->SetXTitle("#it{p}_{T} [GeV]");
 				SystHisto->SetYTitle(axislabel);
 				SystHisto->GetYaxis()->SetTitleOffset(1.5);
@@ -5313,6 +5317,12 @@ int main(int argc, char** argv) {
 					if(!PlotAsymm) plotLegend->AddEntry(graphSyst12,SystID2Title,"f");
 					else plotLegend->AddEntry(graphSyst12,SystID2Title,"l");
 				}
+				//---debug
+				for(int i=0; i<nBinspT; i++){
+					cout<<"ptCentre_["<<i<<"]: "<<ptCentre_[i]<<endl;
+					cout<<"SystError1["<<i<<"]: "<<SystError1[i]<<endl;
+				}
+				//---debug
 				TGraphAsymmErrors *graphSyst1_ = new TGraphAsymmErrors(nBinspT,ptCentre_,SystError1,ptCentreErr_low,ptCentreErr_high,SystError1,0);
 				graphSyst1_->SetFillColor(kBlue);
 				graphSyst1_->SetFillStyle(1001);
@@ -5336,7 +5346,8 @@ int main(int argc, char** argv) {
 				if(rapBin==1) sprintf(texTex,"      |#it{y}| < 0.6");
 				if(rapBin==2) sprintf(texTex,"0.6 < |#it{y}| < 1.2");
 				if(rapBin==3) sprintf(texTex,"1.2 < |#it{y}| < 1.5");
-				TLatex *Systtext = new TLatex(onia::pTRange[rapBin][ptBinMax]*0.75,yMin+(yMax-yMin)*0.1,texTex);
+				//TLatex *Systtext = new TLatex(onia::pTRange[rapBin][ptBinMax]*0.75,yMin+(yMax-yMin)*0.1,texTex);
+				TLatex *Systtext = new TLatex(PlotpTMax*0.75,yMin+(yMax-yMin)*0.1,texTex);
 				Systtext->SetTextSize(0.035);
 				Systtext->Draw( "same" );
 
@@ -5346,8 +5357,8 @@ int main(int argc, char** argv) {
 				if(PlotSystematics) SystCanvas->SaveAs(filename);
 				SystCanvas->Close();
 
-				if(rapBin==2) sprintf(texTex,"0.6 < |#it{y}| < 1.2");
 				delete SystCanvas;
+
 
 			} // rapBin
 

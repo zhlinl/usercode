@@ -3,8 +3,6 @@
 #include <sstream>
 using namespace std;
 
-//#include "../../interface/rootIncludes.inc"
-//#include "../../interface/commonVar.h"
 #include "rootIncludes.inc"
 #include "commonVar.h"
 #include "ToyMC.h"
