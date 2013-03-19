@@ -16,7 +16,7 @@ TH3D *subtract3D(TH3D* hist1, TH3D* hist2);
 TH2D* ReSetBin(TH2D* hist, int nBinX, int nBinY, const std::stringstream& name, const std::stringstream& title);
 
 //---------------------------------------------------------------------------------------------------------------
-void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, bool folding, bool MC, bool doCtauUncer, bool PolLSB, bool PolRSB, bool PolNP, int ctauScen, int FracLSB, bool forceBinning, bool normApproach){
+void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, bool folding, bool MC, bool doCtauUncer, bool PolLSB, bool PolRSB, bool PolNP, int ctauScen, int FracLSB, bool forceBinning, bool normApproach, bool scaleFracBg, char *polDataPath){
 
 	const std::string
 		datafilename = "tmpFiles/selEvents_data.root",
@@ -569,6 +569,17 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 	std::stringstream tbkgname;
 	tbkgname << ";;fraction of total BG in " << onia::nSigMass << "  sigma window, prompt region";
 	TH1D* hFracTBG = new TH1D("background_fraction", tbkgname.str().c_str(), 1, 0., 1.);
+	if(scaleFracBg){
+		char Filename[200];
+		sprintf(Filename,"%s/results_Psi%dS_rap%d_pT%d.root",polDataPath,nState-3,rapBin,ptBin);
+		TFile *resultFile = new TFile(Filename,"R");
+		TH1D* SubtractedBG_test=(TH1D*)resultFile->Get("SubtractedBG_test");
+		double ratio = SubtractedBG_test -> GetMean();
+		std::cout << "fBG_sub / fBG : " << ratio << std::endl;
+		fTBGsig = fTBGsig / ratio ;
+		resultFile->Close();
+	}
+	output->cd();
 	hFracTBG->SetBinContent(1, fTBGsig);
 	hFracTBG->SetBinError(1, fTBGerr);
 	hFracTBG->Write();

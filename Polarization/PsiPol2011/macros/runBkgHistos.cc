@@ -67,7 +67,9 @@ int main(int argc, char* argv[]){
 			 PolNP = false,
 			 forceBinning = false,
 			 folding = false,
-			 normApproach = false;
+			 normApproach = false,
+			 scaleFracBg = false;
+	char *polDataPath = "Default";
 
 	// Loop over argument list
 	for (int i=1; i < argc; i++)
@@ -88,6 +90,8 @@ int main(int argc, char* argv[]){
 		fromSplit("forceBinning", arg, forceBinning);
 		fromSplit("folding", arg, folding);
 		fromSplit("normApproach", arg, normApproach);
+		fromSplit("scaleFracBg", arg, scaleFracBg);
+		if(std::string(argv[i]).find("polDataPath") != std::string::npos) {char* polDataPathchar = argv[i]; char* polDataPathchar2 = strtok (polDataPathchar, "="); polDataPath = polDataPathchar2; cout<<"polDataPath = "<<polDataPath<<endl;}
 	}
 
 	std::cout << "-----------------------\n"
@@ -104,7 +108,7 @@ int main(int argc, char* argv[]){
 			const std::string infilename = temp.str().c_str();
 
 			bkgHistos(infilename.c_str(), iRap, iPT, nState, folding, MC, doCtauUncer, PolLSB, PolRSB, PolNP, 
-					ctauScen, FracLSB, forceBinning, normApproach);
+					ctauScen, FracLSB, forceBinning, normApproach, scaleFracBg, polDataPath);
 
 		}
 	}

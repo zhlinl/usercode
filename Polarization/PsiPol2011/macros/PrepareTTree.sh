@@ -7,8 +7,13 @@ source /afs/ihep.ac.cn/users/z/zhangll/fs/rootset.sh
 #JobID=FrameworkTest_5Dec2012
 
 Cdir=$PWD
+
+cd ..
+basedir=$PWD
+cd macros
+
 # input arguments
-for nState in 4 5;do    #1,2,3,Upsi(1S,2S,3S); 4,Jpsi 5,PsiPrime
+for nState in 5;do    #1,2,3,Upsi(1S,2S,3S); 4,Jpsi 5,PsiPrime
 for FidCuts in 11;do #defines the set of cuts to be used, see macros/polFit/effsAndCuts.h
 cd $Cdir
 
@@ -26,11 +31,15 @@ doCtauUncer=true
 PolLSB=false       #measure polarization of the left sideband
 PolRSB=false       #measure polarization of the right sideband
 PolNP=false        #measure polarization of the non prompt events
-forceBinning=false #set binning of Psi1S consistently to non prompt binning and Psi2S consistently to background binning
-folding=false      #folding is applied to all background histograms
+forceBinning=true  #set binning of Psi1S consistently to non prompt binning and Psi2S consistently to background binning
+folding=true       #folding is applied to all background histograms
 normApproach=false #normalization 
 ctauScen=0         #0:default(1s:2.5,2s:2.0), 1:(1s:3.5,2s:3.0), 2:(1s:1.5,2s:1.0)
 FracLSB=-1         #-1:defalut, 0, 100
+scaleFracBg=true
+
+DataID=Psi$[nState-3]S_ctauScen0_FracLSB-1_16Mar2013
+polDataPath=${basedir}/Psi/Data/${DataID}
 
 #Define JobID
 #JobID=FrameworkTest_5Dec2012
@@ -39,7 +48,8 @@ FracLSB=-1         #-1:defalut, 0, 100
 #JobID=ctauScen${ctauScen}_FracLSB${FracLSB}_26Feb2013_BgNoRebin
 #JobID=ctauScen${ctauScen}_FracLSB${FracLSB}_25Feb2013_Bin20_2_2
 #JobID=ctauScen${ctauScen}_FracLSB${FracLSB}_25Feb2013_Bin5_8_8
-JobID=ctauScen${ctauScen}_FracLSB${FracLSB}_newMLfit_4Mar2013
+#JobID=ctauScen${ctauScen}_FracLSB${FracLSB}_newMLfit_4Mar2013
+JobID=ctauScen${ctauScen}_FracLSB${FracLSB}_newMLfit_4Mar2013_scaleFracBg
 
 # input files
 # In case of more input Files: define inputTreeX and adapt the line starting with inputTrees, at the moment up to 4 files implemented
@@ -70,8 +80,8 @@ execute_runWorkspace=0			     #independent of rapMin, rapMax, ptMin, ptMax
 execute_runMassFit=0			       #can be executed for different pt and y bins
 execute_runLifetimeFit=0         #can be executed for different pt and y bins
 execute_runPlotMassLifetime=0    #can be executed for different pt and y bins
-execut_PlotFitPar=1              #independent of rapMin, rapMax, ptMin, ptMax
-execute_runBkgHistos=0           #can be executed for different pt and y bins
+execut_PlotFitPar=0              #independent of rapMin, rapMax, ptMin, ptMax
+execute_runBkgHistos=1           #can be executed for different pt and y bins
 execute_PlotCosThetaPhiBG=0 		 #This step only has to be executed once for each set of cuts (indep. of FracLSB and nSigma)
 execute_PlotCosThetaPhiDistribution=0 #This step only has to be executed once for each set of cuts (indep. of FracLSB and nSigma)
 
@@ -138,7 +148,7 @@ cp ../latex/MassLifetime_Psi$[nState-3]S.tex       ${WorkDir}/MassLifetime_Psi$[
 
 cd ${WorkDir}
 
-#make
+make
 
 inputTrees="inputTree=${inputTree1} inputTree=${inputTree2} inputTree=${inputTree3} inputTree=${inputTree4}"
 if [ ${execute_runData} -eq 1 ]
@@ -178,7 +188,7 @@ fi
 
 if [ ${execut_PlotFitPar} -eq 1 ]
 then
-#./PlotFitPar nState=${nState} doCtauUncer=${doCtauUncer}
+./PlotFitPar nState=${nState} doCtauUncer=${doCtauUncer}
 #pdflatex Lifetime_fitParameter.tex
 #pdflatex Mass_fitParameter.tex
 pdflatex evaluateCtau.tex
@@ -194,7 +204,7 @@ fi
 if [ ${execute_runBkgHistos} -eq 1 ]
 then
 cp runBkgHistos runBkgHistos_$[nState-3]S_rap${rapMin}_pt${ptMin}
-./runBkgHistos_$[nState-3]S_rap${rapMin}_pt${ptMin} rapMin=${rapMin} rapMax=${rapMax} ptMin=${ptMin} ptMax=${ptMax} nState=${nState} MC=${MC} doCtauUncer=${doCtauUncer} PolLSB=${PolLSB} PolRSB=${PolRSB} PolNP=${PolNP} ctauScen=${ctauScen} FracLSB=${FracLSB} forceBinning=${forceBinning} folding=${folding} normApproach=${normApproach}
+./runBkgHistos_$[nState-3]S_rap${rapMin}_pt${ptMin} rapMin=${rapMin} rapMax=${rapMax} ptMin=${ptMin} ptMax=${ptMax} nState=${nState} MC=${MC} doCtauUncer=${doCtauUncer} PolLSB=${PolLSB} PolRSB=${PolRSB} PolNP=${PolNP} ctauScen=${ctauScen} FracLSB=${FracLSB} forceBinning=${forceBinning} folding=${folding} normApproach=${normApproach} scaleFracBg=${scaleFracBg} ${polDataPath}=polDataPath
 rm runBkgHistos_$[nState-3]S_rap${rapMin}_pt${ptMin}
 fi
 
