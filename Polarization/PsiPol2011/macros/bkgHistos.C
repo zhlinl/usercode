@@ -1537,6 +1537,8 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 			for (int k = 0; k <= ny; k++){
 				double c1 = hSR_cosThetaPhi[iFrame]->GetBinContent(j,k);
 				double c2 = hTBG_cosThetaPhi[iFrame]->GetBinContent(j,k);
+				double e2 = hTBG_cosThetaPhi[iFrame]->GetBinError(j,k);
+				std::cout << c2 << " " << e2 << std::endl;
 				if (c1 == 0 && c2 != 0){
 					hTBG_cosThetaPhi[iFrame]->SetBinContent(j,k,0);
 					hTBG_cosThetaPhi[iFrame]->SetBinError(j,k,0);
@@ -1646,9 +1648,15 @@ TH3D *subtract3D(TH3D* hist1, TH3D* hist2){
 				if (c1 > 0) {
 					double c2 = hist2->GetBinContent(j,k,l);
 					double c3 = c1 - 1.*c2;
-					if(c3 < 0) c3 = 0;
+					double e1 = hist1->GetBinError(j,k,l);  
+					double e2 = hist2->GetBinError(j,k,l);  
+					double e3 = TMath::Sqrt(e1*e1 + e2*e2); 
+					if(c3 < 0){                             
+						c3 = 0;                             
+						e3 = 0;                             
+					}
 					hist1->SetBinContent(j,k,l,c3);
-					hist1->SetBinError(j,k,l, TMath::Sqrt(c3));
+					hist1->SetBinError(j,k,l,e3);
 				}
 
 			} // j
@@ -1670,9 +1678,15 @@ TH2D *subtract2D(TH2D* hist1, TH2D* hist2){
 			if (c1 > 0) {
 				double c2 = hist2->GetBinContent(j,k);
 				double c3 = c1 - 1.*c2;
-				if(c3 < 0) c3 = 0;
+				double e1 = hist1->GetBinError(j,k);
+				double e2 = hist2->GetBinError(j,k);
+				double e3 = TMath::Sqrt(e1*e1 + e2*e2); 
+				if(c3 < 0){
+					c3 = 0;
+					e3 = 0;
+				}
 				hist1->SetBinContent(j,k,c3);
-				hist1->SetBinError(j,k, TMath::Sqrt(c3));
+				hist1->SetBinError(j,k, e3);
 			}
 		}
 	}
