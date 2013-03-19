@@ -36,7 +36,7 @@ folding=true       #folding is applied to all background histograms
 normApproach=false #normalization 
 ctauScen=0         #0:default(1s:2.5,2s:2.0), 1:(1s:3.5,2s:3.0), 2:(1s:1.5,2s:1.0)
 FracLSB=-1         #-1:defalut, 0, 100
-scaleFracBg=true
+scaleFracBg=false
 
 DataID=Psi$[nState-3]S_ctauScen0_FracLSB-1_16Mar2013
 polDataPath=${basedir}/Psi/Data/${DataID}

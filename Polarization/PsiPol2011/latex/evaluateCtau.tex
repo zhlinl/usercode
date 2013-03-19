@@ -120,13 +120,14 @@
 %\tableofcontents
 %\end{frame}
 
-\section{Evaluate $\lpsi$ cut (P region)} 
-\begin{frame}[t]{\small \bf Evaluate $\lpsi$ cut (P region)}{}
+\section{Definitions of PR and NP regions } 
+\begin{frame}[t]{\small \bf Definitions of PR and NP regions }{}
 \begin{textblock}{48}(1,5.25)
 \begin{itemize}
-\scriptsize \item I) get $\sigma$ of prompt p.d.f, by fitting the trend changes as $p_{T}$
-\scriptsize \item II) define P region as a symmetric range around zero with nSigma
-\scriptsize \item III) Evaluate Prompt, Non-prompt, and Background fractions in $\lpsi$ window [-nSigma*$\sigma$, nSigma*$\sigma$] \\
+\scriptsize \item I) get $\sigma$ of prompt p.d.f, by parametrizing the trend changes as $p_{T}$
+\scriptsize \item II) define PR, and NP regions as: [-nSigma*$\sigma$, nSigma*$\sigma$], [-nSigma*$\sigma$, +$\infty$], respectively.
+nSigma=2.5 for $\Jpsi$, and nSigma=2.0 for $\psi(2S)$
+\scriptsize \item III) Evaluate Prompt, Non-prompt, and Background fractions in PR and NP
 \end{itemize}
 \end{textblock}
 \begin{textblock}{48}(1,13)
@@ -166,7 +167,7 @@
 \begin{frame}[t]{\small \bf fractions in P region, \structure{$\psi$(2S), nSigma = 2.0} }{}
 \begin{textblock}{48}(1,5.25)
 \begin{itemize}
-\scriptsize \item  $|$y$|$ $<$ 0.6(left), 0.6 $<$ $|$y$|$ $<$ 1.2(right), and 1.2 $<$ $|$y$|$ $<$ 1.8(bottom)
+\scriptsize \item  $|$y$|$ $<$ 0.6(left), 0.6 $<$ $|$y$|$ $<$ 1.2(right), and 1.2 $<$ $|$y$|$ $<$ 1.5(bottom)
 \end{itemize}
 \end{textblock}
 \begin{textblock}{48}(1,6)
@@ -182,7 +183,7 @@
 \begin{frame}[t]{\small \bf fractions in P region, \structure{Errors $\psi$(2S), nSigma = 2.0} }{}
 \begin{textblock}{48}(1,5.25)
 \begin{itemize}
-\scriptsize \item $|$y$|$ $<$ 0.6(left), 0.6 $<$ $|$y$|$ $<$ 1.2(right), and 1.2 $<$ $|$y$|$ $<$ 1.8(bottom)
+\scriptsize \item $|$y$|$ $<$ 0.6(left), 0.6 $<$ $|$y$|$ $<$ 1.2(right), and 1.2 $<$ $|$y$|$ $<$ 1.5(bottom)
 \end{itemize}
 \end{textblock}
 \begin{textblock}{48}(1,6)
@@ -196,20 +197,20 @@
 
 
 %%%%%%%%%%% NP region
-\section{Evaluate $\lpsi$ cut (NP region)} 
-\begin{frame}[t]{\small \bf Evaluate $\lpsi$ cut (NP region)}{}
-\begin{textblock}{48}(1,5.25)
-\begin{itemize}
-\scriptsize \item I) define NP region as window [nSigma*$\sigma$, +$\infty$]
-\scriptsize \item II) Evaluate Prompt, Non-prompt, and Background fractions in this NP region
-\end{itemize}
-\end{textblock}
-%\begin{textblock}{48}(1,13)
-%\scriptsize sigma changes vs. $p_{T}$ for all rapidity bins: \structure{1S (left), 2S (right)}
-%\hspace*{10pt} \includegraphics[width=0.45\textwidth]{\FittingRltsOneS PR_2.5sigma/rms.pdf}
-%\hspace*{10pt} \includegraphics[width=0.45\textwidth]{\FittingRltsTwoS PR_2sigma/rms.pdf}
+%\section{Evaluate $\lpsi$ cut (NP region)} 
+%\begin{frame}[t]{\small \bf Evaluate $\lpsi$ cut (NP region)}{}
+%\begin{textblock}{48}(1,5.25)
+%\begin{itemize}
+%\scriptsize \item I) define NP region as window [nSigma*$\sigma$, +$\infty$]
+%\scriptsize \item II) Evaluate Prompt, Non-prompt, and Background fractions in this NP region
+%\end{itemize}
 %\end{textblock}
-\end{frame}
+%%\begin{textblock}{48}(1,13)
+%%\scriptsize sigma changes vs. $p_{T}$ for all rapidity bins: \structure{1S (left), 2S (right)}
+%%\hspace*{10pt} \includegraphics[width=0.45\textwidth]{\FittingRltsOneS PR_2.5sigma/rms.pdf}
+%%\hspace*{10pt} \includegraphics[width=0.45\textwidth]{\FittingRltsTwoS PR_2sigma/rms.pdf}
+%%\end{textblock}
+%\end{frame}
 
 %%%%%% 1S
 \begin{frame}[t]{\small \bf fractions in NP region, \structure{$\psi$(1S), nSigma = 2.5} }{}
@@ -241,7 +242,7 @@
 \begin{frame}[t]{\small \bf fractions in NP region, \structure{$\psi$(2S), nSigma = 2.0} }{}
 \begin{textblock}{48}(1,5.25)
 \begin{itemize}
-\scriptsize \item  $|$y$|$ $<$ 0.6(left), 0.6 $<$ $|$y$|$ $<$ 1.2(right), and 1.2 $<$ $|$y$|$ $<$ 1.8(bottom)
+\scriptsize \item  $|$y$|$ $<$ 0.6(left), 0.6 $<$ $|$y$|$ $<$ 1.2(right), and 1.2 $<$ $|$y$|$ $<$ 1.5(bottom)
 \end{itemize}
 \end{textblock}
 \begin{textblock}{48}(1,6)
@@ -257,7 +258,7 @@
 \begin{frame}[t]{\small \bf fractions in NP region, \structure{Errors $\psi$(2S), nSigma = 2.0} }{}
 \begin{textblock}{48}(1,5.25)
 \begin{itemize}
-\scriptsize \item errors, $|$y$|$ $<$ 0.6(left), 0.6 $<$ $|$y$|$ $<$ 1.2(right), and 1.2 $<$ $|$y$|$ $<$ 1.8(bottom)
+\scriptsize \item errors, $|$y$|$ $<$ 0.6(left), 0.6 $<$ $|$y$|$ $<$ 1.2(right), and 1.2 $<$ $|$y$|$ $<$ 1.5(bottom)
 \end{itemize}
 \end{textblock}
 \begin{textblock}{48}(1,6)

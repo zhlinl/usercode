@@ -652,8 +652,8 @@ void plotLifeBg(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 
 	RooRealVar *fBkgSBL_ = (RooRealVar*)ws->var("fBkgSBL");
 	RooRealVar *fBkgSBR_ = (RooRealVar*)ws->var("fBkgSBR");
-	//RooRealVar *fPromptSBL_ = (RooRealVar*)ws->var("fPromptSBL");
-	//RooRealVar *fPromptSBR_ = (RooRealVar*)ws->var("fPromptSBR");
+
+	RooRealVar *fPrompt_ = (RooRealVar*)ws->var("fPrompt");
 
 	double promptMean = promptMean_->getVal();
 	double promptMeanErr = promptMean_->getError();
@@ -682,10 +682,41 @@ void plotLifeBg(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 	double fBkgSBR = fBkgSBR_->getVal();
 	double fBkgSBLErr = fBkgSBL_->getError();
 	double fBkgSBRErr = fBkgSBR_->getError();
-	//double fPromptSBL = fPromptSBL_->getVal();
-	//double fPromptSBR = fPromptSBR_->getVal();
-	//double fPromptSBLErr = fPromptSBL_->getError();
-	//double fPromptSBRErr = fPromptSBR_->getError();
+
+	double fPrompt = fPrompt_->getVal();
+	double fPromptErr = fPrompt_->getError();
+	double fNonPrompt =  1.-fBkg-fPrompt;
+	double fNonPromptErr = sqrt(pow(fBkgErr,2)+pow(fPromptErr,2));
+
+	//f_P / f_NP should be same in LSB,SR,RSB, to interpolate f_P in L(R)SB from SR
+	double fPromptSBL = fPrompt * ( 1. - fBkgSBL ) / ( 1. - fBkg ) ;
+	double fPromptSBR = fPrompt * ( 1. - fBkgSBR ) / ( 1. - fBkg ) ;
+	double fPromptSBLErr = sqrt( 
+			pow(fPromptErr*(1.-fBkgSBL )/(1.-fBkg),2) + 
+			pow(fBkgSBLErr*fPrompt/(1.-fBkg),2) + 
+			pow(fBkgErr*fPrompt*(1.-fBkgSBL )/pow(1.-fBkg,2),2) );
+	double fPromptSBRErr = sqrt( 
+			pow(fPromptErr*(1.-fBkgSBR )/(1.-fBkg),2) + 
+			pow(fBkgSBRErr*fPrompt/(1.-fBkg),2) + 
+			pow(fBkgErr*fPrompt*(1.-fBkgSBR )/pow(1.-fBkg,2),2) );
+
+	double fNonPromptSBL = 1. - fBkgSBL - fPromptSBL ;
+	double fNonPromptSBR = 1. - fBkgSBR - fPromptSBR ;
+	double fNonPromptSBLErr = sqrt(
+			pow(fPromptErr*(1.-fBkgSBL )/(1.-fBkg),2) +
+			pow(fBkgSBLErr*(1.-fPrompt/(1.-fBkg)),2) +
+			pow(fBkgErr*fPrompt*(1.-fBkgSBL )/pow(1.-fBkg,2),2) );
+	double fNonPromptSBRErr = sqrt(
+			pow(fPromptErr*(1.-fBkgSBR )/(1.-fBkg),2) +
+			pow(fBkgSBRErr*(1.-fPrompt/(1.-fBkg)),2) +
+			pow(fBkgErr*fPrompt*(1.-fBkgSBR )/pow(1.-fBkg,2),2) );
+
+	cout<<"fBkgSBL: "<<fBkgSBL<<" fBkgSBR: "<<fBkgSBR<<endl;
+	cout<<"fPromptSBL: "<<fPromptSBL<<" fPromptSBR: "<<fPromptSBR <<endl;
+	cout<<"fNonPromptSBL: "<<fNonPromptSBL<<" fNonPromptSBR: "<<fNonPromptSBL<<endl;
+	cout<<"fPromptSBL/fNonPromptSBL: "<<fPromptSBL/fNonPromptSBL<<endl;
+	cout<<"fPromptSBR/fNonPromptSBR: "<<fPromptSBR/fNonPromptSBR<<endl;
+	cout<<"fPrompt/fNonPrompt: "<<fPrompt/fNonPrompt<<endl;
 
 	double fBkgSSDR_SBL = fBkgSSDR_SBL_->getVal();
 	double fBkgSSDRErr_SBL = fBkgSSDR_SBL_->getError();
@@ -717,6 +748,11 @@ void plotLifeBg(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 	RooAbsPdf *nonPromptSSD = (RooAbsPdf*)ws->pdf("nonPromptSSD");
 
 
+	//relative fraction of Prompt: f_P/f_NP, same in LSB,SR,RSB
+	RooRealVar *fracPrompt = new RooRealVar("fracPrompt","fracPrompt",fPromptSBL/(fPromptSBL+fNonPromptSBL));
+	//RooRealVar fracPrompt("fracPrompt","fracPrompt",fPromptSBL/(fPromptSBL+fNonPromptSBL));
+	RooAddPdf *SignalPdf = new RooAddPdf("SignalPdf","SignalPdf",RooArgList(*Prompt,*nonPromptSSD),*fracPrompt);
+
 
 	int parsFit;
 
@@ -725,8 +761,7 @@ void plotLifeBg(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 	ModelLifeSBL->plotOn(ctauFrameBkgSBL,
 			ProjWData(*JpsictErr, *dataSBL),
 			LineWidth(2),
-			NumCPU(1)
-			);
+			NumCPU(1));
 
 	parsFit=(fitRlt->floatParsFinal()).getSize(); //this used the full p.d.f.
 	int nBins_LSBL=ctauFrameBkgSBL->GetNbinsX();
@@ -752,8 +787,7 @@ void plotLifeBg(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 			LineStyle(2),
 			LineColor(kRed),
 			LineWidth(2),
-			NumCPU(1)
-			);
+			NumCPU(1));
 
 	//ModelLifeSBL->plotOn(ctauFrameBkgSBL,
 	backgroundFD->plotOn(ctauFrameBkgSBL,
@@ -763,8 +797,7 @@ void plotLifeBg(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 			LineStyle(2),
 			LineColor(kGreen),
 			LineWidth(2),
-			NumCPU(1)
-			);
+			NumCPU(1));
 
 	//ModelLifeSBL->plotOn(ctauFrameBkgSBL,
 	backgroundDSD->plotOn(ctauFrameBkgSBL,
@@ -774,8 +807,16 @@ void plotLifeBg(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 			LineStyle(1),
 			LineColor(kBlack),
 			LineWidth(2),
-			NumCPU(1)
-			);
+			NumCPU(1));
+
+	//ModelLifeSBL->plotOn(ctauFrameBkgSBL,
+	SignalPdf->plotOn(ctauFrameBkgSBL,
+			ProjWData(*JpsictErr, *dataSBL),
+			//Components("TotalPromptLifetime,nonPromptSSD"),
+			Normalization(1.-fBkgSBL),
+			LineStyle(7),
+			LineColor(kPink+3),
+			LineWidth(2));
 
 	double Ymax = ctauFrameBkgSBL->GetMaximum();
 	cout<<"Ymax: "<<Ymax<<endl;
@@ -788,8 +829,7 @@ void plotLifeBg(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 	ModelLifeSBR->plotOn(ctauFrameBkgSBR,
 			ProjWData(*JpsictErr, *dataSBR),
 			LineWidth(2),
-			NumCPU(1)
-			);
+			NumCPU(1));
 
 	parsFit=(fitRlt->floatParsFinal()).getSize(); //this used the full p.d.f.
 	int nBins_LSBR=ctauFrameBkgSBR->GetNbinsX();
@@ -813,8 +853,7 @@ void plotLifeBg(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 			LineStyle(2),
 			LineColor(kRed),
 			LineWidth(2),
-			NumCPU(1)
-			);
+			NumCPU(1));
 
 	//ModelLifeSBR->plotOn(ctauFrameBkgSBR,
 	backgroundFD->plotOn(ctauFrameBkgSBR,
@@ -824,8 +863,7 @@ void plotLifeBg(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 			LineStyle(2),
 			LineColor(kGreen),
 			LineWidth(2),
-			NumCPU(1)
-			);
+			NumCPU(1));
 
 	//ModelLifeSBR->plotOn(ctauFrameBkgSBR,
 	backgroundDSD->plotOn(ctauFrameBkgSBR,
@@ -835,8 +873,16 @@ void plotLifeBg(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 			LineStyle(1),
 			LineColor(kBlack),
 			LineWidth(2),
-			NumCPU(1)
-			);
+			NumCPU(1));
+
+	//ModelLifeSBR->plotOn(ctauFrameBkgSBR,
+	SignalPdf->plotOn(ctauFrameBkgSBR,
+			ProjWData(*JpsictErr, *dataSBR),
+			//Components("TotalPromptLifetime,nonPromptSSD"),
+			Normalization(1.-fBkgSBR),
+			LineStyle(7),
+			LineColor(kPink+3),
+			LineWidth(2));
 
 	Ymax = ctauFrameBkgSBR->GetMaximum();
 	cout<<"Ymax: "<<Ymax<<endl;
@@ -852,10 +898,10 @@ void plotLifeBg(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 	TH1* legendGreenDash = dataSBL->createHistogram("legendGreenDash",JpsiMass,Binning(50)) ; legendGreenDash->SetLineColor(kGreen) ; legendGreenDash->SetLineStyle(2) ; legendGreenDash->SetLineWidth(2) ;
 	TH1* legendPink = dataSBL->createHistogram("legendPink",JpsiMass,Binning(50)) ; legendPink->SetLineColor(kPink+3) ; legendPink->SetLineStyle(7) ; legendPink->SetLineWidth(2) ;
 
-	//TLegend* LifetimeLegendBkgSBL=new TLegend(0.65,0.75,0.88,0.88);
 	//TLegend* LifetimeLegendBkgSBL=new TLegend(0.12,0.75,0.25,0.88);
-	//TLegend* LifetimeLegendBkgSBL=new TLegend(0.12,0.75,0.25,0.88);
-	TLegend* LifetimeLegendBkgSBL=new TLegend(0.11,0.83,0.27,0.96);
+	//TLegend* LifetimeLegendBkgSBL=new TLegend(0.11,0.83,0.27,0.97);
+	//TLegend* LifetimeLegendBkgSBL=new TLegend(0.31,0.8,0.43,0.96);
+	TLegend* LifetimeLegendBkgSBL=new TLegend(0.35,0.7,0.5,0.93);
 	LifetimeLegendBkgSBL->SetFillColor(kWhite);
 	LifetimeLegendBkgSBL->SetTextFont(42);
 	LifetimeLegendBkgSBL->SetTextSize(0.035);
@@ -864,9 +910,11 @@ void plotLifeBg(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 	LifetimeLegendBkgSBL->AddEntry(legendGreenDash,"SSL","l");
 	LifetimeLegendBkgSBL->AddEntry(legendRed,"SSR ","l");
 	LifetimeLegendBkgSBL->AddEntry(legendBlack,"DS","l");
+	LifetimeLegendBkgSBL->AddEntry(legendPink,"signal","l");
 
 	//TLegend* LifetimeLegendBkgSBR=new TLegend(0.12,0.75,0.25,0.88);
-	TLegend* LifetimeLegendBkgSBR=new TLegend(0.11,0.83,0.27,0.96);
+	//TLegend* LifetimeLegendBkgSBR=new TLegend(0.11,0.83,0.27,0.97);
+	TLegend* LifetimeLegendBkgSBR=new TLegend(0.35,0.7,0.5,0.93);
 	LifetimeLegendBkgSBR->SetFillColor(kWhite);
 	LifetimeLegendBkgSBR->SetTextFont(42);
 	LifetimeLegendBkgSBR->SetTextSize(0.035);
@@ -875,6 +923,7 @@ void plotLifeBg(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 	LifetimeLegendBkgSBR->AddEntry(legendGreenDash,"SSL","l");
 	LifetimeLegendBkgSBR->AddEntry(legendRed,"SSR ","l");
 	LifetimeLegendBkgSBR->AddEntry(legendBlack,"DS","l");
+	LifetimeLegendBkgSBR->AddEntry(legendPink,"signal","l");
 
 	double left=0.7, top=0.9, textSize=0.025;
 	TLatex *latex=new TLatex();
@@ -936,7 +985,7 @@ void plotLifeBg(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 	latex->DrawLatex(left,top,Form("resolution2  =  %.1f",promptCtRe2));
 	top-=step;
 	if(ptBin>7)
-		latex->DrawLatex(left,top,Form("frac_{SSR}   =  %.2f",fBkgSSDR_SBL));
+		latex->DrawLatex(left,top,Form("frac_{SSR}   =  %.3f",fBkgSSDR_SBL));
 
 
 	//left=0.6; top=0.85;
@@ -952,8 +1001,6 @@ void plotLifeBg(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 	latex->DrawLatex(left,top,Form("#tau_{SSR}   =  %.3f #pm %.3f",bkgTauSSD_SBL, bkgTauSSD_SBLErr));
 	top-=step;
 	latex->DrawLatex(left,top,Form("frac_{Bg}   =  %.3f #pm %.3f",fBkgSBL,fBkgSBLErr));
-	//top-=step;
-	//latex->DrawLatex(left,top,Form("frac_{P}   =  %.3f #pm %.3f",fPromptSBL,fPromptSBLErr));
 	top-=step;
 	top-=step;
 
@@ -1009,8 +1056,6 @@ void plotLifeBg(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 	latex->DrawLatex(left,top,Form("#tau_{SSR}   =  %.3f #pm %.3f",bkgTauSSD_SBR, bkgTauSSD_SBRErr));
 	top-=step;
 	latex->DrawLatex(left,top,Form("frac_{Bg}   =  %.3f #pm %.3f",fBkgSBR,fBkgSBRErr));
-	//top-=step;
-	//latex->DrawLatex(left,top,Form("frac_{P}   =  %.3f #pm %.3f",fPromptSBR,fPromptSBRErr));
 	top-=step;
 	top-=step;
 
