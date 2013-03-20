@@ -1,5 +1,6 @@
 #include "Riostream.h"
 #include "TEfficiency.h"
+#include "TRandom3.h"
 
 
 enum { loose, tight };
@@ -196,18 +197,19 @@ void EvaluateEffFileName(int nEff, char EffFileName [200], bool singleLeptonEff)
 		if(nEff==305 || nEff==315 || nEff==325) sprintf(EffFileName,"rhoFactor_Jpsi_Luca_27Nov2012.root");
 		//if(nEff==306 || nEff==316 || nEff==326) sprintf(EffFileName,"rhoFactor_Psi1S_newMC_Luca_18Feb2013.root");
 		//if(nEff==306 || nEff==316 || nEff==326) sprintf(EffFileName,"rhoFactor_Psi1S_newMC_Luca_21Feb2013.root");
-		if(nEff==306 || nEff==316 || nEff==326) sprintf(EffFileName,"rhoFactor_Psi1S_combinedMC_Luca_27Feb2013.root");
+		//if(nEff==306 || nEff==316 || nEff==326) sprintf(EffFileName,"rhoFactor_Psi1S_combinedMC_Luca_27Feb2013.root");
+		if(nEff==306 || nEff==316 || nEff==326) sprintf(EffFileName,"rhoFactor_Psi1S_combinedMC_leptons_Luca_4March2013.root");
 	}
 
 
 }
 
-double EvaluateRhoFactor( double& costh, double& phi, int nEff, TFile* fInRhoFactor, double rap, double pT) {
+double EvaluateRhoFactor( double& costh, double& phi, int nEff, TFile* fInRhoFactor, double rap, double pT, bool StatVarRho) {
 
 	double eff=1;
 	if(nEff==1) return eff;
 
-	//if(pT<30.) return eff;
+	if(pT<30.) return eff;
 
 	int pTbin;
 	int rapBin;
@@ -242,7 +244,22 @@ double EvaluateRhoFactor( double& costh, double& phi, int nEff, TFile* fInRhoFac
 		Int_t binX = hEff->GetXaxis()->FindBin(costh);
 		Int_t binY = hEff->GetYaxis()->FindBin(phi);
 		eff = hEff->GetBinContent(binX, binY);
+		double effErr = hEff->GetBinError(binX, binY);
 		//cout<<"eff: "<<eff<<endl;
+		//cout<<"effErr: "<<effErr<<endl;
+
+		//apply statistical fluctuations on rho factor
+		if(StatVarRho && eff>0.){
+			TRandom3 *gRandom = new TRandom3(0);
+			double effPre = eff;
+			do {
+				eff = gRandom->Gaus( effPre, effErr );
+			} while( eff <= 0. || eff >= 2. * effPre );
+			delete gRandom;
+		}
+
+		//cout<<"eff: "<<eff<<endl;
+		//cout<<"effErr: "<<effErr<<endl;
 		return eff;
 	}
 
