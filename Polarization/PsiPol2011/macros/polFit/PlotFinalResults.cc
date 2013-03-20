@@ -573,8 +573,10 @@ int main(int argc, char** argv) {
 			if(iLam>6&&iLam<13) nFrame=2;
 			if(iLam>12&&iLam<19) nFrame=3;
 
-			yMin=-1.1;
-			yMax=1.1;
+			//yMin=-1.1;
+			//yMax=1.1;
+			yMin=-1.09;
+			yMax=1.09;
 
 			if(iLam==2||iLam==8||iLam==14||iLam==3||iLam==9||iLam==15){
 				yMin=-0.35;
@@ -582,8 +584,10 @@ int main(int argc, char** argv) {
 			}
 
 			if(iLam==6||iLam==12||iLam==18){
-				yMin=-1.1;
-				yMax=1.1;
+				//yMin=-1.1;
+				//yMax=1.1;
+				yMin=-1.09;
+				yMax=1.09;
 			}
 
 			if(PlotBrazilian){
@@ -787,7 +791,7 @@ int main(int argc, char** argv) {
 			for(int ptBin = ptBinMin; ptBin < ptBinMax+1; ptBin++) {
 
 				graphDefaultRes->GetPoint(ptBin-1,ptCentre_[pt],lmean[pt]);
-				cout<<"debug: ptCentre_["<<pt<<"]: "<<ptCentre_[pt]<<endl;
+				//cout<<"debug: ptCentre_["<<pt<<"]: "<<ptCentre_[pt]<<endl;
 				ptCentreErr_high[pt]=graphDefaultRes->GetErrorXhigh(ptBin-1);
 				ptCentreErr_low[pt]=graphDefaultRes->GetErrorXlow(ptBin-1);
 				lmean_errhigh[pt]=graphDefaultRes->GetErrorYhigh(ptBin-1);
@@ -876,24 +880,37 @@ int main(int argc, char** argv) {
 
 
 			gStyle->SetPalette(1,0);
-			gStyle->SetPadBottomMargin(0.12);
-			gStyle->SetPadLeftMargin(0.13);
-			gStyle->SetPadRightMargin(0.15);
+			//gStyle->SetPadBottomMargin(0.12);
+			//gStyle->SetPadLeftMargin(0.13);
+			//gStyle->SetPadRightMargin(0.15);
+
+			gStyle->SetPadBottomMargin(0.12); //0.11
+			gStyle->SetPadLeftMargin(0.12); //0.08
+			gStyle->SetPadRightMargin(0.02);
+			gStyle->SetPadTopMargin(0.02);
+
+			//gStyle->SetTitleFontSize(0.);
+			gStyle->SetTitleSize(0.043,"X");
+			gStyle->SetTitleSize(0.043,"Y");
+			gStyle->SetLabelSize(0.045,"X");
+			gStyle->SetLabelSize(0.045,"Y");
 
 			gStyle->SetTickLength(-0.02, "xyz");
 			gStyle->SetLabelOffset(0.02, "x");
 			gStyle->SetLabelOffset(0.02, "y");
+			//gStyle->SetTitleOffset(1.3, "x");
+			//gStyle->SetTitleOffset(1.4, "y");
 			gStyle->SetTitleOffset(1.3, "x");
-			gStyle->SetTitleOffset(1.4, "y");
+			gStyle->SetTitleOffset(1.3, "y");
 			gStyle->SetTitleFillColor(kWhite);
 
 			TCanvas *plotCanvas = new TCanvas("plotCanvas","plotCanvas",1000,800);
 
 			plotCanvas->SetFillColor(kWhite);
-			//		plotCanvas->SetGrid();
+			//plotCanvas->SetGrid();
 			plotCanvas->GetFrame()->SetFillColor(kWhite);
 			plotCanvas->GetFrame()->SetBorderSize(0);
-			plotCanvas->SetRightMargin(0.05) ;
+			//plotCanvas->SetRightMargin(0.05) ;
 
 
 			TH1F *plotHisto = new TH1F;
@@ -904,12 +921,13 @@ int main(int argc, char** argv) {
 			plotHisto->SetXTitle("#it{p}_{T} [GeV]");
 			if(PlotVsComp) plotHisto->SetXTitle("M_{#mu#mu} [GeV]");
 			plotHisto->SetYTitle(axislabel);
-			plotHisto->GetYaxis()->SetTitleOffset(1.5);
+			//plotHisto->GetYaxis()->SetTitleOffset(1.5);
 
-			TLegend* plotcompLegend=new TLegend(0.13,0.12,0.6,0.3);
+			TLegend* plotcompLegend=new TLegend(0.12,0.12,0.62,0.3);
+			//TLegend* plotcompLegend=new TLegend(0.13,0.12,0.6,0.3);
 			//TLegend* plotcompLegend=new TLegend(0.13,0.12,0.6,0.2);
 			plotcompLegend->SetFillColor(0);
-			//		plotcompLegend->SetTextFont(72);
+			//plotcompLegend->SetTextFont(72);
 			plotcompLegend->SetTextSize(0.04);
 			plotcompLegend->SetBorderSize(1);
 			char complegendentry[200];
@@ -2286,9 +2304,9 @@ int main(int argc, char** argv) {
 				sprintf(texTex,"      |#it{y}| < 1.2");
 				if(nState>3) sprintf(texTex,"      |#it{y}| < 1.5");
 			}
-			//TLatex *text = new TLatex(onia::pTRange[rapBin][ptBinMax]*0.8,yMin+(yMax-yMin)*0.066,texTex);
-			TLatex *text = new TLatex(PlotpTMax*0.8,yMin+(yMax-yMin)*0.066,texTex);
-			text->SetTextSize(0.035);
+			//TLatex *text = new TLatex(PlotpTMax*0.8,yMin+(yMax-yMin)*0.066,texTex);
+			TLatex *text = new TLatex(PlotpTMax*0.75,yMin+(yMax-yMin)*0.066,texTex);
+			text->SetTextSize(0.045); //0.035
 			if(!SteerIndividuals&&!PlotMattForICHEP&&!PlotVsComp) text->Draw( "same" );
 
 			if(PlotBG0plots){
@@ -5317,12 +5335,12 @@ int main(int argc, char** argv) {
 					if(!PlotAsymm) plotLegend->AddEntry(graphSyst12,SystID2Title,"f");
 					else plotLegend->AddEntry(graphSyst12,SystID2Title,"l");
 				}
-				//---debug
-				for(int i=0; i<nBinspT; i++){
-					cout<<"ptCentre_["<<i<<"]: "<<ptCentre_[i]<<endl;
-					cout<<"SystError1["<<i<<"]: "<<SystError1[i]<<endl;
-				}
-				//---debug
+				////---debug
+				//for(int i=0; i<nBinspT; i++){
+				//	cout<<"ptCentre_["<<i<<"]: "<<ptCentre_[i]<<endl;
+				//	cout<<"SystError1["<<i<<"]: "<<SystError1[i]<<endl;
+				//}
+				////---debug
 				TGraphAsymmErrors *graphSyst1_ = new TGraphAsymmErrors(nBinspT,ptCentre_,SystError1,ptCentreErr_low,ptCentreErr_high,SystError1,0);
 				graphSyst1_->SetFillColor(kBlue);
 				graphSyst1_->SetFillStyle(1001);
