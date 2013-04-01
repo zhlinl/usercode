@@ -235,7 +235,7 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 	RooRealVar *mean_RSB_ws = (RooRealVar*)ws->var("MeanSBR");
 	double mean_RSB = mean_RSB_ws->getVal();
 	double fracLSB = 1 - (mean - mean_LSB)/(mean_RSB - mean_LSB);
-	if(FracLSB!=-1) fracLSB = double(FracLSB);
+	if(FracLSB!=-1) fracLSB = double(FracLSB)/100.;
 
 	RooRealVar* fBkg_ws = (RooRealVar*)ws->var("FracBkg");
 	double fBkg = fBkg_ws->getVal();
