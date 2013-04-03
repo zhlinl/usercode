@@ -75,17 +75,17 @@ int main(int argc, char* argv[]){
 		fromSplit("doCtauUncer", arg, doCtauUncer);
 	}
 
-	//PlotMassPar(nState);
-	//PlotLifePar(nState);
-	//if(nState==4)
-	//	PlotBFrac_1S(nState);
-	//if(nState==5)
-	//	PlotBFrac_2S(nState);
+	PlotMassPar(nState);
+	PlotLifePar(nState);
+	if(nState==4)
+		PlotBFrac_1S(nState);
+	if(nState==5)
+		PlotBFrac_2S(nState);
 
 	double nSigma=2.5;
 	if(nState==4) nSigma=2.5;
 	if(nState==5) nSigma=2.0;
-	//evaluateCtauCut(nSigma, nState, 0, doCtauUncer);
+	evaluateCtauCut(nSigma, nState, 0, doCtauUncer);
 	evaluateCtauCut(nSigma, nState, 1, doCtauUncer);
 
 	return 0;
@@ -441,6 +441,20 @@ void PlotMassPar(int  nState){
 	if(nState==5){
 		legendRightFull->AddEntry(graph_sigma1[2],"1.2 < |y| < 1.5 #sigma_{1}","lp");
 		legendRightFull->AddEntry(graph_sigma2[2],"1.2 < |y| < 1.5 #sigma_{2}","lp");
+	}
+
+	TLegend* legendSigConRightFull=new TLegend(blX,blY,trX,trY);
+	legendSigConRightFull->SetFillColor(kWhite);
+	legendSigConRightFull->SetTextFont(42);
+	legendSigConRightFull->SetTextSize(legendsize);
+	legendSigConRightFull->SetBorderSize(0.);
+	legendSigConRightFull->AddEntry(graph_fracSigInLSB[0],"|y| < 0.6 LSB","lp");
+	legendSigConRightFull->AddEntry(graph_fracSigInRSB[0],"|y| < 0.6 RSB","lp");
+	legendSigConRightFull->AddEntry(graph_fracSigInLSB[1],"0.6 < |y| < 1.2 LSB","lp");
+	legendSigConRightFull->AddEntry(graph_fracSigInRSB[1],"0.6 < |y| < 1.2 RSB","lp");
+	if(nState==5){
+		legendSigConRightFull->AddEntry(graph_fracSigInLSB[2],"1.2 < |y| < 1.5 LSB","lp");
+		legendSigConRightFull->AddEntry(graph_fracSigInRSB[2],"1.2 < |y| < 1.5 RSB","lp");
 	}
 
 	gStyle->SetPadBottomMargin(0.11); //0.12
@@ -996,6 +1010,39 @@ void PlotMassPar(int  nState){
 	if(nState==5)
 		latex->DrawLatex(left,top,"#psi(2S)");
 	c1->SaveAs(Form("%s/fracBkgInRSB.pdf",savePath.str().c_str()));
+
+
+	//ploting signal contamination in one single frame
+	graph_fracSigInLSB[0]->SetMarkerStyle(20);
+	graph_fracSigInLSB[1]->SetMarkerStyle(21);
+	graph_fracSigInRSB[0]->SetMarkerStyle(24);
+	graph_fracSigInRSB[1]->SetMarkerStyle(25);
+
+	graph_fracSigInRSB[0]->SetMarkerSize(1.2);
+	graph_fracSigInRSB[1]->SetMarkerSize(1.2);
+	if(nState==5){
+		graph_fracSigInLSB[2]->SetMarkerStyle(22);
+		graph_fracSigInRSB[2]->SetMarkerStyle(26);
+		graph_fracSigInRSB[2]->SetMarkerSize(1.2);
+	}
+	graph_fracSigInLSB[0]->GetYaxis()->SetTitle("Bg fraction in L(R)SB");
+	graph_fracSigInLSB[0]->Draw("AP");
+	graph_fracSigInLSB[1]->Draw("P");
+	graph_fracSigInRSB[0]->Draw("P");
+	graph_fracSigInRSB[1]->Draw("P");
+	if(nState==5){
+		graph_fracSigInLSB[2]->Draw("P");
+		graph_fracSigInRSB[2]->Draw("P");
+		legendSigConRightFull->Draw();
+		latex->DrawLatex(left,top,"#psi(2S)");
+	}
+	else{
+		legendSigConRightFull->Draw();
+		latex->DrawLatex(left,top,"J/#psi");
+	}
+	c1->SaveAs(Form("%s/fracSigInSB.pdf",savePath.str().c_str()));
+	graph_fracSigInLSB[0]->GetYaxis()->SetTitle("Bg fraction in LSB");
+
 
 	////
 	graph_sigma1[0]->SetMarkerStyle(20);

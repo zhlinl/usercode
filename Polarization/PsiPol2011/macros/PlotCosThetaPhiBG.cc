@@ -114,13 +114,14 @@ int main(int argc, char* argv[]){
 
 		fprintf(NumFile, "\n\n\n\n");
 
-		fprintf(NumFile, "\\begin{table}[!H]\n\\centering\n \\caption{Estimated number of prompt signal events, non-prompt fraction and background fraction in the PRSR, as a function of $p_{T}$} \n");
+		//fprintf(NumFile, "\\begin{table}[!H]\n\\centering\n \\caption{Estimated number of prompt signal events, non-prompt fraction and background fraction in the PRSR, as a function of $p_{T}$} \n");
+		fprintf(NumFile, "\\begin{table}[!H]\n\\centering\n \\caption{Number of prompt signal events, non-prompt fraction and background fraction in the PRSR, as a function of $p_{T}$ and $y$. The fractions are in \\% . } \n");
 		fprintf(NumFile, "\\begin{tabular}{|c|ccc|ccc|ccc|}\n\\hline\n");
-		fprintf(NumFile, "$p_{T}$ [GeV] & $N_{PR}^{PRSR}$ & $f_{NP}^{PRSR} [\\%]$ & $f_{BG}^{PRSR} [\\%] $ & $N_{PR}^{PRSR}$ & $f_{NP}^{PRSR} [\\%]$ & $f_{BG}^{PRSR} [\\%] $ & $N_{PR}^{PRSR}$ & $f_{NP}^{PRSR} [\\%]$ & $f_{BG}^{PRSR} [\\%] $  \\\\\n");
+		fprintf(NumFile, "$p_{T}$ [GeV] & $N_{PR}^{PRSR}$ & $f_{NP}^{PRSR} $ & $f_{BG}^{PRSR} $ & $N_{PR}^{PRSR}$ & $f_{NP}^{PRSR} $ & $f_{BG}^{PRSR} $ & $N_{PR}^{PRSR}$ & $f_{NP}^{PRSR} $ & $f_{BG}^{PRSR} $  \\\\\n");
 
 
 		if(nState==4){
-			sprintf(framerap,"\\hline \\multicolumn{1}{|c|}{} & \\multicolumn{3}{|c|}{$%1.1f < |y| < %1.1f$ } & \\multicolumn{3}{|c|}{$%1.1f < |y| < %1.1f$ } & \\multicolumn{3}{|c|}{$%1.1f < |y| < %1.1f$ } \\\\\n \\hline \n",0.0, 0.6, 0.6, 1.2, 1.2, 1.8);
+			sprintf(framerap,"\\hline \\multicolumn{1}{|c|}{} & \\multicolumn{3}{|c|}{$%1.1f < |y| < %1.1f$ } & \\multicolumn{3}{|c|}{$%1.1f < |y| < %1.1f$ } & \\multicolumn{3}{|c|}{$%1.1f < |y| < %1.1f$ } \\\\\n \\hline \n",0.0, 0.6, 0.6, 1.2, 1.2, 1.5);
 			fprintf(NumFile,framerap);
 			fprintf(NumFile, "\\multicolumn{10}{|c|}{$\\Psi(1S)$} \\\\\n \\hline \n \\rule{0pt}{4mm} \n");
 			int pt=0;
