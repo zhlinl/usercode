@@ -914,7 +914,6 @@ int main(int argc, char** argv) {
 
 
 			TH1F *plotHisto = new TH1F;
-			//if(!PlotMatt) plotHisto = plotCanvas->DrawFrame(onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL,yMin,onia::pTRange[rapBin][ptBinMax],yMax);
 			if(!PlotMatt) plotHisto = plotCanvas->DrawFrame(PlotpTMin-DeltaXminOVERALL,yMin,PlotpTMax,yMax); //to be consistant for Psi 1S and 2S
 			if(PlotMatt) plotHisto = plotCanvas->DrawFrame(0.,yMin,onia::pTRange[rapBin][ptBinMax],yMax);
 			if(PlotVsComp) plotHisto = plotCanvas->DrawFrame(10.1,yMin,10.7,yMax);
@@ -5206,11 +5205,11 @@ int main(int argc, char** argv) {
 				double ParametrizedFontSize[8]={0.05,0.05,0.05,0.05,0.04,0.04,0.03,0.03};
 				double LegendYmin[8]={0.8,0.75,0.7,0.65,0.65,0.6,0.6,0.6};
 
-				//double LegendXmin=0.6;
-				double LegendXmin=0.5; // for FrameworkIII
+				double LegendXmin=0.6; // for FrameworkIII: 0.5
 				if(ExtendLegendInX) LegendXmin=0.25;
 
-				TLegend* plotLegend=new TLegend(LegendXmin,LegendYmin[nSystematics-1],0.95,0.9);
+				//TLegend* plotLegend=new TLegend(LegendXmin,LegendYmin[nSystematics-1],0.95,0.9);
+				TLegend* plotLegend=new TLegend(LegendXmin,LegendYmin[nSystematics-1],0.95,0.98);
 				plotLegend->SetFillColor(kWhite);
 				//plotLegend->SetTextFont(72);
 				plotLegend->SetTextSize(ParametrizedFontSize[nSystematics-1]);
@@ -5223,7 +5222,6 @@ int main(int argc, char** argv) {
 				//sprintf(drawGraphStyle,"PE");
 
 				TH1F *SystHisto = new TH1F;
-				//SystHisto = SystCanvas->DrawFrame(onia::pTRange[rapBin][ptBinMin-1],yMin,onia::pTRange[rapBin][ptBinMax],yMax);
 			  SystHisto = SystCanvas->DrawFrame(PlotpTMin,yMin,PlotpTMax,yMax); //to be consistant for Psi 1S and 2S
 				SystHisto->SetXTitle("#it{p}_{T} [GeV]");
 				SystHisto->SetYTitle(axislabel);
