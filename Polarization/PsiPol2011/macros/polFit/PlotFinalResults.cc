@@ -5172,6 +5172,7 @@ int main(int argc, char** argv) {
 
 
 
+				// Systematic uncertainties
 
 				if(iLam==1)  sprintf(filename,"%s/Systematics_CS_lth_rap%d.pdf",FigDir,rapBin);
 				if(iLam==2)  sprintf(filename,"%s/Systematics_CS_lph_rap%d.pdf",FigDir,rapBin);
@@ -5200,7 +5201,7 @@ int main(int argc, char** argv) {
 				SystCanvas->SetGrid();
 				SystCanvas->GetFrame()->SetFillColor(kWhite);
 				SystCanvas->GetFrame()->SetBorderSize(0);
-				SystCanvas->SetRightMargin(0.05) ;
+				//SystCanvas->SetRightMargin(0.05) ;
 
 				double ParametrizedFontSize[8]={0.05,0.05,0.05,0.05,0.04,0.04,0.03,0.03};
 				double LegendYmin[8]={0.8,0.75,0.7,0.65,0.65,0.6,0.6,0.6};
@@ -5209,7 +5210,7 @@ int main(int argc, char** argv) {
 				if(ExtendLegendInX) LegendXmin=0.25;
 
 				//TLegend* plotLegend=new TLegend(LegendXmin,LegendYmin[nSystematics-1],0.95,0.9);
-				TLegend* plotLegend=new TLegend(LegendXmin,LegendYmin[nSystematics-1],0.95,0.98);
+				TLegend* plotLegend=new TLegend(LegendXmin,LegendYmin[nSystematics-1],0.98,0.98);
 				plotLegend->SetFillColor(kWhite);
 				//plotLegend->SetTextFont(72);
 				plotLegend->SetTextSize(ParametrizedFontSize[nSystematics-1]);
@@ -5225,7 +5226,7 @@ int main(int argc, char** argv) {
 			  SystHisto = SystCanvas->DrawFrame(PlotpTMin,yMin,PlotpTMax,yMax); //to be consistant for Psi 1S and 2S
 				SystHisto->SetXTitle("#it{p}_{T} [GeV]");
 				SystHisto->SetYTitle(axislabel);
-				SystHisto->GetYaxis()->SetTitleOffset(1.5);
+				//SystHisto->GetYaxis()->SetTitleOffset(1.5);
 
 				TGraphAsymmErrors *graphStat = new TGraphAsymmErrors(nBinspT,ptCentre_,lmean_errmean_minus,ptCentreErr_low,ptCentreErr_high,0,lmean_errmean);
 				graphStat->SetFillColor(kGreen-2);
