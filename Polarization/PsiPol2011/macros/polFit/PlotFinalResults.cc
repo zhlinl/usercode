@@ -18,38 +18,6 @@ using namespace std;
 #include "commonVar.h"
 #include "ToyMC.h"
 
-#include "TSystem.h"
-#include "TCanvas.h"
-#include "TStyle.h"
-#include "TFile.h"
-#include "TFrame.h"
-#include "TGraphErrors.h"
-#include "TGraphAsymmErrors.h"
-#include "TROOT.h"
-
-#include "TH2F.h"
-#include "TTree.h"
-#include "TChain.h"
-#include "TDirectory.h"
-#include "TLegend.h"
-#include "Riostream.h"
-#include "TSystem.h"
-#include "TString.h"
-#include "TFile.h"
-#include "TROOT.h"
-#include "TTree.h"
-#include "TMath.h"
-#include "TVector3.h"
-#include "TLorentzVector.h"
-#include "TRandom3.h"
-#include "TF1.h"
-#include "TF2.h"
-#include "TH1.h"
-#include "TH2.h"
-#include "TGaxis.h"
-
-
-
 int main(int argc, char** argv) {
 
 	Char_t *JobID = "JobID"; //Storage Directory
@@ -269,13 +237,13 @@ int main(int argc, char** argv) {
 	sprintf(filename,"%s/macros/polFit/Systematics/%s/%s/TGraphResults_Psi%dS.root",basedir,SystID8Base,SystID8Specify,nState-3);
 	TFile *infileSyst8 = new TFile(filename,"READ");
 
-	//		sprintf(filename,"%s/macros/polFit/MattRes/TGraphResults_Psi%dS_MattResults.root",basedir,nState-3);
-	//		TFile *MattFileStat = new TFile(filename,"READ");
-	//		if(nState>1) MattFileStat=infileRes;
+	//sprintf(filename,"%s/macros/polFit/MattRes/TGraphResults_Psi%dS_MattResults.root",basedir,nState-3);
+	//TFile *MattFileStat = new TFile(filename,"READ");
+	//if(nState>1) MattFileStat=infileRes;
 
-	//		sprintf(filename,"%s/macros/polFit/MattRes/TGraphResults_Psi%dS_MattSyst.root",basedir,nState-3);
-	//		TFile *MattFileSyst = new TFile(filename,"READ");
-	//		if(nState>1) MattFileSyst=infileRes;
+	//sprintf(filename,"%s/macros/polFit/MattRes/TGraphResults_Psi%dS_MattSyst.root",basedir,nState-3);
+	//TFile *MattFileSyst = new TFile(filename,"READ");
+	//if(nState>1) MattFileSyst=infileRes;
 
 	sprintf(filename,"%s/macros/polFit/CDFRes/TGraphResults_Psi%dS_CDFStat.root",basedir,nState-3);
 	TFile *MattFileStat = new TFile(filename,"READ");
@@ -286,18 +254,18 @@ int main(int argc, char** argv) {
 	sprintf(filename,"%s/macros/polFit/CDFRes/TGraphResults_Psi%dS_CDFTotal.root",basedir,nState-3);
 	TFile *MattFileTotal = new TFile(filename,"READ");
 
-	sprintf(filename,"%s/macros/polFit/CDFRes/TGraphResults_1SUps_CDFStat.root",basedir);
+	sprintf(filename,"%s/macros/polFit/CDFRes/TGraphResults_Psi1S_CDFStat.root",basedir);
 	TFile *infileMP1SCDF_Stat = new TFile(filename,"READ");
-	sprintf(filename,"%s/macros/polFit/CDFRes/TGraphResults_2SUps_CDFStat.root",basedir);
+	sprintf(filename,"%s/macros/polFit/CDFRes/TGraphResults_Psi2S_CDFStat.root",basedir);
 	TFile *infileMP2SCDF_Stat = new TFile(filename,"READ");
-	sprintf(filename,"%s/macros/polFit/CDFRes/TGraphResults_3SUps_CDFStat.root",basedir);
+	sprintf(filename,"%s/macros/polFit/CDFRes/TGraphResults_Psi3S_CDFStat.root",basedir);
 	TFile *infileMP3SCDF_Stat = new TFile(filename,"READ");
 
-	sprintf(filename,"%s/macros/polFit/CDFRes/TGraphResults_1SUps_CDFTotal.root",basedir);
+	sprintf(filename,"%s/macros/polFit/CDFRes/TGraphResults_Psi1S_CDFTotal.root",basedir);
 	TFile *infileMP1SCDF_Total = new TFile(filename,"READ");
-	sprintf(filename,"%s/macros/polFit/CDFRes/TGraphResults_2SUps_CDFTotal.root",basedir);
+	sprintf(filename,"%s/macros/polFit/CDFRes/TGraphResults_Psi2S_CDFTotal.root",basedir);
 	TFile *infileMP2SCDF_Total = new TFile(filename,"READ");
-	sprintf(filename,"%s/macros/polFit/CDFRes/TGraphResults_3SUps_CDFTotal.root",basedir);
+	sprintf(filename,"%s/macros/polFit/CDFRes/TGraphResults_Psi3S_CDFTotal.root",basedir);
 	TFile *infileMP3SCDF_Total = new TFile(filename,"READ");
 
 	sprintf(filename,"%s/%s/TGraphResults_Psi%dS.root",storagedir,CompareID1,nState-3);
@@ -563,7 +531,7 @@ int main(int argc, char** argv) {
 			if(iLam==17) sprintf(filename,"%s/FinalResults_PX_lphstar_rap%d.pdf",FigDir,rapBin);
 			if(iLam==18) sprintf(filename,"%s/FinalResults_PX_ltilde_rap%d.pdf",FigDir,rapBin);
 
-			//		if(iLam==18) sprintf(axislabel,"#tilde{#lambda}");
+			//if(iLam==18) sprintf(axislabel,"#tilde{#lambda}");
 
 			if(BGratioChi2Fits) sprintf(axislabel,"#chi^{2} / ndf");
 
@@ -591,8 +559,8 @@ int main(int argc, char** argv) {
 			}
 
 			if(PlotBrazilian){
-				//			yMin=-1.5;
-				//			yMax=1.5;
+				//yMin=-1.5;
+				//yMax=1.5;
 				yMin=-1.275;
 				yMax=1.275;
 
@@ -602,14 +570,14 @@ int main(int argc, char** argv) {
 				}
 
 				if(iLam==6||iLam==12||iLam==18){
-					//				yMin=-1.5;
-					//				yMax=2.1;
+					//yMin=-1.5;
+					//yMax=2.1;
 					yMin=-1.;
 					yMax=1.75;
 				}
 			}
-			//		yMin=-5.5; //ifPull
-			//		yMax=5.5; //ifPull
+			//yMin=-5.5; //ifPull
+			//yMax=5.5; //ifPull
 
 			// Background Pol Fits:
 
@@ -649,21 +617,20 @@ int main(int argc, char** argv) {
 				yMax=30;
 
 			}
-			/*				yMin=-4;
-								yMax=4;
+			/*yMin=-4;
+				yMax=4;
 
-								if(iLam==2||iLam==8||iLam==14||iLam==3||iLam==9||iLam==15){
-								yMin=-4;
-								yMax=4;
-								}
+				if(iLam==2||iLam==8||iLam==14||iLam==3||iLam==9||iLam==15){
+				yMin=-4;
+				yMax=4;
+				}
 
-								if(iLam==6||iLam==12||iLam==18){
-								yMin=-4;
-								yMax=4;
-								}
-			 */
+				if(iLam==6||iLam==12||iLam==18){
+				yMin=-4;
+				yMax=4;
+				} */
 
-			//		if(CompareSyst||BGratioFits){
+			//if(CompareSyst||BGratioFits){
 			if(BGratioFits){
 				yMin=-2.5;
 				yMax=2.5;
@@ -697,8 +664,7 @@ int main(int argc, char** argv) {
 			}
 
 
-			/*
-				 yMin=-3;
+			/* yMin=-3;
 				 yMax=3;
 
 				 if(iLam==2||iLam==8||iLam==14||iLam==3||iLam==9||iLam==15){
@@ -709,8 +675,7 @@ int main(int argc, char** argv) {
 				 if(iLam==6||iLam==12||iLam==18){
 				 yMin=-3;
 				 yMax=3;
-				 }
-			 */
+				 } */
 			TGraphAsymmErrors* graphDefaultRes = (TGraphAsymmErrors*) infileRes->Get(GraphName);
 			TGraphAsymmErrors* graphDefaultRes2sigma = (TGraphAsymmErrors*) infileRes2sigma->Get(GraphName);
 			TGraphAsymmErrors* graphDefaultRes3sigma = (TGraphAsymmErrors*) infileRes3sigma->Get(GraphName);
@@ -791,7 +756,7 @@ int main(int argc, char** argv) {
 			for(int ptBin = ptBinMin; ptBin < ptBinMax+1; ptBin++) {
 
 				graphDefaultRes->GetPoint(ptBin-1,ptCentre_[pt],lmean[pt]);
-				//cout<<"debug: ptCentre_["<<pt<<"]: "<<ptCentre_[pt]<<endl;
+				cout<<"debug: ptCentre_["<<pt<<"]: "<<ptCentre_[pt]<<endl;
 				ptCentreErr_high[pt]=graphDefaultRes->GetErrorXhigh(ptBin-1);
 				ptCentreErr_low[pt]=graphDefaultRes->GetErrorXlow(ptBin-1);
 				lmean_errhigh[pt]=graphDefaultRes->GetErrorYhigh(ptBin-1);
@@ -874,11 +839,6 @@ int main(int argc, char** argv) {
 				pt++;
 			}
 
-
-
-
-
-
 			gStyle->SetPalette(1,0);
 			//gStyle->SetPadBottomMargin(0.12);
 			//gStyle->SetPadLeftMargin(0.13);
@@ -898,8 +858,6 @@ int main(int argc, char** argv) {
 			gStyle->SetTickLength(-0.02, "xyz");
 			gStyle->SetLabelOffset(0.02, "x");
 			gStyle->SetLabelOffset(0.02, "y");
-			//gStyle->SetTitleOffset(1.3, "x");
-			//gStyle->SetTitleOffset(1.4, "y");
 			gStyle->SetTitleOffset(1.3, "x");
 			gStyle->SetTitleOffset(1.3, "y");
 			gStyle->SetTitleFillColor(kWhite);
@@ -965,8 +923,6 @@ int main(int argc, char** argv) {
 			if(!PlotBrazilian&&!SBmSigPlots&&!BGratioFits&&!SteerIndividuals&&!PlotMatt&&!PlotVsComp) graphDefaultRes->Draw(drawGraphStyle);//Comment if PlotBG0plots Low
 
 			if(PlotBrazilian&&!SteerIndividuals&&!PlotVsComp){
-
-
 				int ptOriginal;
 				int nBinsOriginal;
 				double ptCentre_Original[nBinspT];
@@ -985,7 +941,7 @@ int main(int argc, char** argv) {
 					lmean_errlow_Original[ptOriginal]=graphSyst->GetErrorYlow(ptBinOriginal-1);
 					ptCentre_errhigh_Original[ptOriginal]=graphSyst->GetErrorXhigh(ptBinOriginal-1);
 					ptCentre_errlow_Original[ptOriginal]=graphSyst->GetErrorXlow(ptBinOriginal-1);
-					/// Alter TGraph
+					///Alter TGraph
 					ptCentre_errhigh_Original[ptOriginal]=0.;
 					ptCentre_errlow_Original[ptOriginal]=0.;
 					ptOriginal++;
@@ -1082,7 +1038,6 @@ int main(int argc, char** argv) {
 			}
 
 			if(SteerIndividuals){ //not yet changed 12.12.2012 Linlin
-
 				plotHisto->SetYTitle("#lambda");
 
 				double ptCentre_SteerInd[nBinspT];
@@ -1327,13 +1282,11 @@ int main(int argc, char** argv) {
 				}
 
 
-				//TLine* extreme0 = new TLine( onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL, 0, onia::pTRange[rapBin][ptBinMax] ,0);
 				TLine* extreme0 = new TLine( PlotpTMin-DeltaXminOVERALL, 0, PlotpTMax ,0);
 				extreme0->SetLineWidth( 2 );
 				extreme0->SetLineStyle( 1 );
 				extreme0->SetLineColor( kBlack );
 				extreme0->Draw( "same" );
-
 			}// SteerIndividuals
 
 			if(PlotMatt&&!PlotMattForICHEP){ //not yet changed 12.12.2012 Linlin
@@ -1364,7 +1317,7 @@ int main(int argc, char** argv) {
 
 				TLegend* plotMattLegend=new TLegend(0.4,0.7,0.95,0.9);
 				plotMattLegend->SetFillColor(0);
-				//		plotMattLegend->SetTextFont(72);
+				//plotMattLegend->SetTextFont(72);
 				plotMattLegend->SetTextSize(0.04);
 				plotMattLegend->SetBorderSize(1);
 				char Mattlegendentry[200];
@@ -1380,11 +1333,9 @@ int main(int argc, char** argv) {
 			} // PlotMatt&&!PlotMattForICHEP
 
 			if(PlotMatt&&PlotMattForICHEP){ //not yet changed 12.12.2012 Linlin
-
 				plotCanvas->SetRightMargin(0.05);
 				plotCanvas->SetTopMargin(0.05);
 
-				//TLine* extreme0 = new TLine( 0, 0, onia::pTRange[rapBin][ptBinMax] ,0);
 				TLine* extreme0 = new TLine( 0, 0, PlotpTMax ,0);
 				extreme0->SetLineWidth( 2 );
 				extreme0->SetLineStyle( 2 );
@@ -1416,7 +1367,7 @@ int main(int argc, char** argv) {
 
 				TLegend* plotICHEPLegend=new TLegend(0.1375,ICHEPlegendYMin-0.025,0.75,ICHEPlegendYMax);
 				plotICHEPLegend->SetFillColor(0);
-				//		plotICHEPLegend->SetTextFont(72);
+				//plotICHEPLegend->SetTextFont(72);
 				plotICHEPLegend->SetTextSize(0.039);
 				plotICHEPLegend->SetBorderSize(0);
 				//plotICHEPLegend->SetHeader("Data error bars: tot. uncert., 68.3% CL");
@@ -1437,18 +1388,18 @@ int main(int argc, char** argv) {
 				char ICHEPtext[200];
 				sprintf(ICHEPtext,"#psi(%dS)",nState-3);
 				TLatex *texICHEP1 = new TLatex(40.5,yMin+(yMax-yMin)*0.8125,ICHEPtext);
-				texICHEP1->SetTextSize(ICHEPFontSize*1.75)                                                                                                                                                                                                                                             ;
-				texICHEP1->Draw( "same" )                                                                                                                                                                                                                                                 ;
+				texICHEP1->SetTextSize(ICHEPFontSize*1.75);
+				texICHEP1->Draw( "same" );
 
 				sprintf(ICHEPtext,"CMS  pp  #sqrt{s} = 7 TeV  L = 4.9 fb^{-1}");
 				TLatex *texICHEP2 = new TLatex(2,yMin+(yMax-yMin)*0.925,ICHEPtext);
-				texICHEP2->SetTextSize(ICHEPFontSize)                                                                                                                                                                                                                                             ;
-				texICHEP2->Draw( "same" )                                                                                                                                                                                                                                                 ;
+				texICHEP2->SetTextSize(ICHEPFontSize);
+				texICHEP2->Draw( "same" );
 
 				sprintf(ICHEPtext,"CDF  p#bar{p}  #sqrt{s} = 1.96 TeV");
 				TLatex *texICHEP3 = new TLatex(2,yMin+(yMax-yMin)*0.85,ICHEPtext);
-				texICHEP3->SetTextSize(ICHEPFontSize)                                                                                                                                                                                                                                             ;
-				if(nFrame!=3) texICHEP3->Draw( "same" )                                                                                                                                                                                                                                                 ;
+				texICHEP3->SetTextSize(ICHEPFontSize);
+				if(nFrame!=3) texICHEP3->Draw( "same" );
 
 				double xICHEPrap=33.5;
 				if(rapBin==2) xICHEPrap=28.;
@@ -1463,21 +1414,19 @@ int main(int argc, char** argv) {
 				if(nFrame==2&&rapBin==3) sprintf(ICHEPtext,"HX frame, 1.2 < |#it{y}| < 1.5");
 				if(nFrame==3&&rapBin==3) sprintf(ICHEPtext,"PX frame, 1.2 < |#it{y}| < 1.5");
 				TLatex *texICHEP4 = new TLatex(xICHEPrap,yMin+(yMax-yMin)*0.925,ICHEPtext);
-				texICHEP4->SetTextSize(ICHEPFontSize)                                                                                                                                                                                                                                             ;
-				texICHEP4->Draw( "same" )                                                                                                                                                                                                                                                 ;
+				texICHEP4->SetTextSize(ICHEPFontSize);
+				texICHEP4->Draw( "same" );
 
 				plotHisto->GetYaxis()->SetTitleOffset(15);
 
 				//sprintf(ICHEPtext,"%s",axislabel);
 				sprintf(ICHEPtext,"#lambda_{#vartheta}");
 				TLatex *texICHEP5 = new TLatex(-7.65,yMin+(yMax-yMin)*0.485,ICHEPtext);
-				texICHEP5->SetTextSize(ICHEPFontSize*1.75)                                                                                                                                                                                                                                             ;
-				texICHEP5->Draw( "same" )                                                                                                                                                                                                                                                 ;
-
+				texICHEP5->SetTextSize(ICHEPFontSize*1.75);
+				texICHEP5->Draw( "same" );
 			} //PlotMatt&&PlotMattForICHEP
 
 			if(CompareSyst){
-				//TLine* extreme0 = new TLine( onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL, 0, onia::pTRange[rapBin][ptBinMax] ,0);
 				TLine* extreme0 = new TLine( PlotpTMin-DeltaXminOVERALL, 0, PlotpTMax ,0);
 				extreme0->SetLineWidth( 2 );
 				extreme0->SetLineStyle( 1 );
@@ -1490,7 +1439,7 @@ int main(int argc, char** argv) {
 
 			if(FitGraph){
 				TGraphAsymmErrors *fitGraph = new TGraphAsymmErrors(nBinspT,ptCentre_,lmean,0,0,fit_lmean_errlow,fit_lmean_errhigh);
-				//  TGraphErrors *fitGraph = new TGraphErrors(nBinspT,ptCentre_,lmean,0,fit_lmean_errmean);
+				//TGraphErrors *fitGraph = new TGraphErrors(nBinspT,ptCentre_,lmean,0,fit_lmean_errmean);
 
 				double pTmaxPlot=72.; //50;
 				double pTminPlot=6.;  //10;
@@ -1558,13 +1507,10 @@ int main(int argc, char** argv) {
 				TLatex *textConst3 = new TLatex(pTminPlot*1.2,yMin+(yMax-yMin)*0.65,text);
 				textConst3->SetTextSize(1.75*FontSize)                                                                                                                                                                                                                                             ;
 				textConst3->Draw( "same" )                                                                                                                                                                                                                                                 ;
-
 			} //FitGraph
 
 
 			if(SBmSigPlots){ //not yet changed 12.12.2012 Linlin
-
-
 				TGraphAsymmErrors *LSBgraph;
 				TGraphAsymmErrors *RSBgraph;
 
@@ -1883,15 +1829,11 @@ int main(int argc, char** argv) {
 				extreme0->SetLineStyle( 1 );
 				extreme0->SetLineColor( kBlack );
 				extreme0->Draw( "same" );
-
 			} //SBmSigPlots
 
 
 
 			if(BGratioFits){ //not yet changed 12.12.2012 Linlin
-
-
-
 				TGraphAsymmErrors *Ups1SBGratiograph;
 				TGraphAsymmErrors *Ups2SBGratiograph;
 				TGraphAsymmErrors *Ups3SBGratiograph;
@@ -2228,10 +2170,6 @@ int main(int argc, char** argv) {
 									textConst3->SetTextSize(1.75*FontSize)                                                                                                                                                                                                                                             ;
 									textConst3->Draw( "same" )                                                                                                                                                                                                                                                 ;
 				 */
-
-
-
-
 			} //BGratioFits
 
 
@@ -2239,7 +2177,7 @@ int main(int argc, char** argv) {
 				graphCompareFile1->SetMarkerColor(kRed);
 				graphCompareFile1->SetLineColor(kRed);
 				graphCompareFile1->SetMarkerStyle(28);
-				//		graphCompareFile1->SetLineWidth(3);
+				//graphCompareFile1->SetLineWidth(3);
 				graphCompareFile2->SetMarkerColor(kBlue);
 				graphCompareFile2->SetLineColor(kBlue);
 				graphCompareFile2->SetMarkerStyle(30);
@@ -2261,7 +2199,6 @@ int main(int argc, char** argv) {
 
 				}
 
-				//TLine* extreme0 = new TLine( onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL, 0, onia::pTRange[rapBin][ptBinMax] ,0);
 				TLine* extreme0 = new TLine( PlotpTMin-DeltaXminOVERALL, 0, PlotpTMax ,0);
 				extreme0->SetLineWidth( 1 );
 				extreme0->SetLineStyle( 2 );
@@ -2303,7 +2240,6 @@ int main(int argc, char** argv) {
 				sprintf(texTex,"      |#it{y}| < 1.2");
 				if(nState>3) sprintf(texTex,"      |#it{y}| < 1.5");
 			}
-			//TLatex *text = new TLatex(PlotpTMax*0.8,yMin+(yMax-yMin)*0.066,texTex);
 			TLatex *text = new TLatex(PlotpTMax*0.75,yMin+(yMax-yMin)*0.066,texTex);
 			text->SetTextSize(0.045); //0.035
 			if(!SteerIndividuals&&!PlotMattForICHEP&&!PlotVsComp) text->Draw( "same" );
@@ -2311,7 +2247,6 @@ int main(int argc, char** argv) {
 			if(PlotBG0plots){
 				char texTex2[200];
 				sprintf(texTex2,"      |c#tau/#sigma_{c#tau}| < 2");
-				//TLatex *text2 = new TLatex(onia::pTRange[rapBin][ptBinMax]*0.7,yMin+(yMax-yMin)*0.122,texTex2);
 				TLatex *text2 = new TLatex(PlotpTMax*0.7,yMin+(yMax-yMin)*0.122,texTex2);
 				text2->SetTextSize(0.05);
 				text2->Draw( "same" );
@@ -2319,46 +2254,39 @@ int main(int argc, char** argv) {
 
 
 
-			//if(PlotFinalData&&DrawLatexStuff&&!PlotMattForICHEP){
 			if(PlotFinalData&&!PlotMattForICHEP){
 				cout<<"DRAW CMS preliminary Latex"<<endl;
 				double CentralsFontSize=0.035;
 				char text[200];
 				sprintf(text,"CMS preliminary");
 				cout<<text<<endl;
-				//TLatex *CentralsText1 = new TLatex(11.5-DeltaXminOVERALL,yMin+(yMax-yMin)*0.76,text);
 				TLatex *CentralsText1 = new TLatex(PlotpTMin+(PlotpTMax-PlotpTMin)*0.02-DeltaXminOVERALL,yMin+(yMax-yMin)*0.76,text);
 				CentralsText1->SetTextSize(CentralsFontSize*1.25);
 				if(DrawPreliminary) CentralsText1->Draw( "same" );
 				sprintf(text,"L_{int} = 4.9 fb^{-1}");
 				cout<<text<<endl;
-				//TLatex *CentralsText2 = new TLatex(11.5-DeltaXminOVERALL,yMin+(yMax-yMin)*0.935,text);
 				TLatex *CentralsText2 = new TLatex(PlotpTMin+(PlotpTMax-PlotpTMin)*0.02-DeltaXminOVERALL,yMin+(yMax-yMin)*0.935,text);
 				CentralsText2->SetTextSize(CentralsFontSize);
 				if(DrawLatexStuff) CentralsText2->Draw( "same" );
 				sprintf(text,"pp    #sqrt{s} = 7 TeV");
 				cout<<text<<endl;
-				//TLatex *CentralsText3 = new TLatex(11.5-DeltaXminOVERALL,yMin+(yMax-yMin)*0.875,text);
 				TLatex *CentralsText3 = new TLatex(PlotpTMin+(PlotpTMax-PlotpTMin)*0.02-DeltaXminOVERALL,yMin+(yMax-yMin)*0.875,text);
 				CentralsText3->SetTextSize(CentralsFontSize);
 				if(DrawLatexStuff) CentralsText3->Draw( "same" );
 
 
-				//TLine* extreme0 = new TLine( onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL, 0, onia::pTRange[rapBin][ptBinMax] ,0);
 				TLine* extreme0 = new TLine( PlotpTMin-DeltaXminOVERALL, 0, PlotpTMax ,0);
 				extreme0->SetLineWidth( 1 );
 				extreme0->SetLineStyle( 2 );
 				extreme0->SetLineColor( kBlack );
 				extreme0->Draw( "same" );
 
-				//TLine* extreme1 = new TLine( onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL, 1, onia::pTRange[rapBin][ptBinMax] , 1);
 				TLine* extreme1 = new TLine( PlotpTMin-DeltaXminOVERALL, 1, PlotpTMax , 1);
 				extreme1->SetLineWidth( 1 );
 				extreme1->SetLineStyle( 2 );
 				extreme1->SetLineColor( kBlack );
 				if(iLam==1||iLam==7||iLam==13) extreme1->Draw( "same" );
 
-				//TLine* extreme2 = new TLine( onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL, -1, onia::pTRange[rapBin][ptBinMax] ,-1);
 				TLine* extreme2 = new TLine( PlotpTMin-DeltaXminOVERALL, -1, PlotpTMax ,-1);
 				extreme2->SetLineWidth( 1 );
 				extreme2->SetLineStyle( 2 );
@@ -2370,7 +2298,7 @@ int main(int argc, char** argv) {
 
 			if(PlotLegend) plotcompLegend->Draw();
 
-			//		plotCanvas->SetLogx(true);
+			//plotCanvas->SetLogx(true);
 			if(PlotFinalData) plotCanvas->SaveAs(filename);
 			plotCanvas->Close();
 
