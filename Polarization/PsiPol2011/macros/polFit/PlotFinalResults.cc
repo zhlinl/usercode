@@ -185,7 +185,9 @@ int main(int argc, char** argv) {
 	if(ShiftInX) DeltaXminOVERALL=0.9999;
 	bool ShiftXminOVERALL=true;
 
-	double PlotpTMin = 6., PlotpTMax = 72.;
+	double PlotpTMinInitial = 6., PlotpTMaxInitial = 72.;
+	double PlotpTMin = PlotpTMinInitial, 
+				 PlotpTMax = PlotpTMaxInitial;
 
 	int OneSigColor=416;
 	int TwoSigColor=400;//858,898
@@ -290,15 +292,15 @@ int main(int argc, char** argv) {
 
 
 
-	sprintf(filename,"/afs/hephy.at/scratch/k/knuenz/CMSSW_4_2_4_patch2/src/UpsilonPol/macros/polFit/Systematics/TotalSyst/%s/TGraphResults_Psi1S.root",MPCentralsWithTotalSystID);
+	sprintf(filename,"/afs/ihep.ac.cn/users/z/zhangll/fs/work/polarization/PsiPol2011/macros/polFit/Systematics/TotalSyst/%s/TGraphResults_Psi1S.root",MPCentralsWithTotalSystID);
 	TFile *infileMP1 = new TFile(filename,"READ");
 	if(!MultiPanelPlots) infileMP1=infileRes;
 
-	sprintf(filename,"/afs/hephy.at/scratch/k/knuenz/CMSSW_4_2_4_patch2/src/UpsilonPol/macros/polFit/Systematics/TotalSyst/%s/TGraphResults_Psi2S.root",MPCentralsWithTotalSystID);
+	sprintf(filename,"/afs/ihep.ac.cn/users/z/zhangll/fs/work/polarization/PsiPol2011/macros/polFit/Systematics/TotalSyst/%s/TGraphResults_Psi2S.root",MPCentralsWithTotalSystID);
 	TFile *infileMP2 = new TFile(filename,"READ");
 	if(!MultiPanelPlots) infileMP2=infileRes;
 
-	sprintf(filename,"/afs/hephy.at/scratch/k/knuenz/CMSSW_4_2_4_patch2/src/UpsilonPol/macros/polFit/Systematics/TotalSyst/%s/TGraphResults_Psi3S.root",MPCentralsWithTotalSystID);
+	sprintf(filename,"/afs/ihep.ac.cn/users/z/zhangll/fs/work/polarization/PsiPol2011/macros/polFit/Systematics/TotalSyst/%s/TGraphResults_Psi3S.root",MPCentralsWithTotalSystID);
 	TFile *infileMP3 = new TFile(filename,"READ");
 	if(!MultiPanelPlots) infileMP3=infileRes;
 
@@ -375,6 +377,7 @@ int main(int argc, char** argv) {
 
 	int  nRapBins =2;
 	if(nState==5) nRapBins=3;
+	cout << "nRapBins: " << nRapBins << endl;
 
 	double val_table[iParameters+1][nRapBins][tabPtBins];
 	double errHigh_table[iParameters+1][nRapBins][tabPtBins];
@@ -392,13 +395,20 @@ int main(int argc, char** argv) {
 	TCanvas *MPcanvasCS;
 	TCanvas *MPcanvasHX;
 	TCanvas *MPcanvasPX;
+	TCanvas *MPcanvasCS_Psi;
+	TCanvas *MPcanvasHX_Psi;
+	TCanvas *MPcanvasPX_Psi;
 	TCanvas *MPcanvasCS_rap1;
 	TCanvas *MPcanvasHX_rap1;
 	TCanvas *MPcanvasPX_rap1;
 	TCanvas *MPcanvasCS_rap2;
 	TCanvas *MPcanvasHX_rap2;
 	TCanvas *MPcanvasPX_rap2;
+	TCanvas *MPcanvasCS_rap3;
+	TCanvas *MPcanvasHX_rap3;
+	TCanvas *MPcanvasPX_rap3;
 	TCanvas *MPcanvasTilde;
+	TCanvas *MPcanvasTilde_Psi;
 	TCanvas *MPcanvasCDF;
 
 	//================================================================
@@ -565,8 +575,14 @@ int main(int argc, char** argv) {
 				//yMax=1.275;
 
 				if(iLam==2||iLam==8||iLam==14||iLam==3||iLam==9||iLam==15){
-					yMin=-0.55;
-					yMax=0.55;
+					//yMin=-0.55;
+					//yMax=0.55;
+					yMin=-0.6;
+					yMax=0.6;
+				}
+				if(iLam==3||iLam==9||iLam==15){
+					yMin=-0.5;
+					yMax=0.5;
 				}
 
 				if(iLam==6||iLam==12||iLam==18){
@@ -756,7 +772,7 @@ int main(int argc, char** argv) {
 			for(int ptBin = ptBinMin; ptBin < ptBinMax+1; ptBin++) {
 
 				graphDefaultRes->GetPoint(ptBin-1,ptCentre_[pt],lmean[pt]);
-				cout<<"debug: ptCentre_["<<pt<<"]: "<<ptCentre_[pt]<<endl;
+				//cout<<"debug: ptCentre_["<<pt<<"]: "<<ptCentre_[pt]<<endl;
 				ptCentreErr_high[pt]=graphDefaultRes->GetErrorXhigh(ptBin-1);
 				ptCentreErr_low[pt]=graphDefaultRes->GetErrorXlow(ptBin-1);
 				lmean_errhigh[pt]=graphDefaultRes->GetErrorYhigh(ptBin-1);
@@ -932,103 +948,9 @@ int main(int argc, char** argv) {
 				double ptCentre_errlow_Original[nBinspT];
 				double ptCentre_errhigh_Original[nBinspT];
 
-				cout<<"debug--nBinspT: "<<nBinspT<<endl;
-
-				//nBinsOriginal=graphSyst->GetN();
-				//ptOriginal=0;
-				//for(int ptBinOriginal=1;ptBinOriginal<nBinsOriginal+1;ptBinOriginal++){
-				//	graphSyst->GetPoint(ptBinOriginal-1,ptCentre_Original[ptOriginal],lmean_Original[ptOriginal]);
-				//	lmean_errhigh_Original[ptOriginal]=graphSyst->GetErrorYhigh(ptBinOriginal-1);
-				//	lmean_errlow_Original[ptOriginal]=graphSyst->GetErrorYlow(ptBinOriginal-1);
-				//	ptCentre_errhigh_Original[ptOriginal]=graphSyst->GetErrorXhigh(ptBinOriginal-1);
-				//	ptCentre_errlow_Original[ptOriginal]=graphSyst->GetErrorXlow(ptBinOriginal-1);
-				//	///Alter TGraph
-				//	ptCentre_errhigh_Original[ptOriginal]=0.;
-				//	ptCentre_errlow_Original[ptOriginal]=0.;
-				//	ptOriginal++;
-				//}
-				//cout<<"debug--nBinsOriginal: "<<nBinsOriginal<<endl;
-				//graphSyst = new TGraphAsymmErrors(nBinsOriginal,ptCentre_Original,lmean_Original,ptCentre_errlow_Original,ptCentre_errhigh_Original,lmean_errlow_Original,lmean_errhigh_Original);
-
-				//graphSyst->SetLineColor(kBlack);
-				//graphSyst->SetMarkerColor(ToyMC::MarkerColor[nFrame]);
-				//graphSyst->SetLineColor(ToyMC::MarkerColor[nFrame]);
-				//graphSyst->SetMarkerStyle(ToyMC::MarkerStyle[nState][rapBin]);
-				//graphSyst->SetMarkerSize(ToyMC::MarkerSize[nState][rapBin]);
-
-				//nBinsOriginal=graphDefaultStat->GetN();
-				//ptOriginal=0;
-				//for(int ptBinOriginal=1;ptBinOriginal<nBinsOriginal+1;ptBinOriginal++){
-				//	graphDefaultStat->GetPoint(ptBinOriginal-1,ptCentre_Original[ptOriginal],lmean_Original[ptOriginal]);
-				//	lmean_errhigh_Original[ptOriginal]=graphDefaultStat->GetErrorYhigh(ptBinOriginal-1);
-				//	lmean_errlow_Original[ptOriginal]=graphDefaultStat->GetErrorYlow(ptBinOriginal-1);
-				//	ptCentre_errhigh_Original[ptOriginal]=graphDefaultStat->GetErrorXhigh(ptBinOriginal-1);
-				//	ptCentre_errlow_Original[ptOriginal]=graphDefaultStat->GetErrorXlow(ptBinOriginal-1);
-				//	/// Alter TGraph
-				//	ptCentre_errhigh_Original[ptOriginal]=0.;
-				//	ptCentre_errlow_Original[ptOriginal]=0.;
-				//	ptOriginal++;
-				//}
-				//cout<<"debug--nBinsOriginal: "<<nBinsOriginal<<endl;
-				//graphDefaultStat = new TGraphAsymmErrors(nBinsOriginal,ptCentre_Original,lmean_Original,ptCentre_errlow_Original,ptCentre_errhigh_Original,lmean_errlow_Original,lmean_errhigh_Original);
-
-				//graphDefaultStat->SetLineColor(kBlack);
-				//graphDefaultStat->SetMarkerColor(ToyMC::MarkerColor[nFrame]);
-				//graphDefaultStat->SetLineColor(ToyMC::MarkerColor[nFrame]);
-				//graphDefaultStat->SetMarkerStyle(ToyMC::MarkerStyle[nState][rapBin]);
-				//graphDefaultStat->SetMarkerSize(ToyMC::MarkerSize[nState][rapBin]);
-
-				//nBinsOriginal=graphDefaultRes->GetN();
-				//ptOriginal=0;
-				//for(int ptBinOriginal=1;ptBinOriginal<nBinsOriginal+1;ptBinOriginal++){
-				//	graphDefaultRes->GetPoint(ptBinOriginal-1,ptCentre_Original[ptOriginal],lmean_Original[ptOriginal]);
-				//	lmean_errhigh_Original[ptOriginal]=graphDefaultRes->GetErrorYhigh(ptBinOriginal-1);
-				//	lmean_errlow_Original[ptOriginal]=graphDefaultRes->GetErrorYlow(ptBinOriginal-1);
-				//	ptCentre_errhigh_Original[ptOriginal]=graphDefaultRes->GetErrorXhigh(ptBinOriginal-1);
-				//	ptCentre_errlow_Original[ptOriginal]=graphDefaultRes->GetErrorXlow(ptBinOriginal-1);
-				//	/// Alter TGraph
-				//	ptCentre_errhigh_Original[ptOriginal]=ColordBandWidth;
-				//	ptCentre_errlow_Original[ptOriginal]=ColordBandWidth;
-				//	ptOriginal++;
-				//}
-				//cout<<"debug--nBinsOriginal: "<<nBinsOriginal<<endl;
-				//graphDefaultRes = new TGraphAsymmErrors(nBinsOriginal,ptCentre_Original,lmean_Original,ptCentre_errlow_Original,ptCentre_errhigh_Original,lmean_errlow_Original,lmean_errhigh_Original);
-
-				//nBinsOriginal=graphDefaultRes2sigma->GetN();
-				//ptOriginal=0;
-				//for(int ptBinOriginal=1;ptBinOriginal<nBinsOriginal+1;ptBinOriginal++){
-				//	graphDefaultRes2sigma->GetPoint(ptBinOriginal-1,ptCentre_Original[ptOriginal],lmean_Original[ptOriginal]);
-				//	lmean_errhigh_Original[ptOriginal]=graphDefaultRes2sigma->GetErrorYhigh(ptBinOriginal-1);
-				//	lmean_errlow_Original[ptOriginal]=graphDefaultRes2sigma->GetErrorYlow(ptBinOriginal-1);
-				//	ptCentre_errhigh_Original[ptOriginal]=graphDefaultRes2sigma->GetErrorXhigh(ptBinOriginal-1);
-				//	ptCentre_errlow_Original[ptOriginal]=graphDefaultRes2sigma->GetErrorXlow(ptBinOriginal-1);
-				//	/// Alter TGraph
-				//	ptCentre_errhigh_Original[ptOriginal]=ColordBandWidth;
-				//	ptCentre_errlow_Original[ptOriginal]=ColordBandWidth;
-				//	ptOriginal++;
-				//}
-				//cout<<"debug--nBinsOriginal: "<<nBinsOriginal<<endl;
-				//graphDefaultRes2sigma = new TGraphAsymmErrors(nBinsOriginal,ptCentre_Original,lmean_Original,ptCentre_errlow_Original,ptCentre_errhigh_Original,lmean_errlow_Original,lmean_errhigh_Original);
-
-				//nBinsOriginal=graphDefaultRes3sigma->GetN();
-				//ptOriginal=0;
-				//for(int ptBinOriginal=1;ptBinOriginal<nBinsOriginal+1;ptBinOriginal++){
-				//	graphDefaultRes3sigma->GetPoint(ptBinOriginal-1,ptCentre_Original[ptOriginal],lmean_Original[ptOriginal]);
-				//	lmean_errhigh_Original[ptOriginal]=graphDefaultRes3sigma->GetErrorYhigh(ptBinOriginal-1);
-				//	lmean_errlow_Original[ptOriginal]=graphDefaultRes3sigma->GetErrorYlow(ptBinOriginal-1);
-				//	ptCentre_errhigh_Original[ptOriginal]=graphDefaultRes3sigma->GetErrorXhigh(ptBinOriginal-1);
-				//	ptCentre_errlow_Original[ptOriginal]=graphDefaultRes3sigma->GetErrorXlow(ptBinOriginal-1);
-				//	/// Alter TGraph
-				//	ptCentre_errhigh_Original[ptOriginal]=ColordBandWidth;
-				//	ptCentre_errlow_Original[ptOriginal]=ColordBandWidth;
-				//	ptOriginal++;
-				//}
-				//cout<<"debug--nBinsOriginal: "<<nBinsOriginal<<endl;
-				//graphDefaultRes3sigma = new TGraphAsymmErrors(nBinsOriginal,ptCentre_Original,lmean_Original,ptCentre_errlow_Original,ptCentre_errhigh_Original,lmean_errlow_Original,lmean_errhigh_Original);
-
-
 				//nBinsOriginal=graphSyst->GetN();
 				nBinsOriginal=nBinspT;
+				//cout<<"debug--nBinsOriginal: "<<nBinsOriginal<<endl;
 				ptOriginal=0;
 				for(int ptBinOriginal=ptBinMin;ptBinOriginal<ptBinMax+1;ptBinOriginal++){
 					graphSyst->GetPoint(ptBinOriginal-1,ptCentre_Original[ptOriginal],lmean_Original[ptOriginal]);
@@ -1041,7 +963,6 @@ int main(int argc, char** argv) {
 					ptCentre_errlow_Original[ptOriginal]=0.;
 					ptOriginal++;
 				}
-				cout<<"debug--nBinsOriginal: "<<nBinsOriginal<<endl;
 				graphSyst = new TGraphAsymmErrors(nBinsOriginal,ptCentre_Original,lmean_Original,ptCentre_errlow_Original,ptCentre_errhigh_Original,lmean_errlow_Original,lmean_errhigh_Original);
 
 				graphSyst->SetLineColor(kBlack);
@@ -1050,7 +971,6 @@ int main(int argc, char** argv) {
 				graphSyst->SetMarkerStyle(ToyMC::MarkerStyle[nState][rapBin]);
 				graphSyst->SetMarkerSize(ToyMC::MarkerSize[nState][rapBin]);
 
-				//nBinsOriginal=graphDefaultStat->GetN();
 				ptOriginal=0;
 				for(int ptBinOriginal=ptBinMin;ptBinOriginal<ptBinMax+1;ptBinOriginal++){
 					graphDefaultStat->GetPoint(ptBinOriginal-1,ptCentre_Original[ptOriginal],lmean_Original[ptOriginal]);
@@ -1063,7 +983,6 @@ int main(int argc, char** argv) {
 					ptCentre_errlow_Original[ptOriginal]=0.;
 					ptOriginal++;
 				}
-				cout<<"debug--nBinsOriginal: "<<nBinsOriginal<<endl;
 				graphDefaultStat = new TGraphAsymmErrors(nBinsOriginal,ptCentre_Original,lmean_Original,ptCentre_errlow_Original,ptCentre_errhigh_Original,lmean_errlow_Original,lmean_errhigh_Original);
 
 				graphDefaultStat->SetLineColor(kBlack);
@@ -1072,7 +991,6 @@ int main(int argc, char** argv) {
 				graphDefaultStat->SetMarkerStyle(ToyMC::MarkerStyle[nState][rapBin]);
 				graphDefaultStat->SetMarkerSize(ToyMC::MarkerSize[nState][rapBin]);
 
-				//nBinsOriginal=graphDefaultRes->GetN();
 				ptOriginal=0;
 				for(int ptBinOriginal=ptBinMin;ptBinOriginal<ptBinMax+1;ptBinOriginal++){
 					graphDefaultRes->GetPoint(ptBinOriginal-1,ptCentre_Original[ptOriginal],lmean_Original[ptOriginal]);
@@ -1085,10 +1003,8 @@ int main(int argc, char** argv) {
 					ptCentre_errlow_Original[ptOriginal]=ColordBandWidth;
 					ptOriginal++;
 				}
-				cout<<"debug--nBinsOriginal: "<<nBinsOriginal<<endl;
 				graphDefaultRes = new TGraphAsymmErrors(nBinsOriginal,ptCentre_Original,lmean_Original,ptCentre_errlow_Original,ptCentre_errhigh_Original,lmean_errlow_Original,lmean_errhigh_Original);
 
-				//nBinsOriginal=graphDefaultRes2sigma->GetN();
 				ptOriginal=0;
 				for(int ptBinOriginal=ptBinMin;ptBinOriginal<ptBinMax+1;ptBinOriginal++){
 					graphDefaultRes2sigma->GetPoint(ptBinOriginal-1,ptCentre_Original[ptOriginal],lmean_Original[ptOriginal]);
@@ -1101,10 +1017,8 @@ int main(int argc, char** argv) {
 					ptCentre_errlow_Original[ptOriginal]=ColordBandWidth;
 					ptOriginal++;
 				}
-				cout<<"debug--nBinsOriginal: "<<nBinsOriginal<<endl;
 				graphDefaultRes2sigma = new TGraphAsymmErrors(nBinsOriginal,ptCentre_Original,lmean_Original,ptCentre_errlow_Original,ptCentre_errhigh_Original,lmean_errlow_Original,lmean_errhigh_Original);
 
-				//nBinsOriginal=graphDefaultRes3sigma->GetN();
 				ptOriginal=0;
 				for(int ptBinOriginal=ptBinMin;ptBinOriginal<ptBinMax+1;ptBinOriginal++){
 					graphDefaultRes3sigma->GetPoint(ptBinOriginal-1,ptCentre_Original[ptOriginal],lmean_Original[ptOriginal]);
@@ -1117,7 +1031,6 @@ int main(int argc, char** argv) {
 					ptCentre_errlow_Original[ptOriginal]=ColordBandWidth;
 					ptOriginal++;
 				}
-				cout<<"debug--nBinsOriginal: "<<nBinsOriginal<<endl;
 				graphDefaultRes3sigma = new TGraphAsymmErrors(nBinsOriginal,ptCentre_Original,lmean_Original,ptCentre_errlow_Original,ptCentre_errhigh_Original,lmean_errlow_Original,lmean_errhigh_Original);
 
 				graphDefaultRes->SetFillColor(OneSigColor);
@@ -1920,7 +1833,7 @@ int main(int argc, char** argv) {
 									TLatex *textConst3 = new TLatex(pTminPlot*1.2,yMin+(yMax-yMin)*0.8,text);
 									textConst3->SetTextSize(1.75*FontSize)                                                                                                                                                                                                                                             ;
 									textConst3->Draw( "same" )                                                                                                                                                                                                                                                 ;
-				 */
+									*/
 
 
 				//TLine* extreme0 = new TLine( onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL, 0, onia::pTRange[rapBin][ptBinMax] ,0);
@@ -2269,7 +2182,7 @@ int main(int argc, char** argv) {
 									TLatex *textConst3 = new TLatex(pTminPlot*1.2,yMin+(yMax-yMin)*0.8,text);
 									textConst3->SetTextSize(1.75*FontSize)                                                                                                                                                                                                                                             ;
 									textConst3->Draw( "same" )                                                                                                                                                                                                                                                 ;
-				 */
+									*/
 			} //BGratioFits
 
 
@@ -2410,9 +2323,14 @@ int main(int argc, char** argv) {
 
 			if(MultiPanelPlots&&iLam!=4&&iLam!=5&&iLam!=10&&iLam!=11&&iLam!=16&&iLam!=17){
 
-				bool NEW_MPplots=true;
+				bool NEW_MPplots=false;
+				bool Psi_MPplots=true;
+				bool Psi_MPplots_Old = false;
 
 				cout<<"Drawing MultiPanel"<<endl;
+
+				PlotpTMin = 10.;
+				PlotpTMax = 75.;//PlotpTMaxInitial;
 
 				int MPframe;
 				int iPanel;
@@ -2420,14 +2338,13 @@ int main(int argc, char** argv) {
 				// Pad Definitions
 				float Top_margin   = 0.;//0
 				float Left_margin  = 0.15;//0.025
-				float Right_margin = 0.015;//0.005
+				float Right_margin = 0.01;//0.015
 				const int nPanels=3;
 				double lowestBottomMargin=0.2;//0.2
 				double PadCoordYMax=0.985;//0.985
 				double deltaCoordY=PadCoordYMax/(double(nPanels-1)+1./(1-lowestBottomMargin));
 				double startValCoordY=deltaCoordY/(1-lowestBottomMargin);
-				//double PadCoordY[nPanels+1]={0.,0.3,0.5,0.7,0.9};
-				double PadCoordY[nPanels+1]={0.,startValCoordY,startValCoordY+deltaCoordY,PadCoordYMax};
+				double PadCoordY[nPanels+1]={0.,startValCoordY,startValCoordY+deltaCoordY,PadCoordYMax}; //[0.,0.379,0.682,0.985]
 				double PadCoordX[3]={0.1,0.5,0.9};
 
 				// Canvas Definitions
@@ -2435,6 +2352,7 @@ int main(int argc, char** argv) {
 				int MPcanvasYpixelInitial=3000;
 				int MPcanvasXpixel=MPcanvasXpixelInitial;
 				int MPcanvasYpixel=MPcanvasYpixelInitial;
+				if(nState==5) MPcanvasXpixel = MPcanvasXpixelInitial * 1.5;
 
 				// Axis Definitions
 				double yMinMP=yMin+0.01;
@@ -2463,15 +2381,15 @@ int main(int argc, char** argv) {
 				double xRapText;
 				double xRapTextTilde;
 				double yRapText=0.06;
-				if(rapBin==1) xRapText=onia::pTRange[rapBin][ptBinMax]*0.825;//0.625
-				if(rapBin==2) xRapText=onia::pTRange[rapBin][ptBinMax]*0.725;//0.525
-				if(rapBin==1) xRapTextTilde=onia::pTRange[rapBin][ptBinMax]*0.7;//0.625 with frame
-				if(rapBin==2) xRapTextTilde=onia::pTRange[rapBin][ptBinMax]*0.6;//0.525 with frame
-				double xabcdefText=onia::pTRange[rapBin][ptBinMax]*0.225;
+				if(rapBin==1) xRapText=PlotpTMax * 0.8; //0.825
+				if(rapBin==2 || rapBin==3) xRapText=PlotpTMax * 0.7; //0.725
+				if(rapBin==1) xRapTextTilde=PlotpTMax * 0.6;
+				if(rapBin==2 || rapBin==3) xRapTextTilde=PlotpTMax * 0.5;
+				double xabcdefText=PlotpTMax * 0.11; //0.225
 
 				double XaxislabelLatexSize=0.0245;
 				double YtitleAngle=0.;
-				double XtitlePosition=4.;
+				double XtitlePosition=0.; //4.
 				double XtitlePositionYshift=0.025;
 
 				// marker definitions
@@ -2480,16 +2398,23 @@ int main(int argc, char** argv) {
 				int MarkerStyleMP[4] = {20,24,25,27}; // for each frame
 
 				// legend
-				double errorLegendX1=0.165;
-				double errorLegendX2=0.565;
-				double errorLegendY1=0.655;
+				double errorLegendX1=0.265; //0.165
+				double errorLegendX2=0.665; //0.565
+				double errorLegendY1=0.7; //0.655
 				double errorLegendY2=0.95;
-				double errorLegendFontSize=0.08;
+				double errorLegendFontSize=0.07;//0.08
 
 
 				cout<<"begin Frame dependent plots"<<endl;
 				//begin Frame dependent plots
-				if(!NEW_MPplots){
+
+				if(Psi_MPplots){
+
+					MPcanvasXpixel=MPcanvasXpixelInitial;
+					if(nState==5) MPcanvasXpixel = MPcanvasXpixelInitial * 1.5;
+					MPcanvasYpixel = MPcanvasYpixelInitial;
+					cout<<"MPcanvasXpixel: "<<MPcanvasXpixel<<" MPcanvasYpixel: "<<MPcanvasYpixel<<endl;
+
 					if(iLam!=6&&iLam!=12&&iLam!=18){
 
 						if(iLam>0&&iLam<7) MPframe=1;
@@ -2501,7 +2426,6 @@ int main(int argc, char** argv) {
 						if(iLam==3||iLam==9||iLam==15) iPanel=3;
 
 						cout<<"MultiPanel canvas"<<endl;
-
 
 						if(iLam==1&&rapBin==1){
 							MPcanvasCS = new TCanvas("MPcanvasCS", "MPcanvasCS",MPcanvasXpixel,MPcanvasYpixel);
@@ -2528,8 +2452,19 @@ int main(int argc, char** argv) {
 
 						cout<<"MultiPanel pad"<<endl;
 						TPad *MPpad;
-						if(rapBin==1) MPpad = new TPad("MPpad","MPpad",0.,PadCoordY[nPanels-iPanel],0.5,PadCoordY[nPanels-iPanel+1]);
-						if(rapBin==2) MPpad = new TPad("MPpad","MPpad",0.5,PadCoordY[nPanels-iPanel],1.,PadCoordY[nPanels-iPanel+1]);
+						if(nState==5){
+							double X1panel = 0.373;
+							if(rapBin==1) MPpad = new TPad("MPpad","MPpad",0.,PadCoordY[nPanels-iPanel],X1panel,PadCoordY[nPanels-iPanel+1]);
+							if(rapBin==2) MPpad = new TPad("MPpad","MPpad",X1panel,PadCoordY[nPanels-iPanel],
+									(1.+X1panel)/2.,PadCoordY[nPanels-iPanel+1]);
+							if(rapBin==3) MPpad = new TPad("MPpad","MPpad",(1.+X1panel)/2.,PadCoordY[nPanels-iPanel],
+									1.,PadCoordY[nPanels-iPanel+1]);
+						}
+						else{
+							if(rapBin==1) MPpad = new TPad("MPpad","MPpad",0.,PadCoordY[nPanels-iPanel],0.53,PadCoordY[nPanels-iPanel+1]);
+							if(rapBin==2) MPpad = new TPad("MPpad","MPpad",0.53,PadCoordY[nPanels-iPanel],1.,PadCoordY[nPanels-iPanel+1]);
+						}
+
 						MPpad->Draw();
 						MPpad->cd();
 						MPpad->SetFillColor(kWhite);
@@ -2538,7 +2473,8 @@ int main(int argc, char** argv) {
 						MPpad->SetLeftMargin(0.);
 						if(rapBin==1) MPpad->SetLeftMargin(Left_margin);
 						MPpad->SetRightMargin(0.);
-						if(rapBin==2) MPpad->SetRightMargin(Right_margin);
+						if(nState<=4 && rapBin==2) MPpad->SetRightMargin(Right_margin);
+						if(nState==5 && rapBin==3) MPpad->SetRightMargin(Right_margin);
 						MPpad->SetTopMargin(Top_margin+0.0025);
 						MPpad->SetBottomMargin(0.0);
 						if(iPanel==nPanels) MPpad->SetBottomMargin(lowestBottomMargin);
@@ -2546,9 +2482,9 @@ int main(int argc, char** argv) {
 
 						cout<<"MultiPanel hist"<<endl;
 						TH1F *MPhist = new TH1F;
-						if(MPframe==1)MPhist = MPcanvasCS->DrawFrame(onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL,yMinMP,onia::pTRange[rapBin][ptBinMax],yMaxMP);
-						if(MPframe==2)MPhist = MPcanvasHX->DrawFrame(onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL,yMinMP,onia::pTRange[rapBin][ptBinMax],yMaxMP);
-						if(MPframe==3)MPhist = MPcanvasPX->DrawFrame(onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL,yMinMP,onia::pTRange[rapBin][ptBinMax],yMaxMP);
+						if(MPframe==1)MPhist = MPcanvasCS->DrawFrame(PlotpTMin-DeltaXminOVERALL,yMinMP,PlotpTMax,yMaxMP);
+						if(MPframe==2)MPhist = MPcanvasHX->DrawFrame(PlotpTMin-DeltaXminOVERALL,yMinMP,PlotpTMax,yMaxMP);
+						if(MPframe==3)MPhist = MPcanvasPX->DrawFrame(PlotpTMin-DeltaXminOVERALL,yMinMP,PlotpTMax,yMaxMP);
 
 						MPhist->SetXTitle("#it{p}_{T} [GeV]");
 						MPhist->GetXaxis()->SetTitleOffset(-1.35);
@@ -2573,16 +2509,18 @@ int main(int argc, char** argv) {
 
 
 						TLegend* MPframedepLegend;
-						MPframedepLegend=new TLegend(errorLegendX1,errorLegendY1,errorLegendX2,errorLegendY2);
-						if((nState==2||nState==3)&&MPframe==1) MPframedepLegend=new TLegend(errorLegendX1,errorLegendY2-(errorLegendY2-errorLegendY1)*(1-lowestBottomMargin),errorLegendX2,errorLegendY2);
+						MPframedepLegend=new TLegend(errorLegendX1+0.25,errorLegendY1,errorLegendX2,errorLegendY2);
+						if((nState==2||nState==3)&&MPframe==1) 
+							MPframedepLegend=new TLegend(errorLegendX1, errorLegendY2-(errorLegendY2-errorLegendY1)*(1-lowestBottomMargin),
+									errorLegendX2,errorLegendY2);
+
 						MPframedepLegend->SetFillColor(0);
-						//		   MPframedepLegend->SetTextFont(72);
+						//MPframedepLegend->SetTextFont(72);
 						MPframedepLegend->SetTextSize(errorLegendFontSize);
 						if((nState==2||nState==3)&&MPframe==1) MPframedepLegend->SetTextSize(errorLegendFontSize*(1-lowestBottomMargin));
 						MPframedepLegend->SetBorderSize(0);
 
 						char MPframedepLegendEntry[200];
-
 
 						graphSyst->SetMarkerSize(MarkerSizeMP[0]);
 						graphSyst->SetMarkerStyle(MarkerStyleMP[0]);
@@ -2606,30 +2544,33 @@ int main(int argc, char** argv) {
 						if(PlotAlteredPPDResults) sprintf(MPframedepLegendEntry,"Stat. uncert., 68.3 %% CL");
 						if(!PlotAlteredPPDResults) sprintf(MPframedepLegendEntry,"Tot. sys. uncert.");
 						MPframedepLegend->AddEntry(graphSyst,MPframedepLegendEntry,"ple");
-						if(PlotAlteredPPDResults) sprintf(MPframedepLegendEntry,"Tot. uncert., 68.3 %% CL");
+						if(PlotAlteredPPDResults) sprintf(MPframedepLegendEntry,"Tot.  uncert., 68.3 %% CL");
 						if(!PlotAlteredPPDResults) sprintf(MPframedepLegendEntry,"68.3 %% CL");
 						MPframedepLegend->AddEntry(graphDefaultRes,MPframedepLegendEntry,"f");
-						if(PlotAlteredPPDResults) sprintf(MPframedepLegendEntry,"Tot. uncert., 95.5 %% CL");
+						if(PlotAlteredPPDResults) sprintf(MPframedepLegendEntry,"Tot.  uncert., 95.5 %% CL");
 						if(!PlotAlteredPPDResults) sprintf(MPframedepLegendEntry,"95.5 %% CL");
 						MPframedepLegend->AddEntry(graphDefaultRes2sigma,MPframedepLegendEntry,"f");
-						if(PlotAlteredPPDResults) sprintf(MPframedepLegendEntry,"Tot. uncert., 99.7 %% CL");
+						if(PlotAlteredPPDResults) sprintf(MPframedepLegendEntry,"Tot.  uncert., 99.7 %% CL");
 						if(!PlotAlteredPPDResults) sprintf(MPframedepLegendEntry,"99.7 %% CL");
 						MPframedepLegend->AddEntry(graphDefaultRes3sigma,MPframedepLegendEntry,"f");
 
-						if(rapBin==2) deltaTrickAxisMax=-0.001;
+						if(nState<=4 && rapBin==2) deltaTrickAxisMax=-0.001;
+						if(nState==5 && rapBin==3) deltaTrickAxisMax=-0.001;
 
-						TGaxis *axisMPY1 = new TGaxis(onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL,yMinMP,onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL,yMaxMP,yMinMP,yMaxMP,AxisDivisions,"-US");
+						TGaxis *axisMPY1 = new TGaxis(PlotpTMin-DeltaXminOVERALL,yMinMP,PlotpTMin-DeltaXminOVERALL,yMaxMP,
+								yMinMP,yMaxMP,AxisDivisions,"-US");
 						axisMPY1->SetTickSize(ticksize);
 						if(iPanel==nPanels) axisMPY1->SetTickSize(ticksize/(1-lowestBottomMargin));
 						axisMPY1->Draw("same");
 
-						TGaxis *axisMPY2 = new TGaxis(onia::pTRange[rapBin][ptBinMax],yMinMP,onia::pTRange[rapBin][ptBinMax],yMaxMP,yMinMP,yMaxMP,AxisDivisions,"+US");
+						TGaxis *axisMPY2 = new TGaxis(PlotpTMax,yMinMP,PlotpTMax,yMaxMP,yMinMP,yMaxMP,AxisDivisions,"+US");
 						axisMPY2->SetTickSize(ticksize);
 						if(iPanel==nPanels) axisMPY2->SetTickSize(ticksize/(1-lowestBottomMargin));
 						axisMPY2->Draw("same");
 
 
-						TGaxis *axisMPX1 = new TGaxis(onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL,yMinMP,onia::pTRange[rapBin][ptBinMax],yMinMP,onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL+deltaTrickAxisMin,onia::pTRange[rapBin][ptBinMax]+deltaTrickAxisMax,AxisDivisions,"+S");
+						TGaxis *axisMPX1 = new TGaxis(PlotpTMin-DeltaXminOVERALL,yMinMP,PlotpTMax,yMinMP,
+								PlotpTMin-DeltaXminOVERALL+deltaTrickAxisMin,PlotpTMax+deltaTrickAxisMax,AxisDivisions,"+S");
 						axisMPX1->SetTickSize(ticksize*2);
 						if(iPanel==nPanels) axisMPX1->SetLabelSize(LabelSize);
 						if(iPanel<nPanels) axisMPX1->SetLabelSize(0);
@@ -2637,7 +2578,8 @@ int main(int argc, char** argv) {
 						if(iPanel==nPanels) axisMPX1->SetTickSize(ticksize/(1-lowestBottomMargin));
 						axisMPX1->Draw("same");
 
-						TGaxis *axisMPX2 = new TGaxis(onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL,yMaxMP,onia::pTRange[rapBin][ptBinMax],yMaxMP,onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL+deltaTrickAxisMin,onia::pTRange[rapBin][ptBinMax]+deltaTrickAxisMax,AxisDivisions,"-US");
+						TGaxis *axisMPX2 = new TGaxis(PlotpTMin-DeltaXminOVERALL,yMaxMP,PlotpTMax,yMaxMP,
+								PlotpTMin-DeltaXminOVERALL+deltaTrickAxisMin,PlotpTMax+deltaTrickAxisMax,AxisDivisions,"-US");
 						axisMPX2->SetTickSize(ticksize*2);
 						if(iPanel==nPanels) axisMPX2->SetTickSize(ticksize/(1-lowestBottomMargin));
 						axisMPX2->Draw("same");
@@ -2658,17 +2600,14 @@ int main(int argc, char** argv) {
 						MPYtitletext->PaintLatex(whereTexteInPlotX,whereTexteInPlotY, YtitleAngle, YaxistitleLatexSize, axislabel);
 						MPYtitletext->Draw( "same" );
 
-
-
-
 						char frameMPtex[200];
 						if(MPframe==1) sprintf(frameMPtex,"CS");
 						if(MPframe==2) sprintf(frameMPtex,"HX");
 						if(MPframe==3) sprintf(frameMPtex,"PX");
 						char texTexMP[200];
-						if(rapBin==1) sprintf(texTexMP,"|#it{y}| < 0.6", nState, frameMPtex);
-						if(rapBin==2) sprintf(texTexMP,"0.6 < |#it{y}| < 1.2", nState, frameMPtex);
-						if(rapBin==3) sprintf(texTexMP,"1.2 < |#it{y}| < 1.5", nState, frameMPtex);
+						if(rapBin==1) sprintf(texTexMP,"|#it{y}| < 0.6", nState-3, frameMPtex);
+						if(rapBin==2) sprintf(texTexMP,"0.6 < |#it{y}| < 1.2", nState-3, frameMPtex);
+						if(rapBin==3) sprintf(texTexMP,"1.2 < |#it{y}| < 1.5", nState-3, frameMPtex);
 						TLatex *textMP = new TLatex(xRapText,yMin+(yMax-yMin)*yRapText,texTexMP);
 						textMP->SetTextSize(textSizeRap);
 						if(iPanel==nPanels) textMP->SetTextSize(textSizeRap*(1-lowestBottomMargin));
@@ -2688,54 +2627,55 @@ int main(int argc, char** argv) {
 						TLatex *tex_abcdef = new TLatex(xabcdefText,yMin+(yMax-yMin)*yRapText*0.92,abcdef);
 						tex_abcdef->SetTextSize(textSizeRap);
 						if(iPanel==nPanels) tex_abcdef->SetTextSize(textSizeRap*(1-lowestBottomMargin));
-						tex_abcdef->Draw( "same" );
+						//tex_abcdef->Draw( "same" );
 
 						if(PlotFinalData&&DrawLatexStuff){
 
-							//TLine* extreme0MP = new TLine( onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL, 0, onia::pTRange[rapBin][ptBinMax] ,0);
 							TLine* extreme0MP = new TLine( PlotpTMin-DeltaXminOVERALL, 0, PlotpTMax ,0);
 							extreme0MP->SetLineWidth( 1 );
 							extreme0MP->SetLineStyle( 2 );
 							extreme0MP->SetLineColor( kBlack );
 							extreme0MP->Draw( "same" );
 
-							//TLine* extreme1MP = new TLine( onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL, 1, onia::pTRange[rapBin][ptBinMax] , 1);
 							TLine* extreme1MP = new TLine( PlotpTMin-DeltaXminOVERALL, 1, PlotpTMax, 1);
 							extreme1MP->SetLineWidth( 1 );
 							extreme1MP->SetLineStyle( 2 );
 							extreme1MP->SetLineColor( kBlack );
 							if(iLam==1||iLam==7||iLam==13) extreme1MP->Draw( "same" );
 
-							//TLine* extreme2MP = new TLine( onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL, -1, onia::pTRange[rapBin][ptBinMax] ,-1);
 							TLine* extreme2MP = new TLine( PlotpTMin-DeltaXminOVERALL, -1, PlotpTMax ,-1);
 							extreme2MP->SetLineWidth( 1 );
 							extreme2MP->SetLineStyle( 2 );
 							extreme2MP->SetLineColor( kBlack );
 							if(iLam==1||iLam==7||iLam==13) extreme2MP->Draw( "same" );
 							if(iLam==6||iLam==12||iLam==18) extreme2MP->Draw( "same" );
-
 						}
 
 
 						if(rapBin==1&&iPanel==1){
 							cout<<"DRAW CMS preliminary Latex"<<endl;
 							char text[200];
-							sprintf(text,"CMS preliminary     pp    #sqrt{s} = 7 TeV     L = 4.9 fb^{-1}");
+							sprintf(text,"CMS  pp  #sqrt{s} = 7 TeV   L = 4.9 fb^{-1}");
 							TLatex *CentralsText1MP = new TLatex(MPlatexX,MPlatexYmax,text);
 							CentralsText1MP->SetTextSize(CentralsFontSizeMP);
 							CentralsText1MP->Draw( "same" );
-							/*			 sprintf(text,"L = 4.9 fb^{-1}");
-											 TLatex *CentralsText2MP = new TLatex(MPlatexX,MPlatexYmax-2*MPlatexDeltaYmax,text);
-											 CentralsText2MP->SetTextSize(CentralsFontSizeMP);
-											 CentralsText2MP->Draw( "same" );
-											 sprintf(text,"pp    #sqrt{s} = 7 TeV");
-											 TLatex *CentralsText3MP = new TLatex(MPlatexX,MPlatexYmax-MPlatexDeltaYmax,text);
-											 CentralsText3MP->SetTextSize(CentralsFontSizeMP);
-											 CentralsText3MP->Draw( "same" );
-							 */
+
+							sprintf(text,"Preliminary");
+							TLatex *CentralsText2MP = new TLatex(PlotpTMax-22.,MPlatexYmax-2*MPlatexDeltaYmax,text);
+							CentralsText2MP->SetTextSize(CentralsFontSizeMP);
+							CentralsText2MP->Draw( "same" );
+
+							//sprintf(text,"L = 4.9 fb^{-1}");
+							//TLatex *CentralsText2MP = new TLatex(MPlatexX,MPlatexYmax-2*MPlatexDeltaYmax,text);
+							//CentralsText2MP->SetTextSize(CentralsFontSizeMP);
+							//CentralsText2MP->Draw( "same" );
+							//sprintf(text,"pp    #sqrt{s} = 7 TeV");
+							//TLatex *CentralsText3MP = new TLatex(MPlatexX,MPlatexYmax-MPlatexDeltaYmax,text);
+							//CentralsText3MP->SetTextSize(CentralsFontSizeMP);
+							//CentralsText3MP->Draw( "same" );
 						}
 
-						if(rapBin==1&&iPanel==2&&nState==1){
+						if(rapBin==1&&iPanel==2&&(nState==1||nState==4||nState==5)){
 							MPframedepLegend->Draw("same");
 						}
 						if(nState==2||nState==3){
@@ -2753,7 +2693,8 @@ int main(int argc, char** argv) {
 							if(MPframe==2) sprintf(frameMPtex,"HX frame");
 							if(MPframe==3) sprintf(frameMPtex,"PX frame");
 							char textStateFrame[200];
-							sprintf(textStateFrame,"#psi(%dS), %s", nState, frameMPtex);
+							sprintf(textStateFrame,"#psi(%dS), %s", nState-3, frameMPtex);
+							if(nState==4) sprintf(textStateFrame,"J/#psi, %s", frameMPtex);
 							TLatex *TexStateFrame = new TLatex(MPlatexX,MPlatexYmax,textStateFrame);
 							TexStateFrame->SetTextSize(CentralsFontSizeMP);
 							TexStateFrame->Draw( "same" );
@@ -2770,28 +2711,44 @@ int main(int argc, char** argv) {
 						TLatex *MPXlabeltext = new TLatex(whereTexteInPlotX,whereTexteInPlotY ,"1");
 						MPXlabeltext->SetTextSize(XaxislabelLatexSize);
 						MPXlabeltext->SetTextColor(kBlack);
-						if(iPanel==nPanels) MPXlabeltext->Draw( "same" );
+						//if(iPanel==nPanels) MPXlabeltext->Draw( "same" );
 
-						if(iLam==3&&rapBin==2){  sprintf(filename,"%s/FinalResultsCS_OLD_Psi%dS.pdf",FigDir,nState-3);
+						if(iLam==3&&((nState<=4&&rapBin==2)||(nState==5&&rapBin==3))){  
+							sprintf(filename,"%s/FinalResultsCS_Psi%dS.pdf",FigDir,nState-3);
 							if(PlotFinalData) MPcanvasCS->SaveAs(filename);
 							MPcanvasCS->Close();
 						}
-						if(iLam==9&&rapBin==2){  sprintf(filename,"%s/FinalResultsHX_OLD_Psi%dS.pdf",FigDir,nState-3);
+						if(iLam==9&&((nState<=4&&rapBin==2)||(nState==5&&rapBin==3))){  
+							sprintf(filename,"%s/FinalResultsHX_Psi%dS.pdf",FigDir,nState-3);
 							if(PlotFinalData) MPcanvasHX->SaveAs(filename);
 							MPcanvasHX->Close();
 						}
-						if(iLam==15&&rapBin==2){  sprintf(filename,"%s/FinalResultsPX_OLD_Psi%dS.pdf",FigDir,nState-3);
+						if(iLam==15&&((nState<=4&&rapBin==2)||(nState==5&&rapBin==3))){  
+							sprintf(filename,"%s/FinalResultsPX_Psi%dS.pdf",FigDir,nState-3);
 							if(PlotFinalData) MPcanvasPX->SaveAs(filename);
 							MPcanvasPX->Close();
 						}
+
 					}//end Frame dependent plots
 				}
+
+
+
 
 
 				cout<<"begin Frame independent plots"<<endl;
 				cout<<"if(iLam==6||iLam==12||iLam==18)"<<endl;
 				//begin Frame independent plots
-				if(!NEW_MPplots){
+
+				if(Psi_MPplots){
+
+					if(nState>3) {
+						if(nState==5) MPcanvasXpixel = MPcanvasXpixelInitial * 1.5;
+						else MPcanvasXpixel = MPcanvasXpixelInitial ;
+						MPcanvasYpixel = MPcanvasYpixelInitial * 0.5;
+					}
+					cout<<"MPcanvasXpixel: "<<MPcanvasXpixel<<" MPcanvasYpixel: "<<MPcanvasYpixel<<endl;
+
 					if(iLam==6||iLam==12||iLam==18){
 
 						int mainframe;
@@ -2802,497 +2759,485 @@ int main(int argc, char** argv) {
 						cout<<"iLam = "<<iLam<<endl;
 
 						if((iLam==6||iLam==12||iLam==18)&&rapBin==1){
-							MPcanvasTilde = new TCanvas("MPcanvasTilde", "MPcanvasTilde",MPcanvasXpixel,MPcanvasYpixel);
-							MPcanvasTilde->SetFillColor(kWhite);
-							MPcanvasTilde->GetFrame()->SetFillColor(kWhite);
-							MPcanvasTilde->GetFrame()->SetBorderSize(0);
+							MPcanvasTilde_Psi = new TCanvas("MPcanvasTilde_Psi", "MPcanvasTilde_Psi",MPcanvasXpixel,MPcanvasYpixel);
+							MPcanvasTilde_Psi->SetFillColor(kWhite);
+							MPcanvasTilde_Psi->GetFrame()->SetFillColor(kWhite);
+							MPcanvasTilde_Psi->GetFrame()->SetBorderSize(0);
 						}
 
+						cout<<"MultiPanel canvas"<<endl;
 
-						for(int iStateMP=1;iStateMP<4;iStateMP++){
-							if(iStateMP==1) iPanel=1;
-							if(iStateMP==2) iPanel=2;
-							if(iStateMP==3) iPanel=3;
+						MPcanvasTilde_Psi->cd();
 
-							cout<<"MultiPanel canvas"<<endl;
+						cout<<"MultiPanel pad"<<endl;
+						TPad *MPpad;
+						if(nState==5){
+							double X1panel = 0.373;
+							if(rapBin==1) MPpad = new TPad("MPpad","MPpad",0.,   0.,X1panel,1.);
+							if(rapBin==2) MPpad = new TPad("MPpad","MPpad",X1panel,0.,(1.+X1panel)/2.,1.);
+							if(rapBin==3) MPpad = new TPad("MPpad","MPpad",(1.+X1panel)/2.,0.,1.,   1.);
+						}
+						else{
+							if(rapBin==1) MPpad = new TPad("MPpad","MPpad",0., 0.,0.53,1.);
+							if(rapBin==2) MPpad = new TPad("MPpad","MPpad",0.53,0.,1., 1.);
+						}
 
-							MPcanvasTilde->cd();
+						MPpad->Draw();
+						MPpad->cd();
+						MPpad->SetFillColor(kWhite);
+						MPpad->SetFrameFillColor(kWhite);
+						MPpad->SetBorderSize(0);
+						MPpad->SetLeftMargin(0.);
+						if(rapBin==1) MPpad->SetLeftMargin(Left_margin);
+						MPpad->SetRightMargin(0.);
+						if(nState<=4 && rapBin==2) MPpad->SetRightMargin(Right_margin+0.05);
+						if(nState==5 && rapBin==3) MPpad->SetRightMargin(Right_margin+0.05);
+						MPpad->SetTopMargin(Top_margin+0.025);
+						MPpad->SetBottomMargin(0.0);
+						MPpad->SetBottomMargin(lowestBottomMargin-0.08);
 
-							cout<<"MultiPanel pad"<<endl;
-							TPad *MPpad;
-							if(rapBin==1) MPpad = new TPad("MPpad","MPpad",0.,PadCoordY[nPanels-iPanel],0.5,PadCoordY[nPanels-iPanel+1]);
-							if(rapBin==2) MPpad = new TPad("MPpad","MPpad",0.5,PadCoordY[nPanels-iPanel],1.,PadCoordY[nPanels-iPanel+1]);
-							MPpad->Draw();
-							MPpad->cd();
-							MPpad->SetFillColor(kWhite);
-							MPpad->SetFrameFillColor(kWhite);
-							MPpad->SetBorderSize(0);
-							MPpad->SetLeftMargin(0.);
-							if(rapBin==1) MPpad->SetLeftMargin(Left_margin);
-							MPpad->SetRightMargin(0.);
-							if(rapBin==2) MPpad->SetRightMargin(Right_margin);
-							MPpad->SetTopMargin(Top_margin+0.0025);
-							MPpad->SetBottomMargin(0.0);
-							if(iPanel==nPanels) MPpad->SetBottomMargin(lowestBottomMargin);
+						cout<<"MultiPanel hist"<<endl;
+						TH1F *MPhist = new TH1F;
+						MPhist = MPcanvasTilde_Psi->DrawFrame(PlotpTMin-DeltaXminOVERALL,yMinMP,PlotpTMax,yMaxMP);
 
+						MPhist->SetXTitle("#it{p}_{T} [GeV]");
+						MPhist->GetXaxis()->SetTitleOffset(-1.2);
+						if(rapBin==1) MPhist->GetXaxis()->SetTitleOffset(-1.2);
 
-							cout<<"MultiPanel hist"<<endl;
-							TH1F *MPhist = new TH1F;
-							MPhist = MPcanvasTilde->DrawFrame(onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL,yMinMP,onia::pTRange[rapBin][ptBinMax],yMaxMP);
+						MPhist->SetYTitle(axislabel);
+						MPhist->GetYaxis()->SetTitleOffset(titleoffset*0.2);
+						MPhist->GetYaxis()->SetTitleSize(0.);
+						if(rapBin==1) MPhist->GetYaxis()->SetTitleOffset(titleoffset*1.35);
+						if(rapBin==1) MPhist->GetYaxis()->SetTitleSize(0.*(1-lowestBottomMargin));
 
-							MPhist->SetXTitle("#it{p}_{T} [GeV]");
-							MPhist->GetXaxis()->SetTitleOffset(-1.35);
+						MPhist->GetYaxis()->SetLabelSize(LabelSize*0.5);
+						MPhist->GetXaxis()->SetLabelSize(0.);
+						MPhist->GetYaxis()->SetLabelOffset(-0.015);
+						MPhist->GetXaxis()->SetLabelOffset(-0.08);
+						if(rapBin==1) MPhist->GetXaxis()->SetLabelOffset(-0.08*(1-Left_margin));
 
-							MPhist->SetYTitle(axislabel);
-							MPhist->GetYaxis()->SetTitleOffset(titleoffset);
-							MPhist->GetYaxis()->SetTitleSize(0.);
-							if(iPanel==nPanels) MPhist->GetYaxis()->SetTitleOffset(titleoffset*1.35);
-							if(iPanel==nPanels) MPhist->GetYaxis()->SetTitleSize(0.*(1-lowestBottomMargin));
+						if(rapBin==1) MPhist->GetYaxis()->SetLabelSize(LabelSize*.8*(1-lowestBottomMargin));
+						MPhist->GetXaxis()->SetTitleSize(TitleSize*0.55);
+						if(rapBin==1) MPhist->GetXaxis()->SetTitleSize(TitleSize*0.6*(1-Left_margin));
+						MPhist->GetXaxis()->SetAxisColor(kWhite);
+						MPhist->GetYaxis()->SetAxisColor(kWhite);
+						MPhist->GetXaxis()->SetTicks("-");
+						MPhist->GetYaxis()->SetTicks("+");
 
-							MPhist->GetYaxis()->SetLabelSize(LabelSize*1.25);
-							MPhist->GetXaxis()->SetLabelSize(0.);
-							MPhist->GetYaxis()->SetLabelOffset(-0.015);
-							MPhist->GetXaxis()->SetLabelOffset(-0.06);
+						TLegend* MPframedepLegendError;
+						MPframedepLegendError=new TLegend(errorLegendX1-0.25,errorLegendY1+0.1,errorLegendX2,errorLegendY2);
+						MPframedepLegendError->SetFillColor(0);
+						//MPframedepLegendError->SetTextFont(72);
+						MPframedepLegendError->SetTextSize(errorLegendFontSize*0.7);
+						MPframedepLegendError->SetBorderSize(0);
 
-							if(iPanel==nPanels) MPhist->GetYaxis()->SetLabelSize(LabelSize*1.25*(1-lowestBottomMargin));
-							MPhist->GetXaxis()->SetTitleSize(TitleSize*0.85);
-							MPhist->GetXaxis()->SetAxisColor(kWhite);
-							MPhist->GetYaxis()->SetAxisColor(kWhite);
-							MPhist->GetXaxis()->SetTicks("-");
-							MPhist->GetYaxis()->SetTicks("+");
-
-							TLegend* MPframedepLegendError;
-							MPframedepLegendError=new TLegend(errorLegendX1,errorLegendY1,errorLegendX2,errorLegendY2);
-							MPframedepLegendError->SetFillColor(0);
-							//		   MPframedepLegendError->SetTextFont(72);
-							MPframedepLegendError->SetTextSize(errorLegendFontSize);
-							MPframedepLegendError->SetBorderSize(0);
-
-							char MPframedepLegendEntry[200];
-
-
-							TGraphAsymmErrors* graphMP1;
-							TGraphAsymmErrors* graphMP2;
-							TGraphAsymmErrors* graphMP3;
-
-							TGraphAsymmErrors* graphMP1_1sig;
-							TGraphAsymmErrors* graphMP1_2sig;
-							TGraphAsymmErrors* graphMP1_3sig;
-							TGraphAsymmErrors* graphMP2_1sig;
-							TGraphAsymmErrors* graphMP2_2sig;
-							TGraphAsymmErrors* graphMP2_3sig;
-							TGraphAsymmErrors* graphMP3_1sig;
-							TGraphAsymmErrors* graphMP3_2sig;
-							TGraphAsymmErrors* graphMP3_3sig;
-
-							TLegend* MPtildeLegend;
-							MPtildeLegend=new TLegend(0.8,0.75,1.,0.95);
-							MPtildeLegend->SetFillColor(0);
-							//			MPtildeLegend->SetTextFont(72);
-							MPtildeLegend->SetTextSize(0.07);
-							MPtildeLegend->SetBorderSize(0);
-							char MPtildeLegendEntry[200];
-
-							for(int iFrameMP=1;iFrameMP<4;iFrameMP++){
-
-								char GraphNameMP[200];
+						char MPframedepLegendEntry[200];
 
 
-								if(iFrameMP==1){
-									sprintf(GraphNameMP,"ltilde_CS_rap%d",rapBin);
-								}
-								if(iFrameMP==2){
-									sprintf(GraphNameMP,"ltilde_HX_rap%d",rapBin);
-								}
-								if(iFrameMP==3){
-									sprintf(GraphNameMP,"ltilde_PX_rap%d",rapBin);
-								}
+						TGraphAsymmErrors* graphMP1;
+						TGraphAsymmErrors* graphMP2;
 
-								graphMP1 = (TGraphAsymmErrors*) infileMP1->Get(GraphNameMP);
-								graphMP2 = (TGraphAsymmErrors*) infileMP2->Get(GraphNameMP);
-								graphMP3 = (TGraphAsymmErrors*) infileMP3->Get(GraphNameMP);
+						TGraphAsymmErrors* graphMP1_1sig;
+						TGraphAsymmErrors* graphMP1_2sig;
+						TGraphAsymmErrors* graphMP1_3sig;
+						TGraphAsymmErrors* graphMP2_1sig;
+						TGraphAsymmErrors* graphMP2_2sig;
+						TGraphAsymmErrors* graphMP2_3sig;
 
-								int MarkerDefinitionForThisBin[4][4]={{0,0,0,0},{0,1,2,3},{0,2,1,3},{0,2,3,1}};
+						TLegend* MPtildeLegend;
+						MPtildeLegend=new TLegend(0.7,0.75,0.9,0.95);
+						MPtildeLegend->SetFillColor(0);
+						//MPtildeLegend->SetTextFont(72);
+						MPtildeLegend->SetTextSize(0.05);
+						MPtildeLegend->SetBorderSize(0);
+						char MPtildeLegendEntry[200];
 
+						for(int iFrameMP=1;iFrameMP<4;iFrameMP++){
 
-								double ptCentreMP[nBinspT];
-								double ptCentreErr_lowMP[nBinspT];
-								double ptCentreErr_highMP[nBinspT];
-								double lmeanMP[nBinspT];
-								double lmean_errlowMP[nBinspT];
-								double lmean_errhighMP[nBinspT];
+							char GraphNameMP[200];
 
-								double ShiftTildePlot;
-								double ShiftTildePlotZero=0.5;
+							if(iFrameMP==1){
+								sprintf(GraphNameMP,"ltilde_CS_rap%d",rapBin);
+							}
+							if(iFrameMP==2){
+								sprintf(GraphNameMP,"ltilde_HX_rap%d",rapBin);
+							}
+							if(iFrameMP==3){
+								sprintf(GraphNameMP,"ltilde_PX_rap%d",rapBin);
+							}
 
-								if(MarkerDefinitionForThisBin[mainframe][iFrameMP]==1) ShiftTildePlot=0.;
-								if(MarkerDefinitionForThisBin[mainframe][iFrameMP]==2) ShiftTildePlot=ShiftTildePlotZero;
-								if(MarkerDefinitionForThisBin[mainframe][iFrameMP]==3) ShiftTildePlot=-ShiftTildePlotZero;
+							if(rapBin<3) graphMP1 = (TGraphAsymmErrors*) infileMP1->Get(GraphNameMP);
+							graphMP2 = (TGraphAsymmErrors*) infileMP2->Get(GraphNameMP);
 
-								int pt=0;
-								for(int ptBin = ptBinMin; ptBin < ptBinMax+1; ptBin++) {
+							int MarkerDefinitionForThisBin[4][4]={{0,0,0,0},{0,1,2,3},{0,2,1,3},{0,2,3,1}};
 
-									graphMP1->GetPoint(ptBin-1,ptCentreMP[pt],lmeanMP[pt]);
-									ptCentreErr_highMP[pt]=graphMP1->GetErrorXhigh(ptBin-1);
-									ptCentreErr_lowMP[pt]=graphMP1->GetErrorXlow(ptBin-1);
-									lmean_errhighMP[pt]=graphMP1->GetErrorYhigh(ptBin-1);
-									lmean_errlowMP[pt]=graphMP1->GetErrorYlow(ptBin-1);
+							int ptBinMinMP1=3, ptBinMaxMP1=12;
+							int ptBinMinMP2=2, ptBinMaxMP2=5;
+							int nBinspTMP1 = ptBinMaxMP1-ptBinMinMP1+1, 
+									nBinspTMP2 = ptBinMaxMP2-ptBinMinMP2+1;
 
-									ptCentreMP[pt]=ptCentreMP[pt]+ShiftTildePlot;
-									ptCentreErr_highMP[pt]=ptCentreErr_highMP[pt]-ShiftTildePlot;
-									ptCentreErr_lowMP[pt]=ptCentreErr_lowMP[pt]-ShiftTildePlot;
+							double ptCentreMP1[nBinspTMP1];
+							double ptCentreErr_lowMP1[nBinspTMP1];
+							double ptCentreErr_highMP1[nBinspTMP1];
+							double lmeanMP1[nBinspTMP1];
+							double lmean_errlowMP1[nBinspTMP1];
+							double lmean_errhighMP1[nBinspTMP1];
 
-									pt++;
-								}
+							double ptCentreMP2[nBinspTMP2];
+							double ptCentreErr_lowMP2[nBinspTMP2];
+							double ptCentreErr_highMP2[nBinspTMP2];
+							double lmeanMP2[nBinspTMP2];
+							double lmean_errlowMP2[nBinspTMP2];
+							double lmean_errhighMP2[nBinspTMP2];
 
-								graphMP1 = new TGraphAsymmErrors(nBinspT,ptCentreMP,lmeanMP,ptCentreErr_lowMP,ptCentreErr_highMP,lmean_errlowMP,lmean_errhighMP);
+							double ShiftTildePlot;
+							double ShiftTildePlotZero=0.5;
+							bool RemoveHorizontalErrorBar=true;
 
-								pt=0;
-								for(int ptBin = ptBinMin; ptBin < ptBinMax+1; ptBin++) {
+							if(MarkerDefinitionForThisBin[mainframe][iFrameMP]==1) ShiftTildePlot=0.;
+							if(MarkerDefinitionForThisBin[mainframe][iFrameMP]==2) ShiftTildePlot=ShiftTildePlotZero;
+							if(MarkerDefinitionForThisBin[mainframe][iFrameMP]==3) ShiftTildePlot=-ShiftTildePlotZero;
 
-									graphMP2->GetPoint(ptBin-1,ptCentreMP[pt],lmeanMP[pt]);
-									ptCentreErr_highMP[pt]=graphMP2->GetErrorXhigh(ptBin-1);
-									ptCentreErr_lowMP[pt]=graphMP2->GetErrorXlow(ptBin-1);
-									lmean_errhighMP[pt]=graphMP2->GetErrorYhigh(ptBin-1);
-									lmean_errlowMP[pt]=graphMP2->GetErrorYlow(ptBin-1);
+							int pt=0;
+							if(rapBin<3){
+								for(int ptBin = ptBinMinMP1; ptBin < ptBinMaxMP1+1; ptBin++) {
 
-									ptCentreMP[pt]=ptCentreMP[pt]+ShiftTildePlot;
-									ptCentreErr_highMP[pt]=ptCentreErr_highMP[pt]-ShiftTildePlot;
-									ptCentreErr_lowMP[pt]=ptCentreErr_lowMP[pt]-ShiftTildePlot;
+									graphMP1->GetPoint(ptBin-1,ptCentreMP1[pt],lmeanMP1[pt]);
+									ptCentreErr_highMP1[pt]=graphMP1->GetErrorXhigh(ptBin-1);
+									ptCentreErr_lowMP1[pt]=graphMP1->GetErrorXlow(ptBin-1);
+									lmean_errhighMP1[pt]=graphMP1->GetErrorYhigh(ptBin-1);
+									lmean_errlowMP1[pt]=graphMP1->GetErrorYlow(ptBin-1);
+
+									ptCentreMP1[pt]=ptCentreMP1[pt]+ShiftTildePlot;
+									ptCentreErr_highMP1[pt]=ptCentreErr_highMP1[pt]-ShiftTildePlot;
+									ptCentreErr_lowMP1[pt]=ptCentreErr_lowMP1[pt]-ShiftTildePlot;
+									if(RemoveHorizontalErrorBar){ ptCentreErr_highMP1[pt]=0.; ptCentreErr_lowMP1[pt]=0;}
 
 									pt++;
 								}
+								graphMP1 = new TGraphAsymmErrors(nBinspTMP1,ptCentreMP1,lmeanMP1,ptCentreErr_lowMP1,ptCentreErr_highMP1,lmean_errlowMP1,lmean_errhighMP1);
+							}
+							pt=0;
+							for(int ptBin = ptBinMinMP2; ptBin < ptBinMaxMP2+1; ptBin++) {
 
-								graphMP2 = new TGraphAsymmErrors(nBinspT,ptCentreMP,lmeanMP,ptCentreErr_lowMP,ptCentreErr_highMP,lmean_errlowMP,lmean_errhighMP);
+								graphMP2->GetPoint(ptBin-1,ptCentreMP2[pt],lmeanMP2[pt]);
+								ptCentreErr_highMP2[pt]=graphMP2->GetErrorXhigh(ptBin-1);
+								ptCentreErr_lowMP2[pt]=graphMP2->GetErrorXlow(ptBin-1);
+								lmean_errhighMP2[pt]=graphMP2->GetErrorYhigh(ptBin-1);
+								lmean_errlowMP2[pt]=graphMP2->GetErrorYlow(ptBin-1);
 
-								pt=0;
-								for(int ptBin = ptBinMin; ptBin < ptBinMax+1; ptBin++) {
+								ptCentreMP2[pt]=ptCentreMP2[pt]+ShiftTildePlot;
+								ptCentreErr_highMP2[pt]=ptCentreErr_highMP2[pt]-ShiftTildePlot;
+								ptCentreErr_lowMP2[pt]=ptCentreErr_lowMP2[pt]-ShiftTildePlot;
+								if(RemoveHorizontalErrorBar){ ptCentreErr_highMP2[pt]=0.; ptCentreErr_lowMP2[pt]=0;}
 
-									graphMP3->GetPoint(ptBin-1,ptCentreMP[pt],lmeanMP[pt]);
-									ptCentreErr_highMP[pt]=graphMP3->GetErrorXhigh(ptBin-1);
-									ptCentreErr_lowMP[pt]=graphMP3->GetErrorXlow(ptBin-1);
-									lmean_errhighMP[pt]=graphMP3->GetErrorYhigh(ptBin-1);
-									lmean_errlowMP[pt]=graphMP3->GetErrorYlow(ptBin-1);
+								pt++;
+							}
+							graphMP2 = new TGraphAsymmErrors(nBinspTMP2,ptCentreMP2,lmeanMP2,ptCentreErr_lowMP2,ptCentreErr_highMP2,lmean_errlowMP2,lmean_errhighMP2);
 
-									ptCentreMP[pt]=ptCentreMP[pt]+ShiftTildePlot;
-									ptCentreErr_highMP[pt]=ptCentreErr_highMP[pt]-ShiftTildePlot;
-									ptCentreErr_lowMP[pt]=ptCentreErr_lowMP[pt]-ShiftTildePlot;
-
-									pt++;
-								}
-
-								graphMP3 = new TGraphAsymmErrors(nBinspT,ptCentreMP,lmeanMP,ptCentreErr_lowMP,ptCentreErr_highMP,lmean_errlowMP,lmean_errhighMP);
-
+							if(rapBin<3){
 								graphMP1->SetMarkerColor(MarkerColorMP[MarkerDefinitionForThisBin[mainframe][iFrameMP]]);
 								graphMP1->SetLineColor(MarkerColorMP[MarkerDefinitionForThisBin[mainframe][iFrameMP]]);
 								graphMP1->SetMarkerStyle(MarkerStyleMP[MarkerDefinitionForThisBin[mainframe][iFrameMP]]);
 								graphMP1->SetMarkerSize(MarkerSizeMP[MarkerDefinitionForThisBin[mainframe][iFrameMP]]);
+							}
 
-								graphMP2->SetMarkerColor(MarkerColorMP[MarkerDefinitionForThisBin[mainframe][iFrameMP]]);
-								graphMP2->SetLineColor(MarkerColorMP[MarkerDefinitionForThisBin[mainframe][iFrameMP]]);
-								graphMP2->SetMarkerStyle(MarkerStyleMP[MarkerDefinitionForThisBin[mainframe][iFrameMP]]);
-								graphMP2->SetMarkerSize(MarkerSizeMP[MarkerDefinitionForThisBin[mainframe][iFrameMP]]);
-
-								graphMP3->SetMarkerColor(MarkerColorMP[MarkerDefinitionForThisBin[mainframe][iFrameMP]]);
-								graphMP3->SetLineColor(MarkerColorMP[MarkerDefinitionForThisBin[mainframe][iFrameMP]]);
-								graphMP3->SetMarkerStyle(MarkerStyleMP[MarkerDefinitionForThisBin[mainframe][iFrameMP]]);
-								graphMP3->SetMarkerSize(MarkerSizeMP[MarkerDefinitionForThisBin[mainframe][iFrameMP]]);
+							graphMP2->SetMarkerColor(MarkerColorMP[MarkerDefinitionForThisBin[mainframe][iFrameMP]]);
+							graphMP2->SetLineColor(MarkerColorMP[MarkerDefinitionForThisBin[mainframe][iFrameMP]]);
+							graphMP2->SetMarkerStyle(MarkerStyleMP[MarkerDefinitionForThisBin[mainframe][iFrameMP]]);
+							graphMP2->SetMarkerSize(MarkerSizeMP[MarkerDefinitionForThisBin[mainframe][iFrameMP]]);
 
 
-								if(mainframe==1&&iFrameMP==1){ sprintf(MPtildeLegendEntry,"CS"); MPtildeLegend->AddEntry(graphMP1,MPtildeLegendEntry,"lp"); }
-								if(mainframe!=1&&iFrameMP==1){ sprintf(MPtildeLegendEntry,"CS"); MPtildeLegend->AddEntry(graphMP1,MPtildeLegendEntry,"p"); }
+							if(mainframe==1&&iFrameMP==1){ 
+								sprintf(MPtildeLegendEntry,"CS"); MPtildeLegend->AddEntry(graphMP1,MPtildeLegendEntry,"lp"); }
+							if(mainframe!=1&&iFrameMP==1){ 
+								sprintf(MPtildeLegendEntry,"CS"); MPtildeLegend->AddEntry(graphMP1,MPtildeLegendEntry,"p"); }
 
-								if(mainframe==2&&iFrameMP==2){ sprintf(MPtildeLegendEntry,"HX"); MPtildeLegend->AddEntry(graphMP1,MPtildeLegendEntry,"lp"); }
-								if(mainframe!=2&&iFrameMP==2){ sprintf(MPtildeLegendEntry,"HX"); MPtildeLegend->AddEntry(graphMP1,MPtildeLegendEntry,"p"); }
+							if(mainframe==2&&iFrameMP==2){ 
+								sprintf(MPtildeLegendEntry,"HX"); MPtildeLegend->AddEntry(graphMP1,MPtildeLegendEntry,"lp"); }
+							if(mainframe!=2&&iFrameMP==2){ 
+								sprintf(MPtildeLegendEntry,"HX"); MPtildeLegend->AddEntry(graphMP1,MPtildeLegendEntry,"p"); }
 
-								if(mainframe==3&&iFrameMP==3){ sprintf(MPtildeLegendEntry,"PX"); MPtildeLegend->AddEntry(graphMP1,MPtildeLegendEntry,"lp"); }
-								if(mainframe!=3&&iFrameMP==3){ sprintf(MPtildeLegendEntry,"PX"); MPtildeLegend->AddEntry(graphMP1,MPtildeLegendEntry,"p"); }
+							if(mainframe==3&&iFrameMP==3){ 
+								sprintf(MPtildeLegendEntry,"PX"); MPtildeLegend->AddEntry(graphMP1,MPtildeLegendEntry,"lp"); }
+							if(mainframe!=3&&iFrameMP==3){ 
+								sprintf(MPtildeLegendEntry,"PX"); MPtildeLegend->AddEntry(graphMP1,MPtildeLegendEntry,"p"); }
 
 
 
-								if(mainframe==1){
-									sprintf(GraphNameMP,"ltilde_CS_rap%d",rapBin);
-								}
-								if(mainframe==2){
-									sprintf(GraphNameMP,"ltilde_HX_rap%d",rapBin);
-								}
-								if(mainframe==3){
-									sprintf(GraphNameMP,"ltilde_PX_rap%d",rapBin);
-								}
+							if(mainframe==1){
+								sprintf(GraphNameMP,"ltilde_CS_rap%d",rapBin);
+							}
+							if(mainframe==2){
+								sprintf(GraphNameMP,"ltilde_HX_rap%d",rapBin);
+							}
+							if(mainframe==3){
+								sprintf(GraphNameMP,"ltilde_PX_rap%d",rapBin);
+							}
 
+							if(rapBin<3){
 								graphMP1_1sig = (TGraphAsymmErrors*) infileMP1_1sig->Get(GraphNameMP);
 								graphMP1_2sig = (TGraphAsymmErrors*) infileMP1_2sig->Get(GraphNameMP);
 								graphMP1_3sig = (TGraphAsymmErrors*) infileMP1_3sig->Get(GraphNameMP);
-								graphMP2_1sig = (TGraphAsymmErrors*) infileMP2_1sig->Get(GraphNameMP);
-								graphMP2_2sig = (TGraphAsymmErrors*) infileMP2_2sig->Get(GraphNameMP);
-								graphMP2_3sig = (TGraphAsymmErrors*) infileMP2_3sig->Get(GraphNameMP);
-								graphMP3_1sig = (TGraphAsymmErrors*) infileMP3_1sig->Get(GraphNameMP);
-								graphMP3_2sig = (TGraphAsymmErrors*) infileMP3_2sig->Get(GraphNameMP);
-								graphMP3_3sig = (TGraphAsymmErrors*) infileMP3_3sig->Get(GraphNameMP);
+							}
+							graphMP2_1sig = (TGraphAsymmErrors*) infileMP2_1sig->Get(GraphNameMP);
+							graphMP2_2sig = (TGraphAsymmErrors*) infileMP2_2sig->Get(GraphNameMP);
+							graphMP2_3sig = (TGraphAsymmErrors*) infileMP2_3sig->Get(GraphNameMP);
 
-
-								graphMP1_1sig->SetFillColor(kGreen);
-								graphMP1_1sig->SetFillStyle(1001);
-								graphMP1_2sig->SetFillColor(kYellow);
-								graphMP1_2sig->SetFillStyle(1001);
-								graphMP1_3sig->SetFillColor(kCyan-9);
-								graphMP1_3sig->SetFillStyle(1001);
-
-								graphMP2_1sig->SetFillColor(kGreen);
-								graphMP2_1sig->SetFillStyle(1001);
-								graphMP2_2sig->SetFillColor(kYellow);
-								graphMP2_2sig->SetFillStyle(1001);
-								graphMP2_3sig->SetFillColor(kCyan-9);
-								graphMP2_3sig->SetFillStyle(1001);
-
-								graphMP3_1sig->SetFillColor(kGreen);
-								graphMP3_1sig->SetFillStyle(1001);
-								graphMP3_2sig->SetFillColor(kYellow);
-								graphMP3_2sig->SetFillStyle(1001);
-								graphMP3_3sig->SetFillColor(kCyan-9);
-								graphMP3_3sig->SetFillStyle(1001);
-
-								if(iPanel==1){
-
-									if(iFrameMP==1){
-										graphMP1_3sig->Draw("2");
-										graphMP1_2sig->Draw("2");
-										graphMP1_1sig->Draw("2");
-										if(mainframe==1) graphMP1->Draw(drawGraphStyle);
-									}
-									if(iFrameMP==2){
-										if(mainframe==2) graphMP1->Draw(drawGraphStyle);
-									}
-									if(iFrameMP==3){
-										if(mainframe==3) graphMP1->Draw(drawGraphStyle);
-									}
-
-									if(iFrameMP==1){
-										if(mainframe!=1) graphMP1->Draw("PX");
-									}
-									if(iFrameMP==2){
-										if(mainframe!=2) graphMP1->Draw("PX");
-									}
-									if(iFrameMP==3){
-										if(mainframe!=3) graphMP1->Draw("PX");
-									}
-
-								}
-								if(iPanel==2){
-
-									if(iFrameMP==1){
-										graphMP2_3sig->Draw("2");
-										graphMP2_2sig->Draw("2");
-										graphMP2_1sig->Draw("2");
-										if(mainframe==1) graphMP2->Draw(drawGraphStyle);
-									}
-									if(iFrameMP==2){
-										if(mainframe==2) graphMP2->Draw(drawGraphStyle);
-									}
-									if(iFrameMP==3){
-										if(mainframe==3) graphMP2->Draw(drawGraphStyle);
-									}
-
-									if(iFrameMP==1){
-										if(mainframe!=1) graphMP2->Draw("PX");
-									}
-									if(iFrameMP==2){
-										if(mainframe!=2) graphMP2->Draw("PX");
-									}
-									if(iFrameMP==3){
-										if(mainframe!=3) graphMP2->Draw("PX");
-									}
-
-								}
-								if(iPanel==3){
-
-									if(iFrameMP==1){
-										graphMP3_3sig->Draw("2");
-										graphMP3_2sig->Draw("2");
-										graphMP3_1sig->Draw("2");
-										if(mainframe==1) graphMP3->Draw(drawGraphStyle);
-									}
-									if(iFrameMP==2){
-										if(mainframe==2) graphMP3->Draw(drawGraphStyle);
-									}
-									if(iFrameMP==3){
-										if(mainframe==3) graphMP3->Draw(drawGraphStyle);
-									}
-
-									if(iFrameMP==1){
-										if(mainframe!=1) graphMP3->Draw("PX");
-									}
-									if(iFrameMP==2){
-										if(mainframe!=2) graphMP3->Draw("PX");
-									}
-									if(iFrameMP==3){
-										if(mainframe!=3) graphMP3->Draw("PX");
-									}
-
-
+							//remove points from the TGraph
+							for(int ipoint=1; ipoint<ptBinMinMP1; ipoint++){
+								if(rapBin<3){
+									graphMP1_1sig->RemovePoint(0);
+									graphMP1_2sig->RemovePoint(0);
+									graphMP1_3sig->RemovePoint(0);
 								}
 							}
+							for(int ipoint=1; ipoint<ptBinMinMP2; ipoint++){
+								graphMP2_1sig->RemovePoint(0);
+								graphMP2_2sig->RemovePoint(0);
+								graphMP2_3sig->RemovePoint(0);
+							}
+							//end--remove points from the TGraph
 
+							//remove X bin error to ColordBandWidth
+							for(int ipoint=0; ipoint<nBinspTMP1; ipoint++){
+								if(rapBin<3){
+									graphMP1_1sig->SetPointEXlow(ipoint, ColordBandWidth); graphMP1_1sig->SetPointEXhigh(ipoint, ColordBandWidth);
+									graphMP1_2sig->SetPointEXlow(ipoint, ColordBandWidth); graphMP1_2sig->SetPointEXhigh(ipoint, ColordBandWidth);
+									graphMP1_3sig->SetPointEXlow(ipoint, ColordBandWidth); graphMP1_3sig->SetPointEXhigh(ipoint, ColordBandWidth);
+								}
+							}
+							for(int ipoint=0; ipoint<nBinspTMP2; ipoint++){
+								graphMP2_1sig->SetPointEXlow(ipoint, ColordBandWidth); graphMP2_1sig->SetPointEXhigh(ipoint, ColordBandWidth);
+								graphMP2_2sig->SetPointEXlow(ipoint, ColordBandWidth); graphMP2_2sig->SetPointEXhigh(ipoint, ColordBandWidth);
+								graphMP2_3sig->SetPointEXlow(ipoint, ColordBandWidth); graphMP2_3sig->SetPointEXhigh(ipoint, ColordBandWidth);
+							}
+							//end--remove X bin error 
 
+							graphMP1_1sig->SetFillColor(kGreen);
+							graphMP1_1sig->SetFillStyle(1001);
+							graphMP1_2sig->SetFillColor(kYellow);
+							graphMP1_2sig->SetFillStyle(1001);
+							graphMP1_3sig->SetFillColor(kCyan-9);
+							graphMP1_3sig->SetFillStyle(1001);
 
-							TGaxis *axisMPY1 = new TGaxis(onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL,yMinMP,onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL,yMaxMP,yMinMP,yMaxMP,AxisDivisions,"-US");
-							axisMPY1->SetTickSize(ticksize);
-							if(iPanel==nPanels) axisMPY1->SetTickSize(ticksize/(1-lowestBottomMargin));
-							axisMPY1->Draw("same");
+							graphMP2_1sig->SetFillColor(kGreen);
+							graphMP2_1sig->SetFillStyle(1001);
+							graphMP2_2sig->SetFillColor(kYellow);
+							graphMP2_2sig->SetFillStyle(1001);
+							graphMP2_3sig->SetFillColor(kCyan-9);
+							graphMP2_3sig->SetFillStyle(1001);
 
-							TGaxis *axisMPY2 = new TGaxis(onia::pTRange[rapBin][ptBinMax],yMinMP,onia::pTRange[rapBin][ptBinMax],yMaxMP,yMinMP,yMaxMP,AxisDivisions,"+US");
-							axisMPY2->SetTickSize(ticksize);
-							if(iPanel==nPanels) axisMPY2->SetTickSize(ticksize/(1-lowestBottomMargin));
-							axisMPY2->Draw("same");
+							if(nState==4){
 
+								if(iFrameMP==1){
+									graphMP1_3sig->Draw("2");
+									graphMP1_2sig->Draw("2");
+									graphMP1_1sig->Draw("2");
+									if(mainframe==1) graphMP1->Draw(drawGraphStyle);
+								}
+								if(iFrameMP==2){
+									if(mainframe==2) graphMP1->Draw(drawGraphStyle);
+								}
+								if(iFrameMP==3){
+									if(mainframe==3) graphMP1->Draw(drawGraphStyle);
+								}
 
-							TGaxis *axisM3S1 = new TGaxis(onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL,yMinMP,onia::pTRange[rapBin][ptBinMax],yMinMP,onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL+deltaTrickAxisMin,onia::pTRange[rapBin][ptBinMax]+deltaTrickAxisMax,AxisDivisions,"+S");
-							axisM3S1->SetTickSize(ticksize*2);
-							if(iPanel==nPanels) axisM3S1->SetLabelSize(LabelSize);
-							if(iPanel<nPanels) axisM3S1->SetLabelSize(0);
-							axisM3S1->SetLabelOffset(labelOffsetX);
-							if(iPanel==nPanels) axisM3S1->SetTickSize(ticksize/(1-lowestBottomMargin));
-							axisM3S1->Draw("same");
-
-							TGaxis *axisM3S2 = new TGaxis(onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL,yMaxMP,onia::pTRange[rapBin][ptBinMax],yMaxMP,onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL+deltaTrickAxisMin,onia::pTRange[rapBin][ptBinMax]+deltaTrickAxisMax,AxisDivisions,"-US");
-							axisM3S2->SetTickSize(ticksize*2);
-							if(iPanel==nPanels) axisM3S2->SetTickSize(ticksize/(1-lowestBottomMargin));
-							axisM3S2->Draw("same");
-
-							whereTexteInPlotX=XtitlePosition;
-							whereTexteInPlotY=(yMaxMP+yMinMP)/2.-(yMaxMP-yMinMP)*XtitlePositionYshift;
-
-							char axistitleMPtilde[200];
-							sprintf(axistitleMPtilde,"#tilde{#lambda}");
-							if(iPanel==nPanels) YaxistitleLatexSize=YaxistitleLatexSize*(1-lowestBottomMargin);
-							TLatex *MPYtitletext = new TLatex(whereTexteInPlotX,whereTexteInPlotY ,axistitleMPtilde);
-							MPYtitletext->SetTextSize(YaxistitleLatexSize);
-							if(iPanel==nPanels) MPYtitletext->SetTextSize(YaxistitleLatexSize*(1-lowestBottomMargin));
-							MPYtitletext->SetTextColor(kBlack);
-							MPYtitletext->PaintLatex(whereTexteInPlotX,whereTexteInPlotY, YtitleAngle, YaxistitleLatexSize, axislabel);
-							MPYtitletext->Draw( "same" );
-
-
-
-
-							char texTexMP[200];
-							if(rapBin==1) sprintf(texTexMP,"#psi(%dS), |#it{y}| < 0.6", iPanel);
-							if(rapBin==2) sprintf(texTexMP,"#psi(%dS), 0.6 < |#it{y}| < 1.2", iPanel);
-							TLatex *textMP = new TLatex(xRapTextTilde,yMin+(yMax-yMin)*yRapText*0.92,texTexMP);
-							textMP->SetTextSize(textSizeRap);
-							if(iPanel==nPanels) textMP->SetTextSize(textSizeRap*(1-lowestBottomMargin));
-							textMP->Draw( "same" );
-
-							char abcdef[200];
-							if(rapBin==1&&iPanel==1) sprintf(abcdef,"a)");
-							if(rapBin==1&&iPanel==2) sprintf(abcdef,"b)");
-							if(rapBin==1&&iPanel==3) sprintf(abcdef,"c)");
-							if(rapBin==2&&iPanel==1) sprintf(abcdef,"d)");
-							if(rapBin==2&&iPanel==2) sprintf(abcdef,"e)");
-							if(rapBin==2&&iPanel==3) sprintf(abcdef,"f)");
-							if(rapBin==3&&iPanel==1) sprintf(abcdef,"g)");
-							if(rapBin==3&&iPanel==2) sprintf(abcdef,"h)");
-							if(rapBin==3&&iPanel==3) sprintf(abcdef,"i)");
-							cout<<abcdef<<endl;
-							TLatex *tex_abcdef = new TLatex(xabcdefText,yMin+(yMax-yMin)*yRapText*0.92,abcdef);
-							tex_abcdef->SetTextSize(textSizeRap);
-							if(iPanel==nPanels) tex_abcdef->SetTextSize(textSizeRap*(1-lowestBottomMargin));
-							tex_abcdef->Draw( "same" );
-
-							if(PlotFinalData&&DrawLatexStuff){
-
-								//TLine* extreme0MP = new TLine( onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL, 0, onia::pTRange[rapBin][ptBinMax] ,0);
-								TLine* extreme0MP = new TLine( PlotpTMin-DeltaXminOVERALL, 0, PlotpTMax ,0);
-								extreme0MP->SetLineWidth( 1 );
-								extreme0MP->SetLineStyle( 2 );
-								extreme0MP->SetLineColor( kBlack );
-								extreme0MP->Draw( "same" );
-
-								//TLine* extreme1MP = new TLine( onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL, 1, onia::pTRange[rapBin][ptBinMax] , 1);
-								TLine* extreme1MP = new TLine( PlotpTMin-DeltaXminOVERALL, 1, PlotpTMax , 1);
-								extreme1MP->SetLineWidth( 1 );
-								extreme1MP->SetLineStyle( 2 );
-								extreme1MP->SetLineColor( kBlack );
-								if(iLam==1||iLam==7||iLam==13) extreme1MP->Draw( "same" );
-
-								//TLine* extreme2MP = new TLine( onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL, -1, onia::pTRange[rapBin][ptBinMax] ,-1);
-								TLine* extreme2MP = new TLine( PlotpTMin-DeltaXminOVERALL, -1, PlotpTMax ,-1);
-								extreme2MP->SetLineWidth( 1 );
-								extreme2MP->SetLineStyle( 2 );
-								extreme2MP->SetLineColor( kBlack );
-								if(iLam==1||iLam==7||iLam==13) extreme2MP->Draw( "same" );
-								if(iLam==6||iLam==12||iLam==18) extreme2MP->Draw( "same" );
+								if(iFrameMP==1){
+									if(mainframe!=1) graphMP1->Draw("PX");
+								}
+								if(iFrameMP==2){
+									if(mainframe!=2) graphMP1->Draw("PX");
+								}
+								if(iFrameMP==3){
+									if(mainframe!=3) graphMP1->Draw("PX");
+								}
 
 							}
+							if(nState==5){
 
+								if(iFrameMP==1){
+									graphMP2_3sig->Draw("2");
+									graphMP2_2sig->Draw("2");
+									graphMP2_1sig->Draw("2");
+									if(mainframe==1) graphMP2->Draw(drawGraphStyle);
+								}
+								if(iFrameMP==2){
+									if(mainframe==2) graphMP2->Draw(drawGraphStyle);
+								}
+								if(iFrameMP==3){
+									if(mainframe==3) graphMP2->Draw(drawGraphStyle);
+								}
 
-							if(rapBin==1&&iPanel==1){
-								cout<<"DRAW CMS preliminary Latex"<<endl;
-								char text[200];
-								sprintf(text,"CMS preliminary     pp    #sqrt{s} = 7 TeV     L = 4.9 fb^{-1}");
-								TLatex *CentralsText1MP = new TLatex(MPlatexX,MPlatexYmax,text);
-								CentralsText1MP->SetTextSize(CentralsFontSizeMP);
-								CentralsText1MP->Draw( "same" );
-								/*			 sprintf(text,"L = 4.9 fb^{-1}");
-												 TLatex *CentralsText2MP = new TLatex(MPlatexX,MPlatexYmax-2*MPlatexDeltaYmax,text);
-												 CentralsText2MP->SetTextSize(CentralsFontSizeMP);
-												 CentralsText2MP->Draw( "same" );
-												 sprintf(text,"pp    #sqrt{s} = 7 TeV");
-												 TLatex *CentralsText3MP = new TLatex(MPlatexX,MPlatexYmax-MPlatexDeltaYmax,text);
-												 CentralsText3MP->SetTextSize(CentralsFontSizeMP);
-												 CentralsText3MP->Draw( "same" );
-								 */
-
-							}
-
-							if(rapBin==1&&iPanel==2){
-								graphMP1_1sig->SetLineColor(kGreen);
-								graphMP1_2sig->SetLineColor(kYellow);
-								graphMP1_3sig->SetLineColor(kCyan-9);
-
-								TGraphAsymmErrors *legendPhantom = (TGraphAsymmErrors*) infileMP3_3sig->Get("ltilde_CS_rap1");
-
-								legendPhantom->SetMarkerColor(MarkerColorMP[0]);
-								legendPhantom->SetLineColor(MarkerColorMP[0]);
-								legendPhantom->SetMarkerStyle(MarkerStyleMP[1]);
-								legendPhantom->SetMarkerSize(MarkerSizeMP[0]);
-
-
-								if(PlotAlteredPPDResults) sprintf(MPframedepLegendEntry,"Stat. uncert., 68.3 %% CL");
-								if(!PlotAlteredPPDResults) sprintf(MPframedepLegendEntry,"Tot. sys. uncert.");
-								MPframedepLegendError->AddEntry(legendPhantom,MPframedepLegendEntry,"ple");
-								if(PlotAlteredPPDResults) sprintf(MPframedepLegendEntry,"Tot. uncert., 68.3 %% CL");
-								if(!PlotAlteredPPDResults) sprintf(MPframedepLegendEntry,"68.3 %% CL");
-								MPframedepLegendError->AddEntry(graphMP1_1sig,MPframedepLegendEntry,"f");
-								if(PlotAlteredPPDResults) sprintf(MPframedepLegendEntry,"Tot. uncert., 95.5 %% CL");
-								if(!PlotAlteredPPDResults) sprintf(MPframedepLegendEntry,"95.5 %% CL");
-								MPframedepLegendError->AddEntry(graphMP1_2sig,MPframedepLegendEntry,"f");
-								if(PlotAlteredPPDResults) sprintf(MPframedepLegendEntry,"Tot. uncert., 99.7 %% CL");
-								if(!PlotAlteredPPDResults) sprintf(MPframedepLegendEntry,"99.7 %% CL");
-								MPframedepLegendError->AddEntry(graphMP1_3sig,MPframedepLegendEntry,"f");
-
-								MPtildeLegend->Draw("same");
-								MPframedepLegendError->Draw("same");
+								if(iFrameMP==1){
+									if(mainframe!=1) graphMP2->Draw("PX");
+								}
+								if(iFrameMP==2){
+									if(mainframe!=2) graphMP2->Draw("PX");
+								}
+								if(iFrameMP==3){
+									if(mainframe!=3) graphMP2->Draw("PX");
+								}
 
 							}
+						}
 
-							/*			 if(rapBin==2&&iPanel==1){
+						TGaxis *axisMPY1 = new TGaxis(PlotpTMin-DeltaXminOVERALL,yMinMP,PlotpTMin-DeltaXminOVERALL,yMaxMP,
+								yMinMP,yMaxMP,AxisDivisions,"-US");
+						axisMPY1->SetTickSize(ticksize);
+						axisMPY1->SetTickSize(ticksize/(1-lowestBottomMargin));
+						axisMPY1->Draw("same");
 
-											 char frameMPtex[200];
-											 if(MPframe==1) sprintf(frameMPtex,"CS frame");
-											 if(MPframe==2) sprintf(frameMPtex,"HX frame");
-											 if(MPframe==3) sprintf(frameMPtex,"PX frame");
-											 char textStateFrame[200];
-											 sprintf(textStateFrame,"%s", frameMPtex);
-											 TLatex *TexStateFrame = new TLatex(MPlatexX,MPlatexYmax,textStateFrame);
-											 TexStateFrame->SetTextSize(CentralsFontSizeMP);
-											 TexStateFrame->Draw( "same" );
+						TGaxis *axisMPY2 = new TGaxis(PlotpTMax,yMinMP,PlotpTMax,yMaxMP,yMinMP,yMaxMP,AxisDivisions,"+US");
+						axisMPY2->SetTickSize(ticksize);
+						axisMPY2->SetTickSize(ticksize/(1-lowestBottomMargin));
+						axisMPY2->Draw("same");
 
-											 }
-							 */
-						}//end iStateMP loop
+						TGaxis *axisM3S1 = new TGaxis(PlotpTMin-DeltaXminOVERALL,yMinMP,PlotpTMax,yMinMP,
+								PlotpTMin-DeltaXminOVERALL+deltaTrickAxisMin,PlotpTMax+deltaTrickAxisMax,AxisDivisions,"+S");
+						axisM3S1->SetTickSize(ticksize*2);
+						axisM3S1->SetLabelSize(LabelSize*0.62);
+						if(rapBin==1) axisM3S1->SetLabelSize(LabelSize*0.72*(1-Left_margin));
+						axisM3S1->SetLabelOffset(labelOffsetX*0.7);
+						if(rapBin==1) axisM3S1->SetLabelOffset(labelOffsetX*0.8);
+						//if(rapBin==1) axisM3S1->SetLabelOffset(labelOffsetX*0.8*(1-Left_margin));
+						axisM3S1->SetTickSize(ticksize*0.7/(1-lowestBottomMargin));
+						axisM3S1->Draw("same");
 
-						MPcanvasTilde->cd();
+						TGaxis *axisM3S2 = new TGaxis(PlotpTMin-DeltaXminOVERALL,yMaxMP,PlotpTMax,yMaxMP,
+								PlotpTMin-DeltaXminOVERALL+deltaTrickAxisMin,PlotpTMax+deltaTrickAxisMax,AxisDivisions,"-US");
+						axisM3S2->SetTickSize(ticksize*2);
+						axisM3S2->SetTickSize(ticksize/(1-lowestBottomMargin));
+						axisM3S2->Draw("same");
+
+						whereTexteInPlotX=XtitlePosition;
+						whereTexteInPlotY=(yMaxMP+yMinMP)/2.-(yMaxMP-yMinMP)*XtitlePositionYshift;
+
+						char axistitleMPtilde[200];
+						sprintf(axistitleMPtilde,"#tilde{#lambda}");
+						YaxistitleLatexSize=YaxistitleLatexSize*(1-lowestBottomMargin)*0.7;
+						TLatex *MPYtitletext = new TLatex(whereTexteInPlotX,whereTexteInPlotY ,axistitleMPtilde);
+						MPYtitletext->SetTextSize(YaxistitleLatexSize);
+						MPYtitletext->SetTextSize(YaxistitleLatexSize*(1-lowestBottomMargin));
+						MPYtitletext->SetTextColor(kBlack);
+						MPYtitletext->PaintLatex(whereTexteInPlotX,whereTexteInPlotY, YtitleAngle, YaxistitleLatexSize, axislabel);
+						MPYtitletext->Draw( "same" );
+
+						char texTexMP[200];
+						if(rapBin==1) sprintf(texTexMP,"#psi(%dS), |#it{y}| < 0.6", nState-3);
+						if(rapBin==2) sprintf(texTexMP,"#psi(%dS), 0.6 < |#it{y}| < 1.2", nState-3);
+						if(rapBin==3) sprintf(texTexMP,"#psi(%dS), 0.6 < |#it{y}| < 1.5", nState-3);
+						if(nState==4){
+							if(rapBin==1) sprintf(texTexMP,"J/#psi, |#it{y}| < 0.6");
+							if(rapBin==2) sprintf(texTexMP,"J/#psi, 0.6 < |#it{y}| < 1.2");
+						}
+						TLatex *textMP = new TLatex(xRapTextTilde,yMin+(yMax-yMin)*yRapText*0.92,texTexMP);
+						textMP->SetTextSize(textSizeRap*0.7);
+						if(rapBin==1) textMP->SetTextSize(textSizeRap*0.75*(1-Left_margin));
+						textMP->Draw( "same" );
+
+						char abcdef[200];
+						if(rapBin==1) sprintf(abcdef,"a)");
+						if(rapBin==2) sprintf(abcdef,"b)");
+						if(rapBin==3) sprintf(abcdef,"c)");
+						cout<<abcdef<<endl;
+						TLatex *tex_abcdef = new TLatex(xabcdefText,yMin+(yMax-yMin)*yRapText*0.92,abcdef);
+						tex_abcdef->SetTextSize(textSizeRap);
+						tex_abcdef->SetTextSize(textSizeRap*(1-lowestBottomMargin));
+						//tex_abcdef->Draw( "same" );
+
+						if(PlotFinalData&&DrawLatexStuff){
+
+							TLine* extreme0MP = new TLine( PlotpTMin-DeltaXminOVERALL, 0, PlotpTMax ,0);
+							extreme0MP->SetLineWidth( 1 );
+							extreme0MP->SetLineStyle( 2 );
+							extreme0MP->SetLineColor( kBlack );
+							extreme0MP->Draw( "same" );
+
+							TLine* extreme1MP = new TLine( PlotpTMin-DeltaXminOVERALL, 1, PlotpTMax , 1);
+							extreme1MP->SetLineWidth( 1 );
+							extreme1MP->SetLineStyle( 2 );
+							extreme1MP->SetLineColor( kBlack );
+							if(iLam==1||iLam==7||iLam==13) extreme1MP->Draw( "same" );
+
+							TLine* extreme2MP = new TLine( PlotpTMin-DeltaXminOVERALL, -1, PlotpTMax ,-1);
+							extreme2MP->SetLineWidth( 1 );
+							extreme2MP->SetLineStyle( 2 );
+							extreme2MP->SetLineColor( kBlack );
+							if(iLam==1||iLam==7||iLam==13) extreme2MP->Draw( "same" );
+							if(iLam==6||iLam==12||iLam==18) extreme2MP->Draw( "same" );
+
+						}
+
+
+						if(rapBin==1){
+							cout<<"DRAW CMS preliminary Latex"<<endl;
+							char text[200];
+							sprintf(text,"CMS  pp  #sqrt{s} = 7 TeV  L = 4.9 fb^{-1}");
+							TLatex *CentralsText1MP = new TLatex(MPlatexX,MPlatexYmax,text);
+							CentralsText1MP->SetTextSize(CentralsFontSizeMP*0.5);
+							CentralsText1MP->Draw( "same" );
+
+							sprintf(text,"Preliminary");
+							TLatex *CentralsText2MP = new TLatex(MPlatexX,MPlatexYmax-1*MPlatexDeltaYmax,text);
+							CentralsText2MP->SetTextSize(CentralsFontSizeMP*0.5);
+							CentralsText2MP->Draw( "same" );
+
+							//sprintf(text,"L = 4.9 fb^{-1}");
+							//TLatex *CentralsText2MP = new TLatex(MPlatexX,MPlatexYmax-2*MPlatexDeltaYmax,text);
+							//CentralsText2MP->SetTextSize(CentralsFontSizeMP);
+							//CentralsText2MP->Draw( "same" );
+							//sprintf(text,"pp    #sqrt{s} = 7 TeV");
+							//TLatex *CentralsText3MP = new TLatex(MPlatexX,MPlatexYmax-MPlatexDeltaYmax,text);
+							//CentralsText3MP->SetTextSize(CentralsFontSizeMP);
+							//CentralsText3MP->Draw( "same" );
+
+						}
+
+						if(rapBin==2){
+							graphMP1_1sig->SetLineColor(kGreen);
+							graphMP1_2sig->SetLineColor(kYellow);
+							graphMP1_3sig->SetLineColor(kCyan-9);
+
+							TGraphAsymmErrors *legendPhantom = (TGraphAsymmErrors*) infileMP2_3sig->Get("ltilde_CS_rap1");
+
+							legendPhantom->SetMarkerColor(MarkerColorMP[0]);
+							legendPhantom->SetLineColor(MarkerColorMP[0]);
+							legendPhantom->SetMarkerStyle(MarkerStyleMP[1]);
+							legendPhantom->SetMarkerSize(MarkerSizeMP[0]);
+
+
+							if(PlotAlteredPPDResults) sprintf(MPframedepLegendEntry,"Stat. uncert., 68.3 %% CL");
+							if(!PlotAlteredPPDResults) sprintf(MPframedepLegendEntry,"Tot. sys. uncert.");
+							MPframedepLegendError->AddEntry(legendPhantom,MPframedepLegendEntry,"ple");
+							if(PlotAlteredPPDResults) sprintf(MPframedepLegendEntry,"Tot.  uncert., 68.3 %% CL");
+							if(!PlotAlteredPPDResults) sprintf(MPframedepLegendEntry,"68.3 %% CL");
+							MPframedepLegendError->AddEntry(graphMP1_1sig,MPframedepLegendEntry,"f");
+							if(PlotAlteredPPDResults) sprintf(MPframedepLegendEntry,"Tot.  uncert., 95.5 %% CL");
+							if(!PlotAlteredPPDResults) sprintf(MPframedepLegendEntry,"95.5 %% CL");
+							MPframedepLegendError->AddEntry(graphMP1_2sig,MPframedepLegendEntry,"f");
+							if(PlotAlteredPPDResults) sprintf(MPframedepLegendEntry,"Tot.  uncert., 99.7 %% CL");
+							if(!PlotAlteredPPDResults) sprintf(MPframedepLegendEntry,"99.7 %% CL");
+							MPframedepLegendError->AddEntry(graphMP1_3sig,MPframedepLegendEntry,"f");
+
+							MPtildeLegend->Draw("same");
+							MPframedepLegendError->Draw("same");
+
+						}
+
+						//if(rapBin==2){
+						//	char frameMPtex[200];
+						//	if(MPframe==1) sprintf(frameMPtex,"CS frame");
+						//	if(MPframe==2) sprintf(frameMPtex,"HX frame");
+						//	if(MPframe==3) sprintf(frameMPtex,"PX frame");
+						//	char textStateFrame[200];
+						//	sprintf(textStateFrame,"%s", frameMPtex);
+						//	TLatex *TexStateFrame = new TLatex(MPlatexX,MPlatexYmax,textStateFrame);
+						//	TexStateFrame->SetTextSize(CentralsFontSizeMP);
+						//	TexStateFrame->Draw( "same" );
+						//}
+
+						MPcanvasTilde_Psi->cd();
 
 						whereTexteInPlotX=0.488;
 						whereTexteInPlotY=startValCoordY-deltaCoordY-1.425*labelOffsetX;
@@ -3300,17 +3245,369 @@ int main(int argc, char** argv) {
 						TLatex *M3Slabeltext = new TLatex(whereTexteInPlotX,whereTexteInPlotY ,"1");
 						M3Slabeltext->SetTextSize(XaxislabelLatexSize);
 						M3Slabeltext->SetTextColor(kBlack);
-						if(iPanel==nPanels) M3Slabeltext->Draw( "same" );
+						//M3Slabeltext->Draw( "same" );
 
-						if((iLam==6||iLam==12||iLam==18)&&rapBin==2){
-							if(mainframe==1) sprintf(filename,"%s/FinalResultsTildeCS_OLD.pdf",FigDir);
-							if(mainframe==2) sprintf(filename,"%s/FinalResultsTildeHX_OLD.pdf",FigDir);
-							if(mainframe==3) sprintf(filename,"%s/FinalResultsTildePX_OLD.pdf",FigDir);
-							if(PlotFinalData) MPcanvasTilde->SaveAs(filename);
-							MPcanvasTilde->Close();
+						if((iLam==6||iLam==12||iLam==18)&&((nState<=4&&rapBin==2)||(nState==5&&rapBin==3))){
+							if(mainframe==1) sprintf(filename,"%s/FinalResultsTildeCS_Psi%dS.pdf",FigDir,nState-3);
+							if(mainframe==2) sprintf(filename,"%s/FinalResultsTildeHX_Psi%dS.pdf",FigDir,nState-3);
+							if(mainframe==3) sprintf(filename,"%s/FinalResultsTildePX_Psi%dS.pdf",FigDir,nState-3);
+							if(PlotFinalData) MPcanvasTilde_Psi->SaveAs(filename);
+							MPcanvasTilde_Psi->Close();
 						}
 					}//end Frame independent plots
 				}
+
+				//======================================================================================
+
+
+
+				cout<<"begin Frame dependent plots"<<endl;
+
+				//begin Frame dependent plots
+				if(Psi_MPplots_Old){
+
+					if(nState>3) {
+						MPcanvasXpixel = MPcanvasXpixelInitial * 1.5;
+						if(nState==4)
+							MPcanvasYpixel = MPcanvasYpixelInitial * 0.65;
+					}
+					cout<<"MPcanvasXpixel: "<<MPcanvasXpixel<<" MPcanvasYpixel: "<<MPcanvasYpixel<<endl;
+
+					if(iLam!=6&&iLam!=12&&iLam!=18){
+
+						if(iLam>0&&iLam<7) MPframe=1;
+						if(iLam>6&&iLam<13) MPframe=2;
+						if(iLam>12&&iLam<19) MPframe=3;
+
+						if(iLam==1||iLam==7||iLam==13) iPanel=1;
+						if(iLam==2||iLam==8||iLam==14) iPanel=2;
+						if(iLam==3||iLam==9||iLam==15) iPanel=3;
+
+						cout<<"MultiPanel canvas"<<endl;
+
+						if(iLam==1&&rapBin==1){
+							MPcanvasCS_Psi = new TCanvas("MPcanvasCS_Psi", "MPcanvasCS_Psi",MPcanvasXpixel,MPcanvasYpixel);
+							MPcanvasCS_Psi->SetFillColor(kWhite);
+							MPcanvasCS_Psi->GetFrame()->SetFillColor(kWhite);
+							MPcanvasCS_Psi->GetFrame()->SetBorderSize(0);
+						}
+						if(iLam==7&&rapBin==1){
+							MPcanvasHX_Psi = new TCanvas("MPcanvasHX_Psi", "MPcanvasHX_Psi",MPcanvasXpixel,MPcanvasYpixel);
+							MPcanvasHX_Psi->SetFillColor(kWhite);
+							MPcanvasHX_Psi->GetFrame()->SetFillColor(kWhite);
+							MPcanvasHX_Psi->GetFrame()->SetBorderSize(0);
+						}
+						if(iLam==13&&rapBin==1){
+							MPcanvasPX_Psi = new TCanvas("MPcanvasPX_Psi", "MPcanvasPX_Psi",MPcanvasXpixel,MPcanvasYpixel);
+							MPcanvasPX_Psi->SetFillColor(kWhite);
+							MPcanvasPX_Psi->GetFrame()->SetFillColor(kWhite);
+							MPcanvasPX_Psi->GetFrame()->SetBorderSize(0);
+						}
+
+						if(MPframe==1) MPcanvasCS_Psi->cd();
+						if(MPframe==2) MPcanvasHX_Psi->cd();
+						if(MPframe==3) MPcanvasPX_Psi->cd();
+
+						cout<<"MultiPanel pad"<<endl;
+						TPad *MPpad_PsiDep;
+						if(nState==5){
+							if(rapBin==1) MPpad_PsiDep = new TPad("MPpad_PsiDep","MPpad_PsiDep",PadCoordY[iPanel-1],PadCoordY[2],PadCoordY[iPanel],PadCoordY[3]);
+							if(rapBin==2) MPpad_PsiDep = new TPad("MPpad_PsiDep","MPpad_PsiDep",PadCoordY[iPanel-1],PadCoordY[1],PadCoordY[iPanel],PadCoordY[2]);
+							if(rapBin==3) MPpad_PsiDep = new TPad("MPpad_PsiDep","MPpad_PsiDep",PadCoordY[iPanel-1],PadCoordY[0],PadCoordY[iPanel],PadCoordY[1]);
+						}
+						else{
+							if(rapBin==1) MPpad_PsiDep = new TPad("MPpad_PsiDep","MPpad_PsiDep",PadCoordY[iPanel-1] ,0.55, PadCoordY[iPanel] ,1.);
+							if(rapBin==2) MPpad_PsiDep = new TPad("MPpad_PsiDep","MPpad_PsiDep",PadCoordY[iPanel-1] ,0.0, PadCoordY[iPanel] ,0.55);
+						}
+
+						MPpad_PsiDep->Draw();
+						MPpad_PsiDep->cd();
+
+						MPpad_PsiDep->SetFillColor(kWhite);
+						MPpad_PsiDep->SetFrameFillColor(kWhite);
+						MPpad_PsiDep->SetBorderSize(0);
+						MPpad_PsiDep->SetLeftMargin(0.);
+						MPpad_PsiDep->SetRightMargin(0.);
+						if(iPanel==1) MPpad_PsiDep->SetLeftMargin(Left_margin);
+						if(iPanel==3) MPpad_PsiDep->SetRightMargin(Right_margin);
+						MPpad_PsiDep->SetTopMargin(Top_margin+0.0025);
+						if(rapBin==1) MPpad_PsiDep->SetTopMargin(Top_margin+0.035);
+						MPpad_PsiDep->SetBottomMargin(0.0);
+						if((nState==4&&rapBin==2)||(nState==5&&rapBin==3)) MPpad_PsiDep->SetBottomMargin(lowestBottomMargin);
+
+						cout<<"MultiPanel hist"<<endl;
+						TH1F *MPhist_PsiDep = new TH1F;
+						if(MPframe==1)MPhist_PsiDep = MPcanvasCS_Psi->DrawFrame(PlotpTMin-DeltaXminOVERALL,yMinMP,PlotpTMax,yMaxMP);
+						if(MPframe==2)MPhist_PsiDep = MPcanvasHX_Psi->DrawFrame(PlotpTMin-DeltaXminOVERALL,yMinMP,PlotpTMax,yMaxMP);
+						if(MPframe==3)MPhist_PsiDep = MPcanvasPX_Psi->DrawFrame(PlotpTMin-DeltaXminOVERALL,yMinMP,PlotpTMax,yMaxMP);
+
+						MPhist_PsiDep->SetXTitle("#it{p}_{T} [GeV]");
+						MPhist_PsiDep->GetXaxis()->SetTitleOffset(-1.35);
+
+						MPhist_PsiDep->SetYTitle(axislabel);
+						MPhist_PsiDep->GetYaxis()->SetTitleOffset(titleoffset);
+						MPhist_PsiDep->GetYaxis()->SetTitleSize(0.);
+
+						if((nState==4&&rapBin==2)||(nState==5&&rapBin==3)) 
+							MPhist_PsiDep->GetYaxis()->SetTitleOffset(titleoffset*1.35);
+						if((nState==4&&rapBin==2)||(nState==5&&rapBin==3)) 
+							MPhist_PsiDep->GetYaxis()->SetTitleSize(0.*(1-lowestBottomMargin));
+
+						MPhist_PsiDep->GetYaxis()->SetLabelSize(LabelSize*1.25);
+						MPhist_PsiDep->GetXaxis()->SetLabelSize(0.);
+						MPhist_PsiDep->GetYaxis()->SetLabelOffset(-0.015);
+						if(iPanel>1) MPhist_PsiDep->GetYaxis()->SetLabelOffset(0.08);
+						MPhist_PsiDep->GetXaxis()->SetLabelOffset(-0.06);
+
+						if((nState==4&&rapBin==2)||(nState==5&&rapBin==3)) 
+							MPhist_PsiDep->GetYaxis()->SetLabelSize(LabelSize*1.25*(1-lowestBottomMargin));
+						MPhist_PsiDep->GetXaxis()->SetTitleSize(TitleSize*0.85);
+						MPhist_PsiDep->GetXaxis()->SetAxisColor(kWhite);
+						MPhist_PsiDep->GetYaxis()->SetAxisColor(kWhite);
+						MPhist_PsiDep->GetXaxis()->SetTicks("-");
+						MPhist_PsiDep->GetYaxis()->SetTicks("+");
+
+
+						TLegend* MPframedepLegend;
+						MPframedepLegend=new TLegend(errorLegendX1,errorLegendY1,errorLegendX2,errorLegendY2);
+						if((nState==2||nState==3)&&MPframe==1) 
+							MPframedepLegend=new TLegend(errorLegendX1, errorLegendY2-(errorLegendY2-errorLegendY1)*(1-lowestBottomMargin),
+									errorLegendX2,errorLegendY2);
+
+						MPframedepLegend->SetFillColor(0);
+						//MPframedepLegend->SetTextFont(72);
+						MPframedepLegend->SetTextSize(errorLegendFontSize);
+						if((nState==2||nState==3)&&MPframe==1) MPframedepLegend->SetTextSize(errorLegendFontSize*(1-lowestBottomMargin));
+						MPframedepLegend->SetBorderSize(0);
+
+						char MPframedepLegendEntry[200];
+
+						graphSyst->SetMarkerSize(MarkerSizeMP[0]);
+						graphSyst->SetMarkerStyle(MarkerStyleMP[0]);
+						graphSyst->SetMarkerColor(MarkerColorMP[0]);
+
+						graphDefaultStat->SetMarkerSize(MarkerSizeMP[0]);
+						graphDefaultStat->SetMarkerStyle(MarkerStyleMP[0]);
+						graphDefaultStat->SetMarkerColor(MarkerColorMP[0]);
+
+						graphDefaultRes3sigma->Draw("2");
+						graphDefaultRes2sigma->Draw("2");
+						graphDefaultRes->Draw("2");
+						if(!PlotAlteredPPDResults) graphSyst->Draw(drawGraphStyle);
+						if(PlotAlteredPPDResults) graphDefaultStat->Draw(drawGraphStyle);
+
+						graphDefaultRes->SetLineColor(kGreen);
+						graphDefaultRes2sigma->SetLineColor(kYellow);
+						graphDefaultRes3sigma->SetLineColor(kCyan-9);
+
+						if(PlotAlteredPPDResults) sprintf(MPframedepLegendEntry,"Stat. uncert., 68.3 %% CL");
+						if(!PlotAlteredPPDResults) sprintf(MPframedepLegendEntry,"Tot. sys. uncert.");
+						MPframedepLegend->AddEntry(graphSyst,MPframedepLegendEntry,"ple");
+						if(PlotAlteredPPDResults) sprintf(MPframedepLegendEntry,"Tot. uncert., 68.3 %% CL");
+						if(!PlotAlteredPPDResults) sprintf(MPframedepLegendEntry,"68.3 %% CL");
+						MPframedepLegend->AddEntry(graphDefaultRes,MPframedepLegendEntry,"f");
+						if(PlotAlteredPPDResults) sprintf(MPframedepLegendEntry,"Tot. uncert., 95.5 %% CL");
+						if(!PlotAlteredPPDResults) sprintf(MPframedepLegendEntry,"95.5 %% CL");
+						MPframedepLegend->AddEntry(graphDefaultRes2sigma,MPframedepLegendEntry,"f");
+						if(PlotAlteredPPDResults) sprintf(MPframedepLegendEntry,"Tot. uncert., 99.7 %% CL");
+						if(!PlotAlteredPPDResults) sprintf(MPframedepLegendEntry,"99.7 %% CL");
+						MPframedepLegend->AddEntry(graphDefaultRes3sigma,MPframedepLegendEntry,"f");
+
+						if(nState<=4 && rapBin==2) deltaTrickAxisMax=-0.001;
+						if(nState==5 && rapBin==3) deltaTrickAxisMax=-0.001;
+
+						TGaxis *axisMPY1 = new TGaxis(PlotpTMin-DeltaXminOVERALL,yMinMP,PlotpTMin-DeltaXminOVERALL,yMaxMP,
+								yMinMP,yMaxMP,AxisDivisions,"-US");
+						axisMPY1->SetTickSize(ticksize);
+						if((nState==4&&rapBin==2)||(nState==5&&rapBin==3)) axisMPY1->SetTickSize(ticksize/(1-lowestBottomMargin));
+						axisMPY1->Draw("same");
+
+						TGaxis *axisMPY2 = new TGaxis(PlotpTMax,yMinMP,PlotpTMax,yMaxMP,yMinMP,yMaxMP,AxisDivisions,"+US");
+						axisMPY2->SetTickSize(ticksize);
+						if((nState==4&&rapBin==2)||(nState==5&&rapBin==3)) axisMPY2->SetTickSize(ticksize/(1-lowestBottomMargin));
+						////axisMPY2->Draw("same");
+
+						TGaxis *axisMPX1 = new TGaxis(PlotpTMin-DeltaXminOVERALL,yMinMP,PlotpTMax,yMinMP,
+								PlotpTMin-DeltaXminOVERALL+deltaTrickAxisMin,PlotpTMax+deltaTrickAxisMax,AxisDivisions,"+S");
+						axisMPX1->SetTickSize(ticksize*2);
+						if((nState==4&&rapBin==2)||(nState==5&&rapBin==3)) axisMPX1->SetLabelSize(LabelSize);
+						else axisMPX1->SetLabelSize(0);
+						axisMPX1->SetLabelOffset(labelOffsetX);
+						if((nState==4&&rapBin==2)||(nState==5&&rapBin==3)) axisMPX1->SetTickSize(ticksize/(1-lowestBottomMargin));
+						axisMPX1->Draw("same");
+
+						TGaxis *axisMPX2 = new TGaxis(PlotpTMin-DeltaXminOVERALL,yMaxMP,PlotpTMax,yMaxMP,
+								PlotpTMin-DeltaXminOVERALL+deltaTrickAxisMin,PlotpTMax+deltaTrickAxisMax,AxisDivisions,"-US");
+						axisMPX2->SetTickSize(ticksize*2);
+						if((nState==4&&rapBin==2)||(nState==5&&rapBin==3)) axisMPX2->SetTickSize(ticksize/(1-lowestBottomMargin));
+						axisMPX2->Draw("same");
+
+						whereTexteInPlotX=XtitlePosition;
+						whereTexteInPlotY=(yMaxMP+yMinMP)/2.-(yMaxMP-yMinMP)*XtitlePositionYshift;
+
+						char axistitleMPdep[200];
+						if(iLam==1||iLam==7||iLam==13)  sprintf(axistitleMPdep,"#lambda_{#vartheta}");
+						if(iLam==2||iLam==8||iLam==14)  sprintf(axistitleMPdep,"#lambda_{#varphi}");
+						if(iLam==3||iLam==9||iLam==15)  sprintf(axistitleMPdep,"#lambda_{#vartheta#varphi}");
+
+						if((nState==4&&rapBin==2)||(nState==5&&rapBin==3)) 
+							YaxistitleLatexSize=YaxistitleLatexSize*(1-lowestBottomMargin);
+						//TLatex *MPYtitletext = new TLatex(whereTexteInPlotX,whereTexteInPlotY ,axistitleMPdep);
+						//MPYtitletext->SetTextSize(YaxistitleLatexSize);
+						//if((nState==4&&rapBin==2)||(nState==5&&rapBin==3)) 
+						//	MPYtitletext->SetTextSize(YaxistitleLatexSize*(1-lowestBottomMargin));
+						//MPYtitletext->SetTextColor(kBlack);
+						//MPYtitletext->PaintLatex(whereTexteInPlotX,whereTexteInPlotY, YtitleAngle, YaxistitleLatexSize, axislabel);
+						//MPYtitletext->Draw( "same" );
+
+						TLatex *MPYtitletext = new TLatex();
+						MPYtitletext->SetTextSize(YaxistitleLatexSize);
+						if((nState==4&&rapBin==2)||(nState==5&&rapBin==3)) MPYtitletext->SetTextSize(YaxistitleLatexSize);
+						MPYtitletext->SetTextColor(kBlack);
+						if(iPanel==1){
+							whereTexteInPlotX=0.; whereTexteInPlotY=-0.05;
+							MPYtitletext->DrawLatex(whereTexteInPlotX,whereTexteInPlotY,axistitleMPdep);
+
+							sprintf(axistitleMPdep,"#lambda_{#varphi}");
+							whereTexteInPlotX=66.; whereTexteInPlotY=-0.05;
+							MPYtitletext->DrawLatex(whereTexteInPlotX,whereTexteInPlotY,axistitleMPdep);
+						}
+						if(iPanel==2){
+							sprintf(axistitleMPdep,"#lambda_{#vartheta#varphi}");
+							whereTexteInPlotX=64.; whereTexteInPlotY=-0.05;
+							MPYtitletext->DrawLatex(whereTexteInPlotX,whereTexteInPlotY,axistitleMPdep);
+						}
+
+
+						char frameMPtex[200];
+						if(MPframe==1) sprintf(frameMPtex,"CS");
+						if(MPframe==2) sprintf(frameMPtex,"HX");
+						if(MPframe==3) sprintf(frameMPtex,"PX");
+						char texTexMP[200];
+						if(rapBin==1) sprintf(texTexMP,"|#it{y}| < 0.6", nState-3, frameMPtex);
+						if(rapBin==2) sprintf(texTexMP,"0.6 < |#it{y}| < 1.2", nState-3, frameMPtex);
+						if(rapBin==3) sprintf(texTexMP,"1.2 < |#it{y}| < 1.5", nState-3, frameMPtex);
+						TLatex *textMP = new TLatex(xRapText,yMin+(yMax-yMin)*yRapText,texTexMP);
+						textMP->SetTextSize(textSizeRap);
+						if((nState==4&&rapBin==2)||(nState==5&&rapBin==3)) textMP->SetTextSize(textSizeRap*(1-lowestBottomMargin));
+						textMP->Draw( "same" );
+
+						char abcdef[200];
+						if(rapBin==1&&iPanel==1) sprintf(abcdef,"a)");
+						if(rapBin==1&&iPanel==2) sprintf(abcdef,"b)");
+						if(rapBin==1&&iPanel==3) sprintf(abcdef,"c)");
+						if(rapBin==2&&iPanel==1) sprintf(abcdef,"d)");
+						if(rapBin==2&&iPanel==2) sprintf(abcdef,"e)");
+						if(rapBin==2&&iPanel==3) sprintf(abcdef,"f)");
+						if(rapBin==3&&iPanel==1) sprintf(abcdef,"g)");
+						if(rapBin==3&&iPanel==2) sprintf(abcdef,"h)");
+						if(rapBin==3&&iPanel==3) sprintf(abcdef,"i)");
+						cout<<abcdef<<endl;
+						TLatex *tex_abcdef = new TLatex(xabcdefText,yMin+(yMax-yMin)*yRapText*0.92,abcdef);
+						tex_abcdef->SetTextSize(textSizeRap);
+						if((nState==4&&rapBin==2)||(nState==5&&rapBin==3)) tex_abcdef->SetTextSize(textSizeRap*(1-lowestBottomMargin));
+						//tex_abcdef->Draw( "same" );
+
+						if(PlotFinalData&&DrawLatexStuff){
+
+							TLine* extreme0MP = new TLine( PlotpTMin-DeltaXminOVERALL, 0, PlotpTMax ,0);
+							extreme0MP->SetLineWidth( 1 );
+							extreme0MP->SetLineStyle( 2 );
+							extreme0MP->SetLineColor( kBlack );
+							extreme0MP->Draw( "same" );
+
+							//TLine* extreme1MP = new TLine( PlotpTMin-DeltaXminOVERALL, 1, PlotpTMax, 1);
+							//extreme1MP->SetLineWidth( 1 );
+							//extreme1MP->SetLineStyle( 2 );
+							//extreme1MP->SetLineColor( kBlack );
+							//if(iLam==1||iLam==7||iLam==13) extreme1MP->Draw( "same" );
+
+							//TLine* extreme2MP = new TLine( PlotpTMin-DeltaXminOVERALL, -1, PlotpTMax ,-1);
+							//extreme2MP->SetLineWidth( 1 );
+							//extreme2MP->SetLineStyle( 2 );
+							//extreme2MP->SetLineColor( kBlack );
+							//if(iLam==1||iLam==7||iLam==13) extreme2MP->Draw( "same" );
+							//if(iLam==6||iLam==12||iLam==18) extreme2MP->Draw( "same" );
+						}
+
+
+						if(rapBin==1&&iPanel==1){
+							//cout<<"DRAW CMS preliminary Latex"<<endl;
+							//char text[200];
+							//sprintf(text,"CMS preliminary   pp   #sqrt{s} = 7 TeV   L = 4.9 fb^{-1}");
+							//TLatex *CentralsText1MP = new TLatex(MPlatexX,MPlatexYmax,text);
+							//CentralsText1MP->SetTextSize(CentralsFontSizeMP);
+							//CentralsText1MP->Draw( "same" );
+
+							//sprintf(text,"L = 4.9 fb^{-1}");
+							//TLatex *CentralsText2MP = new TLatex(MPlatexX,MPlatexYmax-2*MPlatexDeltaYmax,text);
+							//CentralsText2MP->SetTextSize(CentralsFontSizeMP);
+							//CentralsText2MP->Draw( "same" );
+							//sprintf(text,"pp    #sqrt{s} = 7 TeV");
+							//TLatex *CentralsText3MP = new TLatex(MPlatexX,MPlatexYmax-MPlatexDeltaYmax,text);
+							//CentralsText3MP->SetTextSize(CentralsFontSizeMP);
+							//CentralsText3MP->Draw( "same" );
+						}
+
+						if(rapBin==2&&iPanel==1&&(nState==1||nState==4)){
+							MPframedepLegend->Draw("same");
+						}
+						if(nState==2||nState==3){
+							if(rapBin==1&&iPanel==3&&MPframe==1){
+								MPframedepLegend->Draw("same");
+							}
+							if(rapBin==1&&iPanel==2&&MPframe!=1){
+								MPframedepLegend->Draw("same");
+							}
+						}
+						if(rapBin==1&&iPanel==2){
+
+							char frameMPtex[200];
+							if(MPframe==1) sprintf(frameMPtex,"CS frame");
+							if(MPframe==2) sprintf(frameMPtex,"HX frame");
+							if(MPframe==3) sprintf(frameMPtex,"PX frame");
+							char textStateFrame[200];
+							sprintf(textStateFrame,"#psi(%dS), %s", nState-3, frameMPtex);
+							TLatex *TexStateFrame = new TLatex(MPlatexX+10,MPlatexYmax,textStateFrame);
+							TexStateFrame->SetTextSize(CentralsFontSizeMP);
+							TexStateFrame->Draw( "same" );
+
+						}
+
+						if(MPframe==1) MPcanvasCS_Psi->cd();
+						if(MPframe==2) MPcanvasHX_Psi->cd();
+						if(MPframe==3) MPcanvasPX_Psi->cd();
+
+						whereTexteInPlotX=0.488;
+						whereTexteInPlotY=startValCoordY-deltaCoordY-1.375*labelOffsetX;
+
+						TLatex *MPXlabeltext = new TLatex(whereTexteInPlotX,whereTexteInPlotY ,"1");
+						MPXlabeltext->SetTextSize(XaxislabelLatexSize);
+						MPXlabeltext->SetTextColor(kBlack);
+						//if(iPanel==nPanels) MPXlabeltext->Draw( "same" );
+
+						if(iLam==3&&((nState<=4&&rapBin==2)||(nState==5&&rapBin==3))){  
+							sprintf(filename,"%s/FinalResultsCS_Psi%dS_OLD.pdf",FigDir,nState-3);
+							if(PlotFinalData) MPcanvasCS_Psi->SaveAs(filename);
+							MPcanvasCS_Psi->Close();
+						}
+						if(iLam==9&&((nState<=4&&rapBin==2)||(nState==5&&rapBin==3))){  
+							sprintf(filename,"%s/FinalResultsHX_Psi%dS_OLD.pdf",FigDir,nState-3);
+							if(PlotFinalData) MPcanvasHX_Psi->SaveAs(filename);
+							MPcanvasHX_Psi->Close();
+						}
+						if(iLam==15&&((nState<=4&&rapBin==2)||(nState==5&&rapBin==3))){  
+							sprintf(filename,"%s/FinalResultsPX_Psi%dS_OLD.pdf",FigDir,nState-3);
+							if(PlotFinalData) MPcanvasPX_Psi->SaveAs(filename);
+							MPcanvasPX_Psi->Close();
+						}
+
+					}//end Frame dependent plots
+				}
+
+				//===============================================================================================
+
+
 
 
 
@@ -3320,87 +3617,20 @@ int main(int argc, char** argv) {
 				///////////////////////////////////////////////////////
 				///////////////////////////////////////////////////////
 
-				/*	// Pad Definitions
-						float Top_margin   = 0.;//0
-						float Left_margin  = 0.15;//0.025
-						float Right_margin = 0.15;//0.005
-						const int nPanels=3;
-						double lowestBottomMargin=0.3;
-						double PadCoordYMax=0.95;
-						double deltaCoordY=PadCoordYMax/(double(nPanels-1)+1./(1-lowestBottomMargin));
-						double startValCoordY=deltaCoordY/(1-lowestBottomMargin);
-				//double PadCoordY[nPanels+1]={0.,0.3,0.5,0.7,0.9};
-				double PadCoordY[nPanels+1]={0.,startValCoordY,startValCoordY+deltaCoordY,PadCoordYMax};
-				double PadCoordX[3]={0.1,0.5,0.9};
+				//// Pad Definitions
+				//float Top_margin_MPnew   = 0.;//0
+				//float Left_margin_MPnew  = 0.15;//0.025
+				//float Right_margin_MPnew = 0.15;//0.005
+				//const int nPanels_MPnew=3;
+				//double lowestBottomMargin_MPnew=0.3;
+				//double PadCoordYMax_MPnew=0.95;
+				//double deltaCoordY_MPnew=PadCoordYMax_MPnew/(double(nPanels_MPnew-1)+1./(1-lowestBottomMargin_MPnew));
+				//double startValCoordY_MPnew=deltaCoordY_MPnew/(1-lowestBottomMargin_MPnew);
+				////double PadCoordY[nPanels+1]={0.,0.3,0.5,0.7,0.9};
+				//double PadCoordY_MPnew[nPanels_MPnew+1]={0.,startValCoordY_MPnew,
+				//startValCoordY_MPnew+deltaCoordY_MPnew,PadCoordYMax_MPnew};
+				//double PadCoordX_MPnew[3]={0.1,0.5,0.9};
 
-				// Canvas Definitions
-				int MPcanvasXpixel=3000;
-				int MPcanvasYpixel=3000;
-
-				// Axis Definitions
-				double yMinMP=yMin+0.01;
-				double yMaxMP=yMax-0.01;
-				double LabelSize=0.065;
-				double TitleSize=0.085;
-				double titleoffset=-0.65;
-
-				double ticksize=0.015;
-				int AxisDivisions=510;
-				double deltaTrickAxisMin=-0.001;
-				double deltaTrickAxisMax=-0.001;
-				if(rapBin==2) deltaTrickAxisMax=+0.001;
-
-				// Latex definitions
-				double whereTexteInPlotX;
-				double whereTexteInPlotY;
-				double labelOffsetX=0.02;
-				double YaxistitleLatexSize=0.12;
-				double MPlatexX=11.5;
-				double MPlatexYmax=(yMax-yMin)*0.8875+yMin;//0.35;(yMax-yMin)*0.85+yMin
-				double MPlatexDeltaYmax=0.09*(yMax-yMin);
-				double CentralsFontSizeMP=0.0675;
-				// inner legend definitions
-				double textSizeRap=0.07825;
-				double xRapText;
-				double xRapTextTilde;
-				double yRapText=0.06;
-				if(rapBin==1) xRapText=onia::pTRange[rapBin][ptBinMax]*0.825;//0.625
-				if(rapBin==2) xRapText=onia::pTRange[rapBin][ptBinMax]*0.725;//0.525
-				if(rapBin==1) xRapTextTilde=onia::pTRange[rapBin][ptBinMax]*0.7;//0.625 with frame
-				if(rapBin==2) xRapTextTilde=onia::pTRange[rapBin][ptBinMax]*0.6;//0.525 with frame
-				double xabcdefText=onia::pTRange[rapBin][ptBinMax]*0.225;
-
-				double XaxislabelLatexSize=0.026;
-				double YtitleAngle=0.;
-				double XtitlePosition=4.;
-				double XtitlePositionYshift=0.025;
-
-				// marker definitions
-				double MarkerSizeMP[4]={2.75,2.75,2.75,4.15};// for each frame
-				int MarkerColorMP[4] = {1,1,632,600};//{0,600,632,418}; // for each frame
-				int MarkerStyleMP[4] = {20,24,25,27}; // for each frame
-
-				// legend
-				double errorLegendX1=0.165;
-				double errorLegendX2=0.565;
-				double errorLegendY1=0.725;
-				double errorLegendY2=0.95;
-				double errorLegendFontSize=0.06;
-				 */
-
-				// Pad Definitions
-				/*			float Top_margin_MPnew   = 0.;//0
-								float Left_margin_MPnew  = 0.15;//0.025
-								float Right_margin_MPnew = 0.15;//0.005
-								const int nPanels_MPnew=3;
-								double lowestBottomMargin_MPnew=0.3;
-								double PadCoordYMax_MPnew=0.95;
-								double deltaCoordY_MPnew=PadCoordYMax_MPnew/(double(nPanels_MPnew-1)+1./(1-lowestBottomMargin_MPnew));
-								double startValCoordY_MPnew=deltaCoordY_MPnew/(1-lowestBottomMargin_MPnew);
-				//double PadCoordY[nPanels+1]={0.,0.3,0.5,0.7,0.9};
-				double PadCoordY_MPnew[nPanels_MPnew+1]={0.,startValCoordY_MPnew,startValCoordY_MPnew+deltaCoordY_MPnew,PadCoordYMax_MPnew};
-				double PadCoordX_MPnew[3]={0.1,0.5,0.9};
-				 */
 				// Canvas Definitions
 				int MPcanvasXpixel_MPnew=MPcanvasXpixelInitial*1.5;
 				int MPcanvasYpixel_MPnew=MPcanvasYpixelInitial;
@@ -3426,7 +3656,6 @@ int main(int argc, char** argv) {
 						if(iLam==3||iLam==9||iLam==15) iPanel=3;
 
 						cout<<"MultiPanel canvas"<<endl;
-
 
 						if(iLam==1&&rapBin==1){
 							MPcanvasCS_rap1 = new TCanvas("MPcanvasCS_rap1", "MPcanvasCS_rap1",MPcanvasXpixel_MPnew,MPcanvasYpixel_MPnew);
@@ -3464,8 +3693,29 @@ int main(int argc, char** argv) {
 							MPcanvasPX_rap2->GetFrame()->SetFillColor(kWhite);
 							MPcanvasPX_rap2->GetFrame()->SetBorderSize(0);
 						}
+						if(iLam==1&&rapBin==3){
+							MPcanvasCS_rap3 = new TCanvas("MPcanvasCS_rap3", "MPcanvasCS_rap3",MPcanvasXpixel_MPnew,MPcanvasYpixel_MPnew);
+							MPcanvasCS_rap3->SetFillColor(kWhite);
+							MPcanvasCS_rap3->GetFrame()->SetFillColor(kWhite);
+							MPcanvasCS_rap3->GetFrame()->SetBorderSize(0);
+						}
+						if(iLam==7&&rapBin==3){
+							MPcanvasHX_rap3 = new TCanvas("MPcanvasHX_rap3", "MPcanvasHX_rap3",MPcanvasXpixel_MPnew,MPcanvasYpixel_MPnew);
+							MPcanvasHX_rap3->SetFillColor(kWhite);
+							MPcanvasHX_rap3->GetFrame()->SetFillColor(kWhite);
+							MPcanvasHX_rap3->GetFrame()->SetBorderSize(0);
+						}
+						if(iLam==13&&rapBin==3){
+							MPcanvasPX_rap3 = new TCanvas("MPcanvasPX_rap3", "MPcanvasPX_rap3",MPcanvasXpixel_MPnew,MPcanvasYpixel_MPnew);
+							MPcanvasPX_rap3->SetFillColor(kWhite);
+							MPcanvasPX_rap3->GetFrame()->SetFillColor(kWhite);
+							MPcanvasPX_rap3->GetFrame()->SetBorderSize(0);
+						}
 
-						for(int iStateMP=1;iStateMP<4;iStateMP++){
+
+						int totalState = 3;
+						if(nState>3) totalState = 2;
+						for(int iStateMP=1;iStateMP<totalState+1;iStateMP++){
 
 							if(MPframe==1&&rapBin==1) MPcanvasCS_rap1->cd();
 							if(MPframe==2&&rapBin==1) MPcanvasHX_rap1->cd();
@@ -3474,6 +3724,10 @@ int main(int argc, char** argv) {
 							if(MPframe==1&&rapBin==2) MPcanvasCS_rap2->cd();
 							if(MPframe==2&&rapBin==2) MPcanvasHX_rap2->cd();
 							if(MPframe==3&&rapBin==2) MPcanvasPX_rap2->cd();
+
+							if(MPframe==1&&rapBin==3) MPcanvasCS_rap3->cd();
+							if(MPframe==2&&rapBin==3) MPcanvasHX_rap3->cd();
+							if(MPframe==3&&rapBin==3) MPcanvasPX_rap3->cd();
 
 
 							cout<<"MultiPanel pad"<<endl;
@@ -3537,15 +3791,16 @@ int main(int argc, char** argv) {
 							double SpecialShift=0.01;
 							TLegend* MPframedepLegend;
 							MPframedepLegend=new TLegend(errorLegendX1,errorLegendY1,errorLegendX2,errorLegendY2);
-							if(MPframe==1) MPframedepLegend=new TLegend(errorLegendX1,errorLegendY2-(errorLegendY2-errorLegendY1)*(1-lowestBottomMargin)+SpecialShift,errorLegendX2,errorLegendY2+SpecialShift);
+							if(MPframe==1) MPframedepLegend=new TLegend(errorLegendX1,
+									errorLegendY2-(errorLegendY2-errorLegendY1)*(1-lowestBottomMargin)+SpecialShift,
+									errorLegendX2,errorLegendY2+SpecialShift);
 							MPframedepLegend->SetFillColor(0);
-							//				   MPframedepLegend->SetTextFont(72);
+							//MPframedepLegend->SetTextFont(72);
 							MPframedepLegend->SetTextSize(errorLegendFontSize);
 							if(MPframe==1) MPframedepLegend->SetTextSize(errorLegendFontSize*(1-lowestBottomMargin));
 							MPframedepLegend->SetBorderSize(0);
 
 							char MPframedepLegendEntry[200];
-
 
 							TGraphAsymmErrors* graphMP_3sig_MPnew;
 							TGraphAsymmErrors* graphMP_2sig_MPnew;
@@ -3640,7 +3895,6 @@ int main(int argc, char** argv) {
 							graphMP_MPnew->SetMarkerSize(MarkerSizeMP[0]);
 							graphMP_MPnew->SetMarkerStyle(MarkerStyleMP[0]);
 							graphMP_MPnew->SetMarkerColor(MarkerColorMP[0]);
-
 
 							graphMP_1sig_MPnew->SetFillColor(OneSigColor);
 							graphMP_1sig_MPnew->SetFillStyle(1001);
@@ -3753,31 +4007,28 @@ int main(int argc, char** argv) {
 							TLatex *tex_abcdef = new TLatex(xabcdefText,yMin+(yMax-yMin)*yRapText*0.92,abcdef);
 							tex_abcdef->SetTextSize(textSizeRap);
 							if(iPanel==nPanels) tex_abcdef->SetTextSize(textSizeRap*(1-lowestBottomMargin));
-							//				   tex_abcdef->Draw( "same" );
+							//tex_abcdef->Draw( "same" );
 
 							if(PlotFinalData&&DrawLatexStuff){
 
-								//TLine* extreme0MP = new TLine( onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL, 0, onia::pTRange[rapBin][ptBinMax] ,0);
 								TLine* extreme0MP = new TLine( PlotpTMin-DeltaXminOVERALL, 0, PlotpTMax ,0);
 								extreme0MP->SetLineWidth( 1 );
 								extreme0MP->SetLineStyle( 2 );
 								extreme0MP->SetLineColor( kBlack );
 								extreme0MP->Draw( "same" );
 
-								//TLine* extreme1MP = new TLine( onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL, 1, onia::pTRange[rapBin][ptBinMax] , 1);
 								TLine* extreme1MP = new TLine( PlotpTMin-DeltaXminOVERALL, 1, PlotpTMax , 1);
 								extreme1MP->SetLineWidth( 1 );
 								extreme1MP->SetLineStyle( 2 );
 								extreme1MP->SetLineColor( kBlack );
-								//						if(iLam==1||iLam==7||iLam==13) extreme1MP->Draw( "same" );
+								//if(iLam==1||iLam==7||iLam==13) extreme1MP->Draw( "same" );
 
-								//TLine* extreme2MP = new TLine( onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL, -1, onia::pTRange[rapBin][ptBinMax] ,-1);
 								TLine* extreme2MP = new TLine( PlotpTMin-DeltaXminOVERALL, -1, PlotpTMax ,-1);
 								extreme2MP->SetLineWidth( 1 );
 								extreme2MP->SetLineStyle( 2 );
 								extreme2MP->SetLineColor( kBlack );
-								//						if(iLam==1||iLam==7||iLam==13) extreme2MP->Draw( "same" );
-								//						if(iLam==6||iLam==12||iLam==18) extreme2MP->Draw( "same" );
+								//if(iLam==1||iLam==7||iLam==13) extreme2MP->Draw( "same" );
+								//if(iLam==6||iLam==12||iLam==18) extreme2MP->Draw( "same" );
 
 							}
 
@@ -3794,15 +4045,14 @@ int main(int argc, char** argv) {
 								CentralsText1MP = new TLatex(MPlatexX-DeltaXminOVERALL,(yMax-yMin)*0.2+yMin,text);
 								CentralsText1MP->SetTextSize(CentralsFontSizeMP);
 								if(DrawPreliminary) CentralsText1MP->Draw( "same" );
-								/*			 sprintf(text,"L = 4.9 fb^{-1}");
-												 TLatex *CentralsText2MP = new TLatex(MPlatexX,MPlatexYmax-2*MPlatexDeltaYmax,text);
-												 CentralsText2MP->SetTextSize(CentralsFontSizeMP);
-												 CentralsText2MP->Draw( "same" );
-												 sprintf(text,"pp    #sqrt{s} = 7 TeV");
-												 TLatex *CentralsText3MP = new TLatex(MPlatexX,MPlatexYmax-MPlatexDeltaYmax,text);
-												 CentralsText3MP->SetTextSize(CentralsFontSizeMP);
-												 CentralsText3MP->Draw( "same" );
-								 */
+								//sprintf(text,"L = 4.9 fb^{-1}");
+								//TLatex *CentralsText2MP = new TLatex(MPlatexX,MPlatexYmax-2*MPlatexDeltaYmax,text);
+								//CentralsText2MP->SetTextSize(CentralsFontSizeMP);
+								//CentralsText2MP->Draw( "same" );
+								//sprintf(text,"pp    #sqrt{s} = 7 TeV");
+								//TLatex *CentralsText3MP = new TLatex(MPlatexX,MPlatexYmax-MPlatexDeltaYmax,text);
+								//CentralsText3MP->SetTextSize(CentralsFontSizeMP);
+								//CentralsText3MP->Draw( "same" );
 							}
 
 							if(iStateMP==1&&iPanel==2&&MPframe!=1){
@@ -3813,7 +4063,8 @@ int main(int argc, char** argv) {
 								double yMeanStatErrorLine=yMin+(yMax-yMin)*errorLegendY2-(errorLegendY2-errorLegendY1)*StatErrorLineShift;
 
 
-								TLine* StatErrorLine = new TLine( xStatErrorLine, yMeanStatErrorLine-StatErrorLineLength/2., xStatErrorLine ,yMeanStatErrorLine+StatErrorLineLength/2.);
+								TLine* StatErrorLine = new TLine( xStatErrorLine, yMeanStatErrorLine-StatErrorLineLength/2., 
+										xStatErrorLine ,yMeanStatErrorLine+StatErrorLineLength/2.);
 								StatErrorLine->SetLineWidth( 1 );
 								StatErrorLine->SetLineStyle( 1 );
 								StatErrorLine->SetLineColor( kBlack );
@@ -3828,7 +4079,8 @@ int main(int argc, char** argv) {
 								double yMeanStatErrorLine=yMin+(yMax-yMin)*errorLegendY2-(errorLegendY2-errorLegendY1)*StatErrorLineShift;
 
 
-								TLine* StatErrorLine = new TLine( xStatErrorLine, yMeanStatErrorLine-StatErrorLineLength/2., xStatErrorLine ,yMeanStatErrorLine+StatErrorLineLength/2.);
+								TLine* StatErrorLine = new TLine( xStatErrorLine, yMeanStatErrorLine-StatErrorLineLength/2., 
+										xStatErrorLine ,yMeanStatErrorLine+StatErrorLineLength/2.);
 								StatErrorLine->SetLineWidth( 1 );
 								StatErrorLine->SetLineStyle( 1 );
 								StatErrorLine->SetLineColor( kBlack );
@@ -3836,7 +4088,6 @@ int main(int argc, char** argv) {
 
 							}
 
-							//					 if(iStateMP==2&&iPanel==1){
 							if(iStateMP==2&&iPanel==1){//FRchange
 
 								double DeltaXRap;
@@ -3844,7 +4095,7 @@ int main(int argc, char** argv) {
 								if(rapBin==2) DeltaXRap=14-DeltaXminOVERALL;
 
 								MPlatexYmax=(yMax-yMin)*0.08+yMin;//FRchange
-								//						 DeltaXRap=-DeltaXminOVERALL;//FRchange
+								//DeltaXRap=-DeltaXminOVERALL;//FRchange
 
 								char frameMPtex[200];
 								if(MPframe==1) sprintf(frameMPtex,"CS frame");
@@ -3868,6 +4119,9 @@ int main(int argc, char** argv) {
 						if(MPframe==1&&rapBin==2) MPcanvasCS_rap2->cd();
 						if(MPframe==2&&rapBin==2) MPcanvasHX_rap2->cd();
 						if(MPframe==3&&rapBin==2) MPcanvasPX_rap2->cd();
+						if(MPframe==1&&rapBin==3) MPcanvasCS_rap3->cd();
+						if(MPframe==2&&rapBin==3) MPcanvasHX_rap3->cd();
+						if(MPframe==3&&rapBin==3) MPcanvasPX_rap3->cd();
 
 						whereTexteInPlotX=0.36;
 						whereTexteInPlotY=startValCoordY-deltaCoordY-1.35*labelOffsetX;
@@ -3920,900 +4174,983 @@ int main(int argc, char** argv) {
 							if(PlotFinalData) MPcanvasPX_rap2->SaveAs(filename);
 							MPcanvasPX_rap2->Close();
 						}
-						}//end Frame dependent plots
-					}
+					}//end Frame dependent plots
 
+				}
 
-					double TwoTOthreePanelScaleFactor=deltaCoordY*2.+deltaCoordY*lowestBottomMargin/(1.-lowestBottomMargin)+(1-PadCoordYMax);//0.83125/3.*2.+0.16875;
-					int MPcanvasXpixel_MPnewTilde=MPcanvasXpixelInitial*1.5;
-					int MPcanvasYpixel_MPnewTilde=MPcanvasYpixelInitial*TwoTOthreePanelScaleFactor;
 
-					//			errorLegendFontSize*=TwoTOthreePanelScaleFactor;
+				double TwoTOthreePanelScaleFactor=deltaCoordY*2.+deltaCoordY*lowestBottomMargin/(1.-lowestBottomMargin)+(1-PadCoordYMax);
+				//0.83125/3.*2.+0.16875;
+				int MPcanvasXpixel_MPnewTilde=MPcanvasXpixelInitial*1.5;
+				int MPcanvasYpixel_MPnewTilde=MPcanvasYpixelInitial*TwoTOthreePanelScaleFactor;
 
-					const int nPanels_MPnew=2;
+				//errorLegendFontSize*=TwoTOthreePanelScaleFactor;
 
-					double PadCoordYMax_MPnew=PadCoordYMax;
-					double deltaCoordY_MPnew=PadCoordYMax_MPnew/(double(nPanels_MPnew-1)+1./(1-lowestBottomMargin));
-					double startValCoordY_MPnew=deltaCoordY_MPnew/(1-lowestBottomMargin);
-					//			double PadCoordY_MPnew[nPanels_MPnew+1]={0.,startValCoordY_MPnew,startValCoordY_MPnew+deltaCoordY_MPnew,PadCoordYMax_MPnew};
-					double PadCoordY_MPnew[nPanels_MPnew+1]={0.,startValCoordY_MPnew,PadCoordYMax_MPnew};
+				const int nPanels_MPnew=2;
 
+				double PadCoordYMax_MPnew=PadCoordYMax;
+				double deltaCoordY_MPnew=PadCoordYMax_MPnew/(double(nPanels_MPnew-1)+1./(1-lowestBottomMargin));
+				double startValCoordY_MPnew=deltaCoordY_MPnew/(1-lowestBottomMargin);
+				//double PadCoordY_MPnew[nPanels_MPnew+1]={0.,startValCoordY_MPnew,
+				// 	startValCoordY_MPnew+deltaCoordY_MPnew,PadCoordYMax_MPnew};
+				double PadCoordY_MPnew[nPanels_MPnew+1]={0.,startValCoordY_MPnew,PadCoordYMax_MPnew};
 
-					cout<<"begin NEW Frame independent plots"<<endl;
-					cout<<"if(iLam==6||iLam==12||iLam==18)"<<endl;
-					//begin Frame independent plots
-					if(NEW_MPplots){
-						if(iLam==6||iLam==12||iLam==18){
 
-							int mainframe;
-							if(iLam==6) mainframe=1;
-							if(iLam==12) mainframe=2;
-							if(iLam==18) mainframe=3;
+				cout<<"begin NEW Frame independent plots"<<endl;
+				cout<<"if(iLam==6||iLam==12||iLam==18)"<<endl;
+				//begin Frame independent plots
+				if(NEW_MPplots){
+					if(iLam==6||iLam==12||iLam==18){
 
-							cout<<"iLam = "<<iLam<<endl;
+						int mainframe;
+						if(iLam==6) mainframe=1;
+						if(iLam==12) mainframe=2;
+						if(iLam==18) mainframe=3;
 
-							if((iLam==6||iLam==12||iLam==18)&&rapBin==1){
-								MPcanvasTilde = new TCanvas("MPcanvasTilde", "MPcanvasTilde",MPcanvasXpixel_MPnewTilde,MPcanvasYpixel_MPnewTilde);
-								MPcanvasTilde->SetFillColor(kWhite);
-								MPcanvasTilde->GetFrame()->SetFillColor(kWhite);
-								MPcanvasTilde->GetFrame()->SetBorderSize(0);
-							}
+						cout<<"iLam = "<<iLam<<endl;
 
+						if((iLam==6||iLam==12||iLam==18)&&rapBin==1){
+							MPcanvasTilde = new TCanvas("MPcanvasTilde", "MPcanvasTilde",MPcanvasXpixel_MPnewTilde,MPcanvasYpixel_MPnewTilde);
+							MPcanvasTilde->SetFillColor(kWhite);
+							MPcanvasTilde->GetFrame()->SetFillColor(kWhite);
+							MPcanvasTilde->GetFrame()->SetBorderSize(0);
+						}
 
-							for(int iStateMP=1;iStateMP<4;iStateMP++){
-								if(rapBin==1) iPanel=1;
-								if(rapBin==2) iPanel=2;
+						for(int iStateMP=1;iStateMP<4;iStateMP++){
+							if(rapBin==1) iPanel=1;
+							if(rapBin==2) iPanel=2;
 
-								cout<<"MultiPanel canvas"<<endl;
-
-								MPcanvasTilde->cd();
-
-								cout<<"MultiPanel pad"<<endl;
-								TPad *MPpad;
-								MPpad = new TPad("MPpad","MPpad",PadCoordX_newMP[iStateMP-1],PadCoordY_MPnew[nPanels_MPnew-iPanel],PadCoordX_newMP[iStateMP],PadCoordY_MPnew[nPanels_MPnew-iPanel+1]);
-								MPpad->Draw();
-								MPpad->cd();
-								MPpad->SetFillColor(kWhite);
-								MPpad->SetFrameFillColor(kWhite);
-								MPpad->SetBorderSize(0);
-								MPpad->SetLeftMargin(0.);
-								if(iStateMP==1) MPpad->SetLeftMargin(Left_margin);
-								MPpad->SetRightMargin(0.);
-								if(iStateMP==3) MPpad->SetRightMargin(Right_margin);
-								MPpad->SetTopMargin(Top_margin+0.0025);
-								MPpad->SetBottomMargin(0.0);
-								if(iPanel==nPanels_MPnew) MPpad->SetBottomMargin(lowestBottomMargin);
-
-
-								cout<<"MultiPanel hist"<<endl;
-								TH1F *MPhist = new TH1F;
-								MPhist = MPcanvasTilde->DrawFrame(onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL,yMinMP,onia::pTRange[rapBin][ptBinMax],yMaxMP);
-
-								MPhist->SetXTitle("#it{p}_{T} [GeV]");
-								MPhist->GetXaxis()->SetTitleOffset(-1.35);
-
-								MPhist->SetYTitle(axislabel);
-								MPhist->GetYaxis()->SetTitleOffset(titleoffset);
-								MPhist->GetYaxis()->SetTitleSize(0.);
-								if(iPanel==nPanels_MPnew) MPhist->GetYaxis()->SetTitleOffset(titleoffset*1.35);
-								if(iPanel==nPanels_MPnew) MPhist->GetYaxis()->SetTitleSize(0.*(1-lowestBottomMargin));
-
-								MPhist->GetYaxis()->SetLabelSize(LabelSize*1.25);
-								MPhist->GetXaxis()->SetLabelSize(0.);
-								MPhist->GetYaxis()->SetLabelOffset(-0.015);
-								MPhist->GetXaxis()->SetLabelOffset(-0.06);
-
-								if(iPanel==nPanels_MPnew) MPhist->GetYaxis()->SetLabelSize(LabelSize*1.25*(1-lowestBottomMargin));
-								MPhist->GetXaxis()->SetTitleSize(TitleSize*0.85);
-								MPhist->GetXaxis()->SetAxisColor(kWhite);
-								MPhist->GetYaxis()->SetAxisColor(kWhite);
-								MPhist->GetXaxis()->SetTicks("-");
-								MPhist->GetYaxis()->SetTicks("+");
-
-								TLegend* MPframedepLegendError;
-								//		   MPframedepLegendError=new TLegend(errorLegendX1-Left_margin,errorLegendY1,errorLegendX2-Left_margin,errorLegendY2);
-								MPframedepLegendError=new TLegend(errorLegendX1,errorLegendY2-(errorLegendY2-errorLegendY1)*(1-lowestBottomMargin),errorLegendX2,errorLegendY2);
-								MPframedepLegendError->SetFillColor(0);
-								//		   MPframedepLegendError->SetTextFont(72);
-								MPframedepLegendError->SetTextSize(errorLegendFontSize*(1-lowestBottomMargin));
-								MPframedepLegendError->SetBorderSize(0);
-
-								char MPframedepLegendEntry[200];
-
-
-								TGraphAsymmErrors* graphMP1;
-								TGraphAsymmErrors* graphMP2;
-								TGraphAsymmErrors* graphMP3;
-
-								TGraphAsymmErrors* graphMP1_1sig;
-								TGraphAsymmErrors* graphMP1_2sig;
-								TGraphAsymmErrors* graphMP1_3sig;
-								TGraphAsymmErrors* graphMP2_1sig;
-								TGraphAsymmErrors* graphMP2_2sig;
-								TGraphAsymmErrors* graphMP2_3sig;
-								TGraphAsymmErrors* graphMP3_1sig;
-								TGraphAsymmErrors* graphMP3_2sig;
-								TGraphAsymmErrors* graphMP3_3sig;
-
-								TLegend* MPtildeLegend;
-								MPtildeLegend=new TLegend(0.8,0.75,1.,0.95);
-								MPtildeLegend->SetFillColor(0);
-								//			MPtildeLegend->SetTextFont(72);
-								MPtildeLegend->SetTextSize(0.07);
-								MPtildeLegend->SetBorderSize(0);
-								char MPtildeLegendEntry[200];
-
-								for(int iFrameMP=1;iFrameMP<4;iFrameMP++){
-
-									char GraphNameMP[200];
-
-
-									if(iFrameMP==1){
-										sprintf(GraphNameMP,"ltilde_CS_rap%d",rapBin);
-									}
-									if(iFrameMP==2){
-										sprintf(GraphNameMP,"ltilde_HX_rap%d",rapBin);
-									}
-									if(iFrameMP==3){
-										sprintf(GraphNameMP,"ltilde_PX_rap%d",rapBin);
-									}
-
-									graphMP1 = (TGraphAsymmErrors*) infileMP1->Get(GraphNameMP);
-									graphMP2 = (TGraphAsymmErrors*) infileMP2->Get(GraphNameMP);
-									graphMP3 = (TGraphAsymmErrors*) infileMP3->Get(GraphNameMP);
-
-									int MarkerDefinitionForThisBin[4][4]={{0,0,0,0},{0,1,2,3},{0,2,1,3},{0,2,3,1}};
-
-
-									double ptCentreMP[nBinspT];
-									double ptCentreErr_lowMP[nBinspT];
-									double ptCentreErr_highMP[nBinspT];
-									double lmeanMP[nBinspT];
-									double lmean_errlowMP[nBinspT];
-									double lmean_errhighMP[nBinspT];
-
-									double ShiftTildePlot;
-									double ShiftTildePlotZero=0.75;
-
-									if(MarkerDefinitionForThisBin[mainframe][iFrameMP]==1) ShiftTildePlot=0.;
-									if(MarkerDefinitionForThisBin[mainframe][iFrameMP]==2) ShiftTildePlot=ShiftTildePlotZero;
-									if(MarkerDefinitionForThisBin[mainframe][iFrameMP]==3) ShiftTildePlot=-ShiftTildePlotZero;
-
-									bool RemoveHorizontalErrorBar=true;
-
-									int pt=0;
-									for(int ptBin = ptBinMin; ptBin < ptBinMax+1; ptBin++) {
-
-										graphMP1->GetPoint(ptBin-1,ptCentreMP[pt],lmeanMP[pt]);
-										ptCentreErr_highMP[pt]=graphMP1->GetErrorXhigh(ptBin-1);
-										ptCentreErr_lowMP[pt]=graphMP1->GetErrorXlow(ptBin-1);
-										lmean_errhighMP[pt]=graphMP1->GetErrorYhigh(ptBin-1);
-										lmean_errlowMP[pt]=graphMP1->GetErrorYlow(ptBin-1);
-
-										ptCentreMP[pt]=ptCentreMP[pt]+ShiftTildePlot;
-										ptCentreErr_highMP[pt]=ptCentreErr_highMP[pt]-ShiftTildePlot;
-										ptCentreErr_lowMP[pt]=ptCentreErr_lowMP[pt]-ShiftTildePlot;
-										if(RemoveHorizontalErrorBar) ptCentreErr_highMP[pt]=0;
-										if(RemoveHorizontalErrorBar) ptCentreErr_lowMP[pt]=0;
-
-										pt++;
-									}
-
-									graphMP1 = new TGraphAsymmErrors(nBinspT,ptCentreMP,lmeanMP,ptCentreErr_lowMP,ptCentreErr_highMP,lmean_errlowMP,lmean_errhighMP);
-
-									pt=0;
-									for(int ptBin = ptBinMin; ptBin < ptBinMax+1; ptBin++) {
-
-										graphMP2->GetPoint(ptBin-1,ptCentreMP[pt],lmeanMP[pt]);
-										ptCentreErr_highMP[pt]=graphMP2->GetErrorXhigh(ptBin-1);
-										ptCentreErr_lowMP[pt]=graphMP2->GetErrorXlow(ptBin-1);
-										lmean_errhighMP[pt]=graphMP2->GetErrorYhigh(ptBin-1);
-										lmean_errlowMP[pt]=graphMP2->GetErrorYlow(ptBin-1);
-
-										ptCentreMP[pt]=ptCentreMP[pt]+ShiftTildePlot;
-										ptCentreErr_highMP[pt]=ptCentreErr_highMP[pt]-ShiftTildePlot;
-										ptCentreErr_lowMP[pt]=ptCentreErr_lowMP[pt]-ShiftTildePlot;
-										if(RemoveHorizontalErrorBar) ptCentreErr_highMP[pt]=0;
-										if(RemoveHorizontalErrorBar) ptCentreErr_lowMP[pt]=0;
-
-										pt++;
-									}
-
-									graphMP2 = new TGraphAsymmErrors(nBinspT,ptCentreMP,lmeanMP,ptCentreErr_lowMP,ptCentreErr_highMP,lmean_errlowMP,lmean_errhighMP);
-
-									pt=0;
-									for(int ptBin = ptBinMin; ptBin < ptBinMax+1; ptBin++) {
-
-										graphMP3->GetPoint(ptBin-1,ptCentreMP[pt],lmeanMP[pt]);
-										ptCentreErr_highMP[pt]=graphMP3->GetErrorXhigh(ptBin-1);
-										ptCentreErr_lowMP[pt]=graphMP3->GetErrorXlow(ptBin-1);
-										lmean_errhighMP[pt]=graphMP3->GetErrorYhigh(ptBin-1);
-										lmean_errlowMP[pt]=graphMP3->GetErrorYlow(ptBin-1);
-
-										ptCentreMP[pt]=ptCentreMP[pt]+ShiftTildePlot;
-										ptCentreErr_highMP[pt]=ptCentreErr_highMP[pt]-ShiftTildePlot;
-										ptCentreErr_lowMP[pt]=ptCentreErr_lowMP[pt]-ShiftTildePlot;
-										if(RemoveHorizontalErrorBar) ptCentreErr_highMP[pt]=0;
-										if(RemoveHorizontalErrorBar) ptCentreErr_lowMP[pt]=0;
-
-										pt++;
-									}
-
-									graphMP3 = new TGraphAsymmErrors(nBinspT,ptCentreMP,lmeanMP,ptCentreErr_lowMP,ptCentreErr_highMP,lmean_errlowMP,lmean_errhighMP);
-
-									graphMP1->SetMarkerColor(MarkerColorMP[MarkerDefinitionForThisBin[mainframe][iFrameMP]]);
-									graphMP1->SetLineColor(MarkerColorMP[MarkerDefinitionForThisBin[mainframe][iFrameMP]]);
-									graphMP1->SetMarkerStyle(MarkerStyleMP[MarkerDefinitionForThisBin[mainframe][iFrameMP]]);
-									graphMP1->SetMarkerSize(MarkerSizeMP[MarkerDefinitionForThisBin[mainframe][iFrameMP]]);
-
-									graphMP2->SetMarkerColor(MarkerColorMP[MarkerDefinitionForThisBin[mainframe][iFrameMP]]);
-									graphMP2->SetLineColor(MarkerColorMP[MarkerDefinitionForThisBin[mainframe][iFrameMP]]);
-									graphMP2->SetMarkerStyle(MarkerStyleMP[MarkerDefinitionForThisBin[mainframe][iFrameMP]]);
-									graphMP2->SetMarkerSize(MarkerSizeMP[MarkerDefinitionForThisBin[mainframe][iFrameMP]]);
-
-									graphMP3->SetMarkerColor(MarkerColorMP[MarkerDefinitionForThisBin[mainframe][iFrameMP]]);
-									graphMP3->SetLineColor(MarkerColorMP[MarkerDefinitionForThisBin[mainframe][iFrameMP]]);
-									graphMP3->SetMarkerStyle(MarkerStyleMP[MarkerDefinitionForThisBin[mainframe][iFrameMP]]);
-									graphMP3->SetMarkerSize(MarkerSizeMP[MarkerDefinitionForThisBin[mainframe][iFrameMP]]);
-
-
-									if(mainframe==1&&iFrameMP==1){ sprintf(MPtildeLegendEntry,"CS"); MPtildeLegend->AddEntry(graphMP1,MPtildeLegendEntry,"p"); }
-									if(mainframe!=1&&iFrameMP==1){ sprintf(MPtildeLegendEntry,"CS"); MPtildeLegend->AddEntry(graphMP1,MPtildeLegendEntry,"p"); }
-
-									if(mainframe==2&&iFrameMP==2){ sprintf(MPtildeLegendEntry,"HX"); MPtildeLegend->AddEntry(graphMP1,MPtildeLegendEntry,"p"); }
-									if(mainframe!=2&&iFrameMP==2){ sprintf(MPtildeLegendEntry,"HX"); MPtildeLegend->AddEntry(graphMP1,MPtildeLegendEntry,"p"); }
-
-									if(mainframe==3&&iFrameMP==3){ sprintf(MPtildeLegendEntry,"PX"); MPtildeLegend->AddEntry(graphMP1,MPtildeLegendEntry,"p"); }
-									if(mainframe!=3&&iFrameMP==3){ sprintf(MPtildeLegendEntry,"PX"); MPtildeLegend->AddEntry(graphMP1,MPtildeLegendEntry,"p"); }
-
-
-
-									if(mainframe==1){
-										sprintf(GraphNameMP,"ltilde_CS_rap%d",rapBin);
-									}
-									if(mainframe==2){
-										sprintf(GraphNameMP,"ltilde_HX_rap%d",rapBin);
-									}
-									if(mainframe==3){
-										sprintf(GraphNameMP,"ltilde_PX_rap%d",rapBin);
-									}
-
-									graphMP1_1sig = (TGraphAsymmErrors*) infileMP1_1sig->Get(GraphNameMP);
-									graphMP1_2sig = (TGraphAsymmErrors*) infileMP1_2sig->Get(GraphNameMP);
-									graphMP1_3sig = (TGraphAsymmErrors*) infileMP1_3sig->Get(GraphNameMP);
-									graphMP2_1sig = (TGraphAsymmErrors*) infileMP2_1sig->Get(GraphNameMP);
-									graphMP2_2sig = (TGraphAsymmErrors*) infileMP2_2sig->Get(GraphNameMP);
-									graphMP2_3sig = (TGraphAsymmErrors*) infileMP2_3sig->Get(GraphNameMP);
-									graphMP3_1sig = (TGraphAsymmErrors*) infileMP3_1sig->Get(GraphNameMP);
-									graphMP3_2sig = (TGraphAsymmErrors*) infileMP3_2sig->Get(GraphNameMP);
-									graphMP3_3sig = (TGraphAsymmErrors*) infileMP3_3sig->Get(GraphNameMP);
-
-									int ptMP;
-									int nBinsMP;
-									double ptCentre_MP[nBinspT];
-									double lmean_MP[nBinspT];
-									double lmean_errlow_MP[nBinspT];
-									double lmean_errhigh_MP[nBinspT];
-									double ptCentre_errlow_MP[nBinspT];
-									double ptCentre_errhigh_MP[nBinspT];
-
-									nBinsMP=graphMP1_1sig->GetN();
-									ptMP=0;
-									for(int ptBinMP=1;ptBinMP<nBinsMP+1;ptBinMP++){
-										graphMP1_1sig->GetPoint(ptBinMP-1,ptCentre_MP[ptMP],lmean_MP[ptMP]);
-										lmean_errhigh_MP[ptMP]=graphMP1_1sig->GetErrorYhigh(ptBinMP-1);
-										lmean_errlow_MP[ptMP]=graphMP1_1sig->GetErrorYlow(ptBinMP-1);
-										ptCentre_errhigh_MP[ptMP]=graphMP1_1sig->GetErrorXhigh(ptBinMP-1);
-										ptCentre_errlow_MP[ptMP]=graphMP1_1sig->GetErrorXlow(ptBinMP-1);
-										/// Alter TGraph
-										ptCentre_errhigh_MP[ptMP]=ColordBandWidth;
-										ptCentre_errlow_MP[ptMP]=ColordBandWidth;
-										ptMP++;
-									}
-									graphMP1_1sig = new TGraphAsymmErrors(nBinsMP,ptCentre_MP,lmean_MP,ptCentre_errlow_MP,ptCentre_errhigh_MP,lmean_errlow_MP,lmean_errhigh_MP);
-
-									nBinsMP=graphMP1_2sig->GetN();
-									ptMP=0;
-									for(int ptBinMP=1;ptBinMP<nBinsMP+1;ptBinMP++){
-										graphMP1_2sig->GetPoint(ptBinMP-1,ptCentre_MP[ptMP],lmean_MP[ptMP]);
-										lmean_errhigh_MP[ptMP]=graphMP1_2sig->GetErrorYhigh(ptBinMP-1);
-										lmean_errlow_MP[ptMP]=graphMP1_2sig->GetErrorYlow(ptBinMP-1);
-										ptCentre_errhigh_MP[ptMP]=graphMP1_2sig->GetErrorXhigh(ptBinMP-1);
-										ptCentre_errlow_MP[ptMP]=graphMP1_2sig->GetErrorXlow(ptBinMP-1);
-										/// Alter TGraph
-										ptCentre_errhigh_MP[ptMP]=ColordBandWidth;
-										ptCentre_errlow_MP[ptMP]=ColordBandWidth;
-										ptMP++;
-									}
-									graphMP1_2sig = new TGraphAsymmErrors(nBinsMP,ptCentre_MP,lmean_MP,ptCentre_errlow_MP,ptCentre_errhigh_MP,lmean_errlow_MP,lmean_errhigh_MP);
-
-									nBinsMP=graphMP1_3sig->GetN();
-									ptMP=0;
-									for(int ptBinMP=1;ptBinMP<nBinsMP+1;ptBinMP++){
-										graphMP1_3sig->GetPoint(ptBinMP-1,ptCentre_MP[ptMP],lmean_MP[ptMP]);
-										lmean_errhigh_MP[ptMP]=graphMP1_3sig->GetErrorYhigh(ptBinMP-1);
-										lmean_errlow_MP[ptMP]=graphMP1_3sig->GetErrorYlow(ptBinMP-1);
-										ptCentre_errhigh_MP[ptMP]=graphMP1_3sig->GetErrorXhigh(ptBinMP-1);
-										ptCentre_errlow_MP[ptMP]=graphMP1_3sig->GetErrorXlow(ptBinMP-1);
-										/// Alter TGraph
-										ptCentre_errhigh_MP[ptMP]=ColordBandWidth;
-										ptCentre_errlow_MP[ptMP]=ColordBandWidth;
-										ptMP++;
-									}
-									graphMP1_3sig = new TGraphAsymmErrors(nBinsMP,ptCentre_MP,lmean_MP,ptCentre_errlow_MP,ptCentre_errhigh_MP,lmean_errlow_MP,lmean_errhigh_MP);
-
-
-
-
-									nBinsMP=graphMP2_1sig->GetN();
-									ptMP=0;
-									for(int ptBinMP=1;ptBinMP<nBinsMP+1;ptBinMP++){
-										graphMP2_1sig->GetPoint(ptBinMP-1,ptCentre_MP[ptMP],lmean_MP[ptMP]);
-										lmean_errhigh_MP[ptMP]=graphMP2_1sig->GetErrorYhigh(ptBinMP-1);
-										lmean_errlow_MP[ptMP]=graphMP2_1sig->GetErrorYlow(ptBinMP-1);
-										ptCentre_errhigh_MP[ptMP]=graphMP2_1sig->GetErrorXhigh(ptBinMP-1);
-										ptCentre_errlow_MP[ptMP]=graphMP2_1sig->GetErrorXlow(ptBinMP-1);
-										/// Alter TGraph
-										ptCentre_errhigh_MP[ptMP]=ColordBandWidth;
-										ptCentre_errlow_MP[ptMP]=ColordBandWidth;
-										ptMP++;
-									}
-									graphMP2_1sig = new TGraphAsymmErrors(nBinsMP,ptCentre_MP,lmean_MP,ptCentre_errlow_MP,ptCentre_errhigh_MP,lmean_errlow_MP,lmean_errhigh_MP);
-
-									nBinsMP=graphMP2_2sig->GetN();
-									ptMP=0;
-									for(int ptBinMP=1;ptBinMP<nBinsMP+1;ptBinMP++){
-										graphMP2_2sig->GetPoint(ptBinMP-1,ptCentre_MP[ptMP],lmean_MP[ptMP]);
-										lmean_errhigh_MP[ptMP]=graphMP2_2sig->GetErrorYhigh(ptBinMP-1);
-										lmean_errlow_MP[ptMP]=graphMP2_2sig->GetErrorYlow(ptBinMP-1);
-										ptCentre_errhigh_MP[ptMP]=graphMP2_2sig->GetErrorXhigh(ptBinMP-1);
-										ptCentre_errlow_MP[ptMP]=graphMP2_2sig->GetErrorXlow(ptBinMP-1);
-										/// Alter TGraph
-										ptCentre_errhigh_MP[ptMP]=ColordBandWidth;
-										ptCentre_errlow_MP[ptMP]=ColordBandWidth;
-										ptMP++;
-									}
-									graphMP2_2sig = new TGraphAsymmErrors(nBinsMP,ptCentre_MP,lmean_MP,ptCentre_errlow_MP,ptCentre_errhigh_MP,lmean_errlow_MP,lmean_errhigh_MP);
-
-									nBinsMP=graphMP2_3sig->GetN();
-									ptMP=0;
-									for(int ptBinMP=1;ptBinMP<nBinsMP+1;ptBinMP++){
-										graphMP2_3sig->GetPoint(ptBinMP-1,ptCentre_MP[ptMP],lmean_MP[ptMP]);
-										lmean_errhigh_MP[ptMP]=graphMP2_3sig->GetErrorYhigh(ptBinMP-1);
-										lmean_errlow_MP[ptMP]=graphMP2_3sig->GetErrorYlow(ptBinMP-1);
-										ptCentre_errhigh_MP[ptMP]=graphMP2_3sig->GetErrorXhigh(ptBinMP-1);
-										ptCentre_errlow_MP[ptMP]=graphMP2_3sig->GetErrorXlow(ptBinMP-1);
-										/// Alter TGraph
-										ptCentre_errhigh_MP[ptMP]=ColordBandWidth;
-										ptCentre_errlow_MP[ptMP]=ColordBandWidth;
-										ptMP++;
-									}
-									graphMP2_3sig = new TGraphAsymmErrors(nBinsMP,ptCentre_MP,lmean_MP,ptCentre_errlow_MP,ptCentre_errhigh_MP,lmean_errlow_MP,lmean_errhigh_MP);
-
-
-
-
-									nBinsMP=graphMP3_1sig->GetN();
-									ptMP=0;
-									for(int ptBinMP=1;ptBinMP<nBinsMP+1;ptBinMP++){
-										graphMP3_1sig->GetPoint(ptBinMP-1,ptCentre_MP[ptMP],lmean_MP[ptMP]);
-										lmean_errhigh_MP[ptMP]=graphMP3_1sig->GetErrorYhigh(ptBinMP-1);
-										lmean_errlow_MP[ptMP]=graphMP3_1sig->GetErrorYlow(ptBinMP-1);
-										ptCentre_errhigh_MP[ptMP]=graphMP3_1sig->GetErrorXhigh(ptBinMP-1);
-										ptCentre_errlow_MP[ptMP]=graphMP3_1sig->GetErrorXlow(ptBinMP-1);
-										/// Alter TGraph
-										ptCentre_errhigh_MP[ptMP]=ColordBandWidth;
-										ptCentre_errlow_MP[ptMP]=ColordBandWidth;
-										ptMP++;
-									}
-									graphMP3_1sig = new TGraphAsymmErrors(nBinsMP,ptCentre_MP,lmean_MP,ptCentre_errlow_MP,ptCentre_errhigh_MP,lmean_errlow_MP,lmean_errhigh_MP);
-
-									nBinsMP=graphMP3_2sig->GetN();
-									ptMP=0;
-									for(int ptBinMP=1;ptBinMP<nBinsMP+1;ptBinMP++){
-										graphMP3_2sig->GetPoint(ptBinMP-1,ptCentre_MP[ptMP],lmean_MP[ptMP]);
-										lmean_errhigh_MP[ptMP]=graphMP3_2sig->GetErrorYhigh(ptBinMP-1);
-										lmean_errlow_MP[ptMP]=graphMP3_2sig->GetErrorYlow(ptBinMP-1);
-										ptCentre_errhigh_MP[ptMP]=graphMP3_2sig->GetErrorXhigh(ptBinMP-1);
-										ptCentre_errlow_MP[ptMP]=graphMP3_2sig->GetErrorXlow(ptBinMP-1);
-										/// Alter TGraph
-										ptCentre_errhigh_MP[ptMP]=ColordBandWidth;
-										ptCentre_errlow_MP[ptMP]=ColordBandWidth;
-										ptMP++;
-									}
-									graphMP3_2sig = new TGraphAsymmErrors(nBinsMP,ptCentre_MP,lmean_MP,ptCentre_errlow_MP,ptCentre_errhigh_MP,lmean_errlow_MP,lmean_errhigh_MP);
-
-									nBinsMP=graphMP3_3sig->GetN();
-									ptMP=0;
-									for(int ptBinMP=1;ptBinMP<nBinsMP+1;ptBinMP++){
-										graphMP3_3sig->GetPoint(ptBinMP-1,ptCentre_MP[ptMP],lmean_MP[ptMP]);
-										lmean_errhigh_MP[ptMP]=graphMP3_3sig->GetErrorYhigh(ptBinMP-1);
-										lmean_errlow_MP[ptMP]=graphMP3_3sig->GetErrorYlow(ptBinMP-1);
-										ptCentre_errhigh_MP[ptMP]=graphMP3_3sig->GetErrorXhigh(ptBinMP-1);
-										ptCentre_errlow_MP[ptMP]=graphMP3_3sig->GetErrorXlow(ptBinMP-1);
-										/// Alter TGraph
-										ptCentre_errhigh_MP[ptMP]=ColordBandWidth;
-										ptCentre_errlow_MP[ptMP]=ColordBandWidth;
-										ptMP++;
-									}
-									graphMP3_3sig = new TGraphAsymmErrors(nBinsMP,ptCentre_MP,lmean_MP,ptCentre_errlow_MP,ptCentre_errhigh_MP,lmean_errlow_MP,lmean_errhigh_MP);
-
-
-
-									graphMP1_1sig->SetFillColor(OneSigColor);
-									graphMP1_1sig->SetFillStyle(1001);
-									graphMP1_2sig->SetFillColor(TwoSigColor);
-									graphMP1_2sig->SetFillStyle(1001);
-									graphMP1_3sig->SetFillColor(ThreeSigColor);
-									graphMP1_3sig->SetFillStyle(1001);
-
-									graphMP2_1sig->SetFillColor(OneSigColor);
-									graphMP2_1sig->SetFillStyle(1001);
-									graphMP2_2sig->SetFillColor(TwoSigColor);
-									graphMP2_2sig->SetFillStyle(1001);
-									graphMP2_3sig->SetFillColor(ThreeSigColor);
-									graphMP2_3sig->SetFillStyle(1001);
-
-									graphMP3_1sig->SetFillColor(OneSigColor);
-									graphMP3_1sig->SetFillStyle(1001);
-									graphMP3_2sig->SetFillColor(TwoSigColor);
-									graphMP3_2sig->SetFillStyle(1001);
-									graphMP3_3sig->SetFillColor(ThreeSigColor);
-									graphMP3_3sig->SetFillStyle(1001);
-
-									if(iStateMP==1){
-
-										if(iFrameMP==1){
-											graphMP1_3sig->Draw("2");
-											graphMP1_2sig->Draw("2");
-											graphMP1_1sig->Draw("2");
-											if(mainframe==1) graphMP1->Draw("[]");
-											if(mainframe==1) graphMP1->Draw(drawGraphStyle);
-										}
-										if(iFrameMP==2){
-											if(mainframe==2) graphMP1->Draw("[]");
-											if(mainframe==2) graphMP1->Draw(drawGraphStyle);
-										}
-										if(iFrameMP==3){
-											if(mainframe==3) graphMP1->Draw("[]");
-											if(mainframe==3) graphMP1->Draw(drawGraphStyle);
-										}
-
-										if(iFrameMP==1){
-											if(mainframe!=1) graphMP1->Draw("PX");
-										}
-										if(iFrameMP==2){
-											if(mainframe!=2) graphMP1->Draw("PX");
-										}
-										if(iFrameMP==3){
-											if(mainframe!=3) graphMP1->Draw("PX");
-										}
-
-									}
-									if(iStateMP==2){
-
-										if(iFrameMP==1){
-											graphMP2_3sig->Draw("2");
-											graphMP2_2sig->Draw("2");
-											graphMP2_1sig->Draw("2");
-											if(mainframe==1) graphMP2->Draw("[]");
-											if(mainframe==1) graphMP2->Draw(drawGraphStyle);
-										}
-										if(iFrameMP==2){
-											if(mainframe==2) graphMP2->Draw("[]");
-											if(mainframe==2) graphMP2->Draw(drawGraphStyle);
-										}
-										if(iFrameMP==3){
-											if(mainframe==3) graphMP2->Draw("[]");
-											if(mainframe==3) graphMP2->Draw(drawGraphStyle);
-										}
-
-										if(iFrameMP==1){
-											if(mainframe!=1) graphMP2->Draw("PX");
-										}
-										if(iFrameMP==2){
-											if(mainframe!=2) graphMP2->Draw("PX");
-										}
-										if(iFrameMP==3){
-											if(mainframe!=3) graphMP2->Draw("PX");
-										}
-
-									}
-									if(iStateMP==3){
-
-										if(iFrameMP==1){
-											graphMP3_3sig->Draw("2");
-											graphMP3_2sig->Draw("2");
-											graphMP3_1sig->Draw("2");
-											if(mainframe==1) graphMP3->Draw("[]");
-											if(mainframe==1) graphMP3->Draw(drawGraphStyle);
-										}
-										if(iFrameMP==2){
-											if(mainframe==2) graphMP3->Draw("[]");
-											if(mainframe==2) graphMP3->Draw(drawGraphStyle);
-										}
-										if(iFrameMP==3){
-											if(mainframe==3) graphMP3->Draw("[]");
-											if(mainframe==3) graphMP3->Draw(drawGraphStyle);
-										}
-
-										if(iFrameMP==1){
-											if(mainframe!=1) graphMP3->Draw("PX");
-										}
-										if(iFrameMP==2){
-											if(mainframe!=2) graphMP3->Draw("PX");
-										}
-										if(iFrameMP==3){
-											if(mainframe!=3) graphMP3->Draw("PX");
-										}
-
-
-									}
-								}
-
-
-
-								TGaxis *axisMPY1 = new TGaxis(onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL,yMinMP,onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL,yMaxMP,yMinMP,yMaxMP,AxisDivisions,"-US");
-								axisMPY1->SetTickSize(ticksize);
-								if(iPanel==nPanels_MPnew) axisMPY1->SetTickSize(ticksize/(1-lowestBottomMargin));
-								axisMPY1->Draw("same");
-
-								TGaxis *axisMPY2 = new TGaxis(onia::pTRange[rapBin][ptBinMax],yMinMP,onia::pTRange[rapBin][ptBinMax],yMaxMP,yMinMP,yMaxMP,AxisDivisions,"+US");
-								axisMPY2->SetTickSize(ticksize);
-								if(iPanel==nPanels_MPnew) axisMPY2->SetTickSize(ticksize/(1-lowestBottomMargin));
-								axisMPY2->Draw("same");
-
-
-								double deltaTrickAxisMax_MPnew;
-								deltaTrickAxisMax_MPnew=-0.001;
-								//		   if(iStateMP==3) deltaTrickAxisMax_MPnew=+0.001;
-
-								TGaxis *axisM3S1 = new TGaxis(onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL,yMinMP,onia::pTRange[rapBin][ptBinMax],yMinMP,onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL+deltaTrickAxisMin,onia::pTRange[rapBin][ptBinMax]+deltaTrickAxisMax_MPnew,AxisDivisions,"+S");
-								axisM3S1->SetTickSize(ticksize*2);
-								if(iPanel==nPanels_MPnew) axisM3S1->SetLabelSize(LabelSize);
-								if(iPanel<nPanels_MPnew) axisM3S1->SetLabelSize(0);
-								axisM3S1->SetLabelOffset(labelOffsetX);
-								if(iPanel==nPanels_MPnew) axisM3S1->SetTickSize(ticksize/(1-lowestBottomMargin));
-								axisM3S1->Draw("same");
-
-								TGaxis *axisM3S2 = new TGaxis(onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL,yMaxMP,onia::pTRange[rapBin][ptBinMax],yMaxMP,onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL+deltaTrickAxisMin,onia::pTRange[rapBin][ptBinMax]+deltaTrickAxisMax_MPnew,AxisDivisions,"-US");
-								axisM3S2->SetTickSize(ticksize*2);
-								if(iPanel==nPanels_MPnew) axisM3S2->SetTickSize(ticksize/(1-lowestBottomMargin));
-								axisM3S2->Draw("same");
-
-								whereTexteInPlotX=XtitlePosition;
-								whereTexteInPlotY=(yMaxMP+yMinMP)/2.-(yMaxMP-yMinMP)*XtitlePositionYshift;
-
-								char axistitleMPtilde[200];
-								sprintf(axistitleMPtilde,"#tilde{#lambda}");
-								if(iPanel==nPanels_MPnew) YaxistitleLatexSize=YaxistitleLatexSize*(1-lowestBottomMargin);
-								TLatex *MPYtitletext = new TLatex(whereTexteInPlotX,whereTexteInPlotY ,axistitleMPtilde);
-								MPYtitletext->SetTextSize(YaxistitleLatexSize);
-								if(iPanel==nPanels_MPnew) MPYtitletext->SetTextSize(YaxistitleLatexSize*(1-lowestBottomMargin));
-								MPYtitletext->SetTextColor(kBlack);
-								MPYtitletext->PaintLatex(whereTexteInPlotX-DeltaXminOVERALL,whereTexteInPlotY, YtitleAngle, YaxistitleLatexSize, axislabel);
-								MPYtitletext->Draw( "same" );
-
-
-
-								double increaseSize=1.25;
-								double SpecialShiftUpsilonLabel=0.9;
-								double SpecialShiftUpsilonLabelx=-3;
-
-								char texTexMP[200];
-								if(rapBin==1) sprintf(texTexMP,"#psi(%dS), |#it{y}| < 0.6", iStateMP);
-								if(rapBin==2) sprintf(texTexMP,"#psi(%dS), 0.6 < |#it{y}| < 1.2", iStateMP);
-								TLatex *textMP = new TLatex(xRapTextTilde-DeltaXminOVERALL+SpecialShiftUpsilonLabelx,yMin+(yMax-yMin)*yRapText*0.92*SpecialShiftUpsilonLabel,texTexMP);
-								textMP->SetTextSize(textSizeRap*increaseSize);
-								if(iPanel==nPanels_MPnew) textMP->SetTextSize(textSizeRap*(1-lowestBottomMargin)*increaseSize);
-								textMP->Draw( "same" );
-
-								char abcdef[200];
-								if(iStateMP==1&&iPanel==1) sprintf(abcdef,"a)");
-								if(iStateMP==1&&iPanel==2) sprintf(abcdef,"b)");
-								if(iStateMP==2&&iPanel==1) sprintf(abcdef,"c)");
-								if(iStateMP==2&&iPanel==2) sprintf(abcdef,"d)");
-								if(iStateMP==3&&iPanel==1) sprintf(abcdef,"e)");
-								if(iStateMP==3&&iPanel==2) sprintf(abcdef,"f)");
-								cout<<abcdef<<endl;
-								TLatex *tex_abcdef = new TLatex(xabcdefText-DeltaXminOVERALL,yMin+(yMax-yMin)*yRapText*0.92,abcdef);
-								tex_abcdef->SetTextSize(textSizeRap);
-								if(iPanel==nPanels_MPnew) tex_abcdef->SetTextSize(textSizeRap*(1-lowestBottomMargin));
-								//		   tex_abcdef->Draw( "same" );
-
-								if(PlotFinalData&&DrawLatexStuff){
-
-									//TLine* extreme0MP = new TLine( onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL, 0, onia::pTRange[rapBin][ptBinMax] ,0);
-									TLine* extreme0MP = new TLine( PlotpTMin-DeltaXminOVERALL, 0, PlotpTMax ,0);
-									extreme0MP->SetLineWidth( 1 );
-									extreme0MP->SetLineStyle( 2 );
-									extreme0MP->SetLineColor( kBlack );
-									extreme0MP->Draw( "same" );
-
-									//TLine* extreme1MP = new TLine( onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL, 1, onia::pTRange[rapBin][ptBinMax] , 1);
-									TLine* extreme1MP = new TLine( PlotpTMin-DeltaXminOVERALL, 1, PlotpTMax , 1);
-									extreme1MP->SetLineWidth( 1 );
-									extreme1MP->SetLineStyle( 2 );
-									extreme1MP->SetLineColor( kBlack );
-									if(iLam==1||iLam==7||iLam==13) extreme1MP->Draw( "same" );
-
-									//TLine* extreme2MP = new TLine( onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL, -1, onia::pTRange[rapBin][ptBinMax] ,-1);
-									TLine* extreme2MP = new TLine( PlotpTMin-DeltaXminOVERALL, -1, PlotpTMax ,-1);
-									extreme2MP->SetLineWidth( 1 );
-									extreme2MP->SetLineStyle( 2 );
-									extreme2MP->SetLineColor( kBlack );
-									if(iLam==1||iLam==7||iLam==13) extreme2MP->Draw( "same" );
-									//				if(iLam==6||iLam==12||iLam==18) extreme2MP->Draw( "same" );
-
-								}
-
-
-								if(iStateMP==1&&iPanel==1){
-									cout<<"DRAW CMS preliminary Latex"<<endl;
-									char text[200];
-									sprintf(text,"CMS     pp      #sqrt{s} = 7 TeV     L = 4.9 fb^{-1}");
-									TLatex *CentralsText1MP = new TLatex(MPlatexX-DeltaXminOVERALL,MPlatexYmax,text);
-									CentralsText1MP->SetTextSize(CentralsFontSizeMP);
-									CentralsText1MP->Draw( "same" );
-									sprintf(text,"preliminary");
-									CentralsText1MP = new TLatex(MPlatexX-DeltaXminOVERALL,(yMax-yMin)*0.75+yMin,text);
-									CentralsText1MP->SetTextSize(CentralsFontSizeMP);
-									if(DrawPreliminary) CentralsText1MP->Draw( "same" );
-									/*			 sprintf(text,"L = 4.9 fb^{-1}");
-													 TLatex *CentralsText2MP = new TLatex(MPlatexX,MPlatexYmax-2*MPlatexDeltaYmax,text);
-													 CentralsText2MP->SetTextSize(CentralsFontSizeMP);
-													 CentralsText2MP->Draw( "same" );
-													 sprintf(text,"pp    #sqrt{s} = 7 TeV");
-													 TLatex *CentralsText3MP = new TLatex(MPlatexX,MPlatexYmax-MPlatexDeltaYmax,text);
-													 CentralsText3MP->SetTextSize(CentralsFontSizeMP);
-													 CentralsText3MP->Draw( "same" );
-									 */
-
-								}
-
-								if(iStateMP==1&&iPanel==2){
-									graphMP1_1sig->SetLineColor(OneSigColor);
-									graphMP1_2sig->SetLineColor(TwoSigColor);
-									graphMP1_3sig->SetLineColor(ThreeSigColor);
-
-									TGraphAsymmErrors *legendPhantom = (TGraphAsymmErrors*) infileMP3_3sig->Get("ltilde_CS_rap1");
-
-									legendPhantom->SetMarkerColor(MarkerColorMP[0]);
-									legendPhantom->SetLineColor(MarkerColorMP[0]);
-									legendPhantom->SetMarkerStyle(MarkerStyleMP[1]);
-									legendPhantom->SetMarkerSize(MarkerSizeMP[0]);
-
-
-									if(PlotAlteredPPDResults) sprintf(MPframedepLegendEntry,"Stat. uncert., 68.3 %% CL");
-									if(!PlotAlteredPPDResults) sprintf(MPframedepLegendEntry,"Tot. sys. uncert.");
-									MPframedepLegendError->AddEntry(legendPhantom,MPframedepLegendEntry,"p");
-									if(PlotAlteredPPDResults) sprintf(MPframedepLegendEntry,"Tot. uncert., 68.3 %% CL");
-									if(!PlotAlteredPPDResults) sprintf(MPframedepLegendEntry,"68.3 %% CL");
-									MPframedepLegendError->AddEntry(graphMP1_1sig,MPframedepLegendEntry,"f");
-									if(PlotAlteredPPDResults) sprintf(MPframedepLegendEntry,"Tot. uncert., 95.5 %% CL");
-									if(!PlotAlteredPPDResults) sprintf(MPframedepLegendEntry,"95.5 %% CL");
-									MPframedepLegendError->AddEntry(graphMP1_2sig,MPframedepLegendEntry,"f");
-									if(PlotAlteredPPDResults) sprintf(MPframedepLegendEntry,"Tot. uncert., 99.7 %% CL");
-									if(!PlotAlteredPPDResults) sprintf(MPframedepLegendEntry,"99.7 %% CL");
-									MPframedepLegendError->AddEntry(graphMP1_3sig,MPframedepLegendEntry,"f");
-
-									MPtildeLegend->Draw("same");
-									MPframedepLegendError->Draw("same");
-
-									double xStatErrorLine=13.06-DeltaXminOVERALL+DeltaXminOVERALL*0.075;
-									double StatErrorLineShift=0.75;
-									double errorLegendY1Tilde=errorLegendY2-(errorLegendY2-errorLegendY1)*(1-lowestBottomMargin)+0.05;
-									double StatErrorLineLength=(errorLegendY2-errorLegendY1Tilde)*0.95;
-									double yMeanStatErrorLine=yMin+(yMax-yMin)*errorLegendY2-(errorLegendY2-errorLegendY1Tilde)*StatErrorLineShift;
-
-
-									TLine* StatErrorLine = new TLine( xStatErrorLine, yMeanStatErrorLine-StatErrorLineLength/2., xStatErrorLine ,yMeanStatErrorLine+StatErrorLineLength/2.);
-									StatErrorLine->SetLineWidth( 1 );
-									StatErrorLine->SetLineStyle( 1 );
-									StatErrorLine->SetLineColor( kBlack );
-									StatErrorLine->Draw( "same" );
-
-								}
-
-								/*			 if(rapBin==2&&iPanel==1){
-
-												 char frameMPtex[200];
-												 if(MPframe==1) sprintf(frameMPtex,"CS frame");
-												 if(MPframe==2) sprintf(frameMPtex,"HX frame");
-												 if(MPframe==3) sprintf(frameMPtex,"PX frame");
-												 char textStateFrame[200];
-												 sprintf(textStateFrame,"%s", frameMPtex);
-												 TLatex *TexStateFrame = new TLatex(MPlatexX,MPlatexYmax,textStateFrame);
-												 TexStateFrame->SetTextSize(CentralsFontSizeMP);
-												 TexStateFrame->Draw( "same" );
-
-												 }
-								 */
-							}//end iStateMP loop
+							cout<<"MultiPanel canvas"<<endl;
 
 							MPcanvasTilde->cd();
 
-							/*			whereTexteInPlotX=0.488;
-											whereTexteInPlotY=startValCoordY-deltaCoordY-1.425*labelOffsetX;
-
-											TLatex *M3Slabeltext = new TLatex(whereTexteInPlotX,whereTexteInPlotY ,"1");
-											M3Slabeltext->SetTextSize(XaxislabelLatexSize);
-											M3Slabeltext->SetTextColor(kBlack);
-											if(iPanel==nPanels_MPnew) M3Slabeltext->Draw( "same" );
-							 */
-							whereTexteInPlotX=0.36035;
-							whereTexteInPlotY=startValCoordY-deltaCoordY-0.006;
-
-							TLatex *MPXlabeltext = new TLatex(whereTexteInPlotX,whereTexteInPlotY ,"1");
-							MPXlabeltext->SetTextSize(XaxislabelLatexSize/TwoTOthreePanelScaleFactor);
-							MPXlabeltext->SetTextColor(kBlack);
-							if(iPanel==nPanels_MPnew&&!ShiftXminOVERALL) MPXlabeltext->Draw( "same" );
-
-							whereTexteInPlotX+=x_tilde;
-							MPXlabeltext = new TLatex(whereTexteInPlotX,whereTexteInPlotY ,"1");
-							MPXlabeltext->SetTextSize(XaxislabelLatexSize/TwoTOthreePanelScaleFactor);
-							MPXlabeltext->SetTextColor(kBlack);
-							if(iPanel==nPanels_MPnew&&!ShiftXminOVERALL) MPXlabeltext->Draw( "same" );
+							cout<<"MultiPanel pad"<<endl;
+							TPad *MPpad;
+							MPpad = new TPad("MPpad","MPpad",PadCoordX_newMP[iStateMP-1],PadCoordY_MPnew[nPanels_MPnew-iPanel],PadCoordX_newMP[iStateMP],PadCoordY_MPnew[nPanels_MPnew-iPanel+1]);
+							MPpad->Draw();
+							MPpad->cd();
+							MPpad->SetFillColor(kWhite);
+							MPpad->SetFrameFillColor(kWhite);
+							MPpad->SetBorderSize(0);
+							MPpad->SetLeftMargin(0.);
+							if(iStateMP==1) MPpad->SetLeftMargin(Left_margin);
+							MPpad->SetRightMargin(0.);
+							if(iStateMP==3) MPpad->SetRightMargin(Right_margin);
+							MPpad->SetTopMargin(Top_margin+0.0025);
+							MPpad->SetBottomMargin(0.0);
+							if(iPanel==nPanels_MPnew) MPpad->SetBottomMargin(lowestBottomMargin);
 
 
-							if((iLam==6||iLam==12||iLam==18)&&rapBin==2){
-								if(mainframe==1) sprintf(filename,"%s/FinalResultsTildeCS.pdf",FigDir);
-								if(mainframe==2) sprintf(filename,"%s/FinalResultsTildeHX.pdf",FigDir);
-								if(mainframe==3) sprintf(filename,"%s/FinalResultsTildePX.pdf",FigDir);
-								if(PlotFinalData) MPcanvasTilde->SaveAs(filename);
-								if(mainframe==1) sprintf(filename,"%s/FinalResultsTildeCS.C",FigDir);
-								if(mainframe==2) sprintf(filename,"%s/FinalResultsTildeHX.C",FigDir);
-								if(mainframe==3) sprintf(filename,"%s/FinalResultsTildePX.C",FigDir);
-								if(PlotFinalData) MPcanvasTilde->SaveAs(filename);
-								MPcanvasTilde->Close();
+							cout<<"MultiPanel hist"<<endl;
+							TH1F *MPhist = new TH1F;
+							MPhist = MPcanvasTilde->DrawFrame(onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL,yMinMP,onia::pTRange[rapBin][ptBinMax],yMaxMP);
+
+							MPhist->SetXTitle("#it{p}_{T} [GeV]");
+							MPhist->GetXaxis()->SetTitleOffset(-1.35);
+
+							MPhist->SetYTitle(axislabel);
+							MPhist->GetYaxis()->SetTitleOffset(titleoffset);
+							MPhist->GetYaxis()->SetTitleSize(0.);
+							if(iPanel==nPanels_MPnew) MPhist->GetYaxis()->SetTitleOffset(titleoffset*1.35);
+							if(iPanel==nPanels_MPnew) MPhist->GetYaxis()->SetTitleSize(0.*(1-lowestBottomMargin));
+
+							MPhist->GetYaxis()->SetLabelSize(LabelSize*1.25);
+							MPhist->GetXaxis()->SetLabelSize(0.);
+							MPhist->GetYaxis()->SetLabelOffset(-0.015);
+							MPhist->GetXaxis()->SetLabelOffset(-0.06);
+
+							if(iPanel==nPanels_MPnew) MPhist->GetYaxis()->SetLabelSize(LabelSize*1.25*(1-lowestBottomMargin));
+							MPhist->GetXaxis()->SetTitleSize(TitleSize*0.85);
+							MPhist->GetXaxis()->SetAxisColor(kWhite);
+							MPhist->GetYaxis()->SetAxisColor(kWhite);
+							MPhist->GetXaxis()->SetTicks("-");
+							MPhist->GetYaxis()->SetTicks("+");
+
+							TLegend* MPframedepLegendError;
+							//MPframedepLegendError=new TLegend(errorLegendX1-Left_margin,errorLegendY1,errorLegendX2-Left_margin,errorLegendY2);
+							MPframedepLegendError=new TLegend(errorLegendX1,errorLegendY2-(errorLegendY2-errorLegendY1)*(1-lowestBottomMargin),errorLegendX2,errorLegendY2);
+							MPframedepLegendError->SetFillColor(0);
+							//MPframedepLegendError->SetTextFont(72);
+							MPframedepLegendError->SetTextSize(errorLegendFontSize*(1-lowestBottomMargin));
+							MPframedepLegendError->SetBorderSize(0);
+
+							char MPframedepLegendEntry[200];
+
+
+							TGraphAsymmErrors* graphMP1;
+							TGraphAsymmErrors* graphMP2;
+							TGraphAsymmErrors* graphMP3;
+
+							TGraphAsymmErrors* graphMP1_1sig;
+							TGraphAsymmErrors* graphMP1_2sig;
+							TGraphAsymmErrors* graphMP1_3sig;
+							TGraphAsymmErrors* graphMP2_1sig;
+							TGraphAsymmErrors* graphMP2_2sig;
+							TGraphAsymmErrors* graphMP2_3sig;
+							TGraphAsymmErrors* graphMP3_1sig;
+							TGraphAsymmErrors* graphMP3_2sig;
+							TGraphAsymmErrors* graphMP3_3sig;
+
+							TLegend* MPtildeLegend;
+							MPtildeLegend=new TLegend(0.8,0.75,1.,0.95);
+							MPtildeLegend->SetFillColor(0);
+							//			MPtildeLegend->SetTextFont(72);
+							MPtildeLegend->SetTextSize(0.07);
+							MPtildeLegend->SetBorderSize(0);
+							char MPtildeLegendEntry[200];
+
+							for(int iFrameMP=1;iFrameMP<4;iFrameMP++){
+
+								char GraphNameMP[200];
+
+
+								if(iFrameMP==1){
+									sprintf(GraphNameMP,"ltilde_CS_rap%d",rapBin);
+								}
+								if(iFrameMP==2){
+									sprintf(GraphNameMP,"ltilde_HX_rap%d",rapBin);
+								}
+								if(iFrameMP==3){
+									sprintf(GraphNameMP,"ltilde_PX_rap%d",rapBin);
+								}
+
+								graphMP1 = (TGraphAsymmErrors*) infileMP1->Get(GraphNameMP);
+								graphMP2 = (TGraphAsymmErrors*) infileMP2->Get(GraphNameMP);
+								graphMP3 = (TGraphAsymmErrors*) infileMP3->Get(GraphNameMP);
+
+								int MarkerDefinitionForThisBin[4][4]={{0,0,0,0},{0,1,2,3},{0,2,1,3},{0,2,3,1}};
+
+
+								double ptCentreMP[nBinspT];
+								double ptCentreErr_lowMP[nBinspT];
+								double ptCentreErr_highMP[nBinspT];
+								double lmeanMP[nBinspT];
+								double lmean_errlowMP[nBinspT];
+								double lmean_errhighMP[nBinspT];
+
+								double ShiftTildePlot;
+								double ShiftTildePlotZero=0.75;
+
+								if(MarkerDefinitionForThisBin[mainframe][iFrameMP]==1) ShiftTildePlot=0.;
+								if(MarkerDefinitionForThisBin[mainframe][iFrameMP]==2) ShiftTildePlot=ShiftTildePlotZero;
+								if(MarkerDefinitionForThisBin[mainframe][iFrameMP]==3) ShiftTildePlot=-ShiftTildePlotZero;
+
+								bool RemoveHorizontalErrorBar=true;
+
+								int pt=0;
+								for(int ptBin = ptBinMin; ptBin < ptBinMax+1; ptBin++) {
+
+									graphMP1->GetPoint(ptBin-1,ptCentreMP[pt],lmeanMP[pt]);
+									ptCentreErr_highMP[pt]=graphMP1->GetErrorXhigh(ptBin-1);
+									ptCentreErr_lowMP[pt]=graphMP1->GetErrorXlow(ptBin-1);
+									lmean_errhighMP[pt]=graphMP1->GetErrorYhigh(ptBin-1);
+									lmean_errlowMP[pt]=graphMP1->GetErrorYlow(ptBin-1);
+
+									ptCentreMP[pt]=ptCentreMP[pt]+ShiftTildePlot;
+									ptCentreErr_highMP[pt]=ptCentreErr_highMP[pt]-ShiftTildePlot;
+									ptCentreErr_lowMP[pt]=ptCentreErr_lowMP[pt]-ShiftTildePlot;
+									if(RemoveHorizontalErrorBar) ptCentreErr_highMP[pt]=0;
+									if(RemoveHorizontalErrorBar) ptCentreErr_lowMP[pt]=0;
+
+									pt++;
+								}
+
+								graphMP1 = new TGraphAsymmErrors(nBinspT,ptCentreMP,lmeanMP,ptCentreErr_lowMP,ptCentreErr_highMP,lmean_errlowMP,lmean_errhighMP);
+
+								pt=0;
+								for(int ptBin = ptBinMin; ptBin < ptBinMax+1; ptBin++) {
+
+									graphMP2->GetPoint(ptBin-1,ptCentreMP[pt],lmeanMP[pt]);
+									ptCentreErr_highMP[pt]=graphMP2->GetErrorXhigh(ptBin-1);
+									ptCentreErr_lowMP[pt]=graphMP2->GetErrorXlow(ptBin-1);
+									lmean_errhighMP[pt]=graphMP2->GetErrorYhigh(ptBin-1);
+									lmean_errlowMP[pt]=graphMP2->GetErrorYlow(ptBin-1);
+
+									ptCentreMP[pt]=ptCentreMP[pt]+ShiftTildePlot;
+									ptCentreErr_highMP[pt]=ptCentreErr_highMP[pt]-ShiftTildePlot;
+									ptCentreErr_lowMP[pt]=ptCentreErr_lowMP[pt]-ShiftTildePlot;
+									if(RemoveHorizontalErrorBar) ptCentreErr_highMP[pt]=0;
+									if(RemoveHorizontalErrorBar) ptCentreErr_lowMP[pt]=0;
+
+									pt++;
+								}
+
+								graphMP2 = new TGraphAsymmErrors(nBinspT,ptCentreMP,lmeanMP,ptCentreErr_lowMP,ptCentreErr_highMP,lmean_errlowMP,lmean_errhighMP);
+
+								pt=0;
+								for(int ptBin = ptBinMin; ptBin < ptBinMax+1; ptBin++) {
+
+									graphMP3->GetPoint(ptBin-1,ptCentreMP[pt],lmeanMP[pt]);
+									ptCentreErr_highMP[pt]=graphMP3->GetErrorXhigh(ptBin-1);
+									ptCentreErr_lowMP[pt]=graphMP3->GetErrorXlow(ptBin-1);
+									lmean_errhighMP[pt]=graphMP3->GetErrorYhigh(ptBin-1);
+									lmean_errlowMP[pt]=graphMP3->GetErrorYlow(ptBin-1);
+
+									ptCentreMP[pt]=ptCentreMP[pt]+ShiftTildePlot;
+									ptCentreErr_highMP[pt]=ptCentreErr_highMP[pt]-ShiftTildePlot;
+									ptCentreErr_lowMP[pt]=ptCentreErr_lowMP[pt]-ShiftTildePlot;
+									if(RemoveHorizontalErrorBar) ptCentreErr_highMP[pt]=0;
+									if(RemoveHorizontalErrorBar) ptCentreErr_lowMP[pt]=0;
+
+									pt++;
+								}
+
+								graphMP3 = new TGraphAsymmErrors(nBinspT,ptCentreMP,lmeanMP,ptCentreErr_lowMP,ptCentreErr_highMP,lmean_errlowMP,lmean_errhighMP);
+
+								graphMP1->SetMarkerColor(MarkerColorMP[MarkerDefinitionForThisBin[mainframe][iFrameMP]]);
+								graphMP1->SetLineColor(MarkerColorMP[MarkerDefinitionForThisBin[mainframe][iFrameMP]]);
+								graphMP1->SetMarkerStyle(MarkerStyleMP[MarkerDefinitionForThisBin[mainframe][iFrameMP]]);
+								graphMP1->SetMarkerSize(MarkerSizeMP[MarkerDefinitionForThisBin[mainframe][iFrameMP]]);
+
+								graphMP2->SetMarkerColor(MarkerColorMP[MarkerDefinitionForThisBin[mainframe][iFrameMP]]);
+								graphMP2->SetLineColor(MarkerColorMP[MarkerDefinitionForThisBin[mainframe][iFrameMP]]);
+								graphMP2->SetMarkerStyle(MarkerStyleMP[MarkerDefinitionForThisBin[mainframe][iFrameMP]]);
+								graphMP2->SetMarkerSize(MarkerSizeMP[MarkerDefinitionForThisBin[mainframe][iFrameMP]]);
+
+								graphMP3->SetMarkerColor(MarkerColorMP[MarkerDefinitionForThisBin[mainframe][iFrameMP]]);
+								graphMP3->SetLineColor(MarkerColorMP[MarkerDefinitionForThisBin[mainframe][iFrameMP]]);
+								graphMP3->SetMarkerStyle(MarkerStyleMP[MarkerDefinitionForThisBin[mainframe][iFrameMP]]);
+								graphMP3->SetMarkerSize(MarkerSizeMP[MarkerDefinitionForThisBin[mainframe][iFrameMP]]);
+
+
+								if(mainframe==1&&iFrameMP==1){ sprintf(MPtildeLegendEntry,"CS"); 
+									MPtildeLegend->AddEntry(graphMP1,MPtildeLegendEntry,"p"); }
+									if(mainframe!=1&&iFrameMP==1){ sprintf(MPtildeLegendEntry,"CS");
+										MPtildeLegend->AddEntry(graphMP1,MPtildeLegendEntry,"p"); }
+
+										if(mainframe==2&&iFrameMP==2){ sprintf(MPtildeLegendEntry,"HX"); 
+											MPtildeLegend->AddEntry(graphMP1,MPtildeLegendEntry,"p"); }
+											if(mainframe!=2&&iFrameMP==2){ sprintf(MPtildeLegendEntry,"HX"); 
+												MPtildeLegend->AddEntry(graphMP1,MPtildeLegendEntry,"p"); }
+
+												if(mainframe==3&&iFrameMP==3){ sprintf(MPtildeLegendEntry,"PX"); 
+													MPtildeLegend->AddEntry(graphMP1,MPtildeLegendEntry,"p"); }
+													if(mainframe!=3&&iFrameMP==3){ sprintf(MPtildeLegendEntry,"PX"); 
+														MPtildeLegend->AddEntry(graphMP1,MPtildeLegendEntry,"p"); }
+
+														if(mainframe==1){
+															sprintf(GraphNameMP,"ltilde_CS_rap%d",rapBin);
+														}
+														if(mainframe==2){
+															sprintf(GraphNameMP,"ltilde_HX_rap%d",rapBin);
+														}
+														if(mainframe==3){
+															sprintf(GraphNameMP,"ltilde_PX_rap%d",rapBin);
+														}
+
+														graphMP1_1sig = (TGraphAsymmErrors*) infileMP1_1sig->Get(GraphNameMP);
+														graphMP1_2sig = (TGraphAsymmErrors*) infileMP1_2sig->Get(GraphNameMP);
+														graphMP1_3sig = (TGraphAsymmErrors*) infileMP1_3sig->Get(GraphNameMP);
+														graphMP2_1sig = (TGraphAsymmErrors*) infileMP2_1sig->Get(GraphNameMP);
+														graphMP2_2sig = (TGraphAsymmErrors*) infileMP2_2sig->Get(GraphNameMP);
+														graphMP2_3sig = (TGraphAsymmErrors*) infileMP2_3sig->Get(GraphNameMP);
+														graphMP3_1sig = (TGraphAsymmErrors*) infileMP3_1sig->Get(GraphNameMP);
+														graphMP3_2sig = (TGraphAsymmErrors*) infileMP3_2sig->Get(GraphNameMP);
+														graphMP3_3sig = (TGraphAsymmErrors*) infileMP3_3sig->Get(GraphNameMP);
+
+														int ptMP;
+														int nBinsMP;
+														double ptCentre_MP[nBinspT];
+														double lmean_MP[nBinspT];
+														double lmean_errlow_MP[nBinspT];
+														double lmean_errhigh_MP[nBinspT];
+														double ptCentre_errlow_MP[nBinspT];
+														double ptCentre_errhigh_MP[nBinspT];
+
+														nBinsMP=graphMP1_1sig->GetN();
+														ptMP=0;
+														for(int ptBinMP=1;ptBinMP<nBinsMP+1;ptBinMP++){
+															graphMP1_1sig->GetPoint(ptBinMP-1,ptCentre_MP[ptMP],lmean_MP[ptMP]);
+															lmean_errhigh_MP[ptMP]=graphMP1_1sig->GetErrorYhigh(ptBinMP-1);
+															lmean_errlow_MP[ptMP]=graphMP1_1sig->GetErrorYlow(ptBinMP-1);
+															ptCentre_errhigh_MP[ptMP]=graphMP1_1sig->GetErrorXhigh(ptBinMP-1);
+															ptCentre_errlow_MP[ptMP]=graphMP1_1sig->GetErrorXlow(ptBinMP-1);
+															/// Alter TGraph
+															ptCentre_errhigh_MP[ptMP]=ColordBandWidth;
+															ptCentre_errlow_MP[ptMP]=ColordBandWidth;
+															ptMP++;
+														}
+														graphMP1_1sig = new TGraphAsymmErrors(nBinsMP,ptCentre_MP,lmean_MP,ptCentre_errlow_MP,ptCentre_errhigh_MP,lmean_errlow_MP,lmean_errhigh_MP);
+
+														nBinsMP=graphMP1_2sig->GetN();
+														ptMP=0;
+														for(int ptBinMP=1;ptBinMP<nBinsMP+1;ptBinMP++){
+															graphMP1_2sig->GetPoint(ptBinMP-1,ptCentre_MP[ptMP],lmean_MP[ptMP]);
+															lmean_errhigh_MP[ptMP]=graphMP1_2sig->GetErrorYhigh(ptBinMP-1);
+															lmean_errlow_MP[ptMP]=graphMP1_2sig->GetErrorYlow(ptBinMP-1);
+															ptCentre_errhigh_MP[ptMP]=graphMP1_2sig->GetErrorXhigh(ptBinMP-1);
+															ptCentre_errlow_MP[ptMP]=graphMP1_2sig->GetErrorXlow(ptBinMP-1);
+															/// Alter TGraph
+															ptCentre_errhigh_MP[ptMP]=ColordBandWidth;
+															ptCentre_errlow_MP[ptMP]=ColordBandWidth;
+															ptMP++;
+														}
+														graphMP1_2sig = new TGraphAsymmErrors(nBinsMP,ptCentre_MP,lmean_MP,ptCentre_errlow_MP,ptCentre_errhigh_MP,lmean_errlow_MP,lmean_errhigh_MP);
+
+														nBinsMP=graphMP1_3sig->GetN();
+														ptMP=0;
+														for(int ptBinMP=1;ptBinMP<nBinsMP+1;ptBinMP++){
+															graphMP1_3sig->GetPoint(ptBinMP-1,ptCentre_MP[ptMP],lmean_MP[ptMP]);
+															lmean_errhigh_MP[ptMP]=graphMP1_3sig->GetErrorYhigh(ptBinMP-1);
+															lmean_errlow_MP[ptMP]=graphMP1_3sig->GetErrorYlow(ptBinMP-1);
+															ptCentre_errhigh_MP[ptMP]=graphMP1_3sig->GetErrorXhigh(ptBinMP-1);
+															ptCentre_errlow_MP[ptMP]=graphMP1_3sig->GetErrorXlow(ptBinMP-1);
+															/// Alter TGraph
+															ptCentre_errhigh_MP[ptMP]=ColordBandWidth;
+															ptCentre_errlow_MP[ptMP]=ColordBandWidth;
+															ptMP++;
+														}
+														graphMP1_3sig = new TGraphAsymmErrors(nBinsMP,ptCentre_MP,lmean_MP,ptCentre_errlow_MP,ptCentre_errhigh_MP,lmean_errlow_MP,lmean_errhigh_MP);
+
+
+														nBinsMP=graphMP2_1sig->GetN();
+														ptMP=0;
+														for(int ptBinMP=1;ptBinMP<nBinsMP+1;ptBinMP++){
+															graphMP2_1sig->GetPoint(ptBinMP-1,ptCentre_MP[ptMP],lmean_MP[ptMP]);
+															lmean_errhigh_MP[ptMP]=graphMP2_1sig->GetErrorYhigh(ptBinMP-1);
+															lmean_errlow_MP[ptMP]=graphMP2_1sig->GetErrorYlow(ptBinMP-1);
+															ptCentre_errhigh_MP[ptMP]=graphMP2_1sig->GetErrorXhigh(ptBinMP-1);
+															ptCentre_errlow_MP[ptMP]=graphMP2_1sig->GetErrorXlow(ptBinMP-1);
+															/// Alter TGraph
+															ptCentre_errhigh_MP[ptMP]=ColordBandWidth;
+															ptCentre_errlow_MP[ptMP]=ColordBandWidth;
+															ptMP++;
+														}
+														graphMP2_1sig = new TGraphAsymmErrors(nBinsMP,ptCentre_MP,lmean_MP,ptCentre_errlow_MP,ptCentre_errhigh_MP,lmean_errlow_MP,lmean_errhigh_MP);
+
+														nBinsMP=graphMP2_2sig->GetN();
+														ptMP=0;
+														for(int ptBinMP=1;ptBinMP<nBinsMP+1;ptBinMP++){
+															graphMP2_2sig->GetPoint(ptBinMP-1,ptCentre_MP[ptMP],lmean_MP[ptMP]);
+															lmean_errhigh_MP[ptMP]=graphMP2_2sig->GetErrorYhigh(ptBinMP-1);
+															lmean_errlow_MP[ptMP]=graphMP2_2sig->GetErrorYlow(ptBinMP-1);
+															ptCentre_errhigh_MP[ptMP]=graphMP2_2sig->GetErrorXhigh(ptBinMP-1);
+															ptCentre_errlow_MP[ptMP]=graphMP2_2sig->GetErrorXlow(ptBinMP-1);
+															/// Alter TGraph
+															ptCentre_errhigh_MP[ptMP]=ColordBandWidth;
+															ptCentre_errlow_MP[ptMP]=ColordBandWidth;
+															ptMP++;
+														}
+														graphMP2_2sig = new TGraphAsymmErrors(nBinsMP,ptCentre_MP,lmean_MP,ptCentre_errlow_MP,ptCentre_errhigh_MP,lmean_errlow_MP,lmean_errhigh_MP);
+
+														nBinsMP=graphMP2_3sig->GetN();
+														ptMP=0;
+														for(int ptBinMP=1;ptBinMP<nBinsMP+1;ptBinMP++){
+															graphMP2_3sig->GetPoint(ptBinMP-1,ptCentre_MP[ptMP],lmean_MP[ptMP]);
+															lmean_errhigh_MP[ptMP]=graphMP2_3sig->GetErrorYhigh(ptBinMP-1);
+															lmean_errlow_MP[ptMP]=graphMP2_3sig->GetErrorYlow(ptBinMP-1);
+															ptCentre_errhigh_MP[ptMP]=graphMP2_3sig->GetErrorXhigh(ptBinMP-1);
+															ptCentre_errlow_MP[ptMP]=graphMP2_3sig->GetErrorXlow(ptBinMP-1);
+															/// Alter TGraph
+															ptCentre_errhigh_MP[ptMP]=ColordBandWidth;
+															ptCentre_errlow_MP[ptMP]=ColordBandWidth;
+															ptMP++;
+														}
+														graphMP2_3sig = new TGraphAsymmErrors(nBinsMP,ptCentre_MP,lmean_MP,ptCentre_errlow_MP,ptCentre_errhigh_MP,lmean_errlow_MP,lmean_errhigh_MP);
+
+
+														nBinsMP=graphMP3_1sig->GetN();
+														ptMP=0;
+														for(int ptBinMP=1;ptBinMP<nBinsMP+1;ptBinMP++){
+															graphMP3_1sig->GetPoint(ptBinMP-1,ptCentre_MP[ptMP],lmean_MP[ptMP]);
+															lmean_errhigh_MP[ptMP]=graphMP3_1sig->GetErrorYhigh(ptBinMP-1);
+															lmean_errlow_MP[ptMP]=graphMP3_1sig->GetErrorYlow(ptBinMP-1);
+															ptCentre_errhigh_MP[ptMP]=graphMP3_1sig->GetErrorXhigh(ptBinMP-1);
+															ptCentre_errlow_MP[ptMP]=graphMP3_1sig->GetErrorXlow(ptBinMP-1);
+															/// Alter TGraph
+															ptCentre_errhigh_MP[ptMP]=ColordBandWidth;
+															ptCentre_errlow_MP[ptMP]=ColordBandWidth;
+															ptMP++;
+														}
+														graphMP3_1sig = new TGraphAsymmErrors(nBinsMP,ptCentre_MP,lmean_MP,ptCentre_errlow_MP,ptCentre_errhigh_MP,lmean_errlow_MP,lmean_errhigh_MP);
+
+														nBinsMP=graphMP3_2sig->GetN();
+														ptMP=0;
+														for(int ptBinMP=1;ptBinMP<nBinsMP+1;ptBinMP++){
+															graphMP3_2sig->GetPoint(ptBinMP-1,ptCentre_MP[ptMP],lmean_MP[ptMP]);
+															lmean_errhigh_MP[ptMP]=graphMP3_2sig->GetErrorYhigh(ptBinMP-1);
+															lmean_errlow_MP[ptMP]=graphMP3_2sig->GetErrorYlow(ptBinMP-1);
+															ptCentre_errhigh_MP[ptMP]=graphMP3_2sig->GetErrorXhigh(ptBinMP-1);
+															ptCentre_errlow_MP[ptMP]=graphMP3_2sig->GetErrorXlow(ptBinMP-1);
+															/// Alter TGraph
+															ptCentre_errhigh_MP[ptMP]=ColordBandWidth;
+															ptCentre_errlow_MP[ptMP]=ColordBandWidth;
+															ptMP++;
+														}
+														graphMP3_2sig = new TGraphAsymmErrors(nBinsMP,ptCentre_MP,lmean_MP,ptCentre_errlow_MP,ptCentre_errhigh_MP,lmean_errlow_MP,lmean_errhigh_MP);
+
+														nBinsMP=graphMP3_3sig->GetN();
+														ptMP=0;
+														for(int ptBinMP=1;ptBinMP<nBinsMP+1;ptBinMP++){
+															graphMP3_3sig->GetPoint(ptBinMP-1,ptCentre_MP[ptMP],lmean_MP[ptMP]);
+															lmean_errhigh_MP[ptMP]=graphMP3_3sig->GetErrorYhigh(ptBinMP-1);
+															lmean_errlow_MP[ptMP]=graphMP3_3sig->GetErrorYlow(ptBinMP-1);
+															ptCentre_errhigh_MP[ptMP]=graphMP3_3sig->GetErrorXhigh(ptBinMP-1);
+															ptCentre_errlow_MP[ptMP]=graphMP3_3sig->GetErrorXlow(ptBinMP-1);
+															/// Alter TGraph
+															ptCentre_errhigh_MP[ptMP]=ColordBandWidth;
+															ptCentre_errlow_MP[ptMP]=ColordBandWidth;
+															ptMP++;
+														}
+														graphMP3_3sig = new TGraphAsymmErrors(nBinsMP,ptCentre_MP,lmean_MP,ptCentre_errlow_MP,ptCentre_errhigh_MP,lmean_errlow_MP,lmean_errhigh_MP);
+
+
+														graphMP1_1sig->SetFillColor(OneSigColor);
+														graphMP1_1sig->SetFillStyle(1001);
+														graphMP1_2sig->SetFillColor(TwoSigColor);
+														graphMP1_2sig->SetFillStyle(1001);
+														graphMP1_3sig->SetFillColor(ThreeSigColor);
+														graphMP1_3sig->SetFillStyle(1001);
+
+														graphMP2_1sig->SetFillColor(OneSigColor);
+														graphMP2_1sig->SetFillStyle(1001);
+														graphMP2_2sig->SetFillColor(TwoSigColor);
+														graphMP2_2sig->SetFillStyle(1001);
+														graphMP2_3sig->SetFillColor(ThreeSigColor);
+														graphMP2_3sig->SetFillStyle(1001);
+
+														graphMP3_1sig->SetFillColor(OneSigColor);
+														graphMP3_1sig->SetFillStyle(1001);
+														graphMP3_2sig->SetFillColor(TwoSigColor);
+														graphMP3_2sig->SetFillStyle(1001);
+														graphMP3_3sig->SetFillColor(ThreeSigColor);
+														graphMP3_3sig->SetFillStyle(1001);
+
+														if(iStateMP==1){
+
+															if(iFrameMP==1){
+																graphMP1_3sig->Draw("2");
+																graphMP1_2sig->Draw("2");
+																graphMP1_1sig->Draw("2");
+																if(mainframe==1) graphMP1->Draw("[]");
+																if(mainframe==1) graphMP1->Draw(drawGraphStyle);
+															}
+															if(iFrameMP==2){
+																if(mainframe==2) graphMP1->Draw("[]");
+																if(mainframe==2) graphMP1->Draw(drawGraphStyle);
+															}
+															if(iFrameMP==3){
+																if(mainframe==3) graphMP1->Draw("[]");
+																if(mainframe==3) graphMP1->Draw(drawGraphStyle);
+															}
+
+															if(iFrameMP==1){
+																if(mainframe!=1) graphMP1->Draw("PX");
+															}
+															if(iFrameMP==2){
+																if(mainframe!=2) graphMP1->Draw("PX");
+															}
+															if(iFrameMP==3){
+																if(mainframe!=3) graphMP1->Draw("PX");
+															}
+
+														}
+														if(iStateMP==2){
+
+															if(iFrameMP==1){
+																graphMP2_3sig->Draw("2");
+																graphMP2_2sig->Draw("2");
+																graphMP2_1sig->Draw("2");
+																if(mainframe==1) graphMP2->Draw("[]");
+																if(mainframe==1) graphMP2->Draw(drawGraphStyle);
+															}
+															if(iFrameMP==2){
+																if(mainframe==2) graphMP2->Draw("[]");
+																if(mainframe==2) graphMP2->Draw(drawGraphStyle);
+															}
+															if(iFrameMP==3){
+																if(mainframe==3) graphMP2->Draw("[]");
+																if(mainframe==3) graphMP2->Draw(drawGraphStyle);
+															}
+
+															if(iFrameMP==1){
+																if(mainframe!=1) graphMP2->Draw("PX");
+															}
+															if(iFrameMP==2){
+																if(mainframe!=2) graphMP2->Draw("PX");
+															}
+															if(iFrameMP==3){
+																if(mainframe!=3) graphMP2->Draw("PX");
+															}
+
+														}
+														if(iStateMP==3){
+
+															if(iFrameMP==1){
+																graphMP3_3sig->Draw("2");
+																graphMP3_2sig->Draw("2");
+																graphMP3_1sig->Draw("2");
+																if(mainframe==1) graphMP3->Draw("[]");
+																if(mainframe==1) graphMP3->Draw(drawGraphStyle);
+															}
+															if(iFrameMP==2){
+																if(mainframe==2) graphMP3->Draw("[]");
+																if(mainframe==2) graphMP3->Draw(drawGraphStyle);
+															}
+															if(iFrameMP==3){
+																if(mainframe==3) graphMP3->Draw("[]");
+																if(mainframe==3) graphMP3->Draw(drawGraphStyle);
+															}
+
+															if(iFrameMP==1){
+																if(mainframe!=1) graphMP3->Draw("PX");
+															}
+															if(iFrameMP==2){
+																if(mainframe!=2) graphMP3->Draw("PX");
+															}
+															if(iFrameMP==3){
+																if(mainframe!=3) graphMP3->Draw("PX");
+															}
+
+
+														}
 							}
-						}//end Frame independent plots NEW
-					}
+
+
+							TGaxis *axisMPY1 = new TGaxis(onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL,yMinMP,onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL,yMaxMP,yMinMP,yMaxMP,AxisDivisions,"-US");
+							axisMPY1->SetTickSize(ticksize);
+							if(iPanel==nPanels_MPnew) axisMPY1->SetTickSize(ticksize/(1-lowestBottomMargin));
+							axisMPY1->Draw("same");
+
+							TGaxis *axisMPY2 = new TGaxis(onia::pTRange[rapBin][ptBinMax],yMinMP,onia::pTRange[rapBin][ptBinMax],yMaxMP,yMinMP,yMaxMP,AxisDivisions,"+US");
+							axisMPY2->SetTickSize(ticksize);
+							if(iPanel==nPanels_MPnew) axisMPY2->SetTickSize(ticksize/(1-lowestBottomMargin));
+							axisMPY2->Draw("same");
+
+
+							double deltaTrickAxisMax_MPnew;
+							deltaTrickAxisMax_MPnew=-0.001;
+							//if(iStateMP==3) deltaTrickAxisMax_MPnew=+0.001;
+
+							TGaxis *axisM3S1 = new TGaxis(onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL,yMinMP,onia::pTRange[rapBin][ptBinMax],yMinMP,onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL+deltaTrickAxisMin,onia::pTRange[rapBin][ptBinMax]+deltaTrickAxisMax_MPnew,AxisDivisions,"+S");
+							axisM3S1->SetTickSize(ticksize*2);
+							if(iPanel==nPanels_MPnew) axisM3S1->SetLabelSize(LabelSize);
+							if(iPanel<nPanels_MPnew) axisM3S1->SetLabelSize(0);
+							axisM3S1->SetLabelOffset(labelOffsetX);
+							if(iPanel==nPanels_MPnew) axisM3S1->SetTickSize(ticksize/(1-lowestBottomMargin));
+							axisM3S1->Draw("same");
+
+							TGaxis *axisM3S2 = new TGaxis(onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL,yMaxMP,onia::pTRange[rapBin][ptBinMax],yMaxMP,onia::pTRange[rapBin][ptBinMin-1]-DeltaXminOVERALL+deltaTrickAxisMin,onia::pTRange[rapBin][ptBinMax]+deltaTrickAxisMax_MPnew,AxisDivisions,"-US");
+							axisM3S2->SetTickSize(ticksize*2);
+							if(iPanel==nPanels_MPnew) axisM3S2->SetTickSize(ticksize/(1-lowestBottomMargin));
+							axisM3S2->Draw("same");
+
+							whereTexteInPlotX=XtitlePosition;
+							whereTexteInPlotY=(yMaxMP+yMinMP)/2.-(yMaxMP-yMinMP)*XtitlePositionYshift;
+
+							char axistitleMPtilde[200];
+							sprintf(axistitleMPtilde,"#tilde{#lambda}");
+							if(iPanel==nPanels_MPnew) YaxistitleLatexSize=YaxistitleLatexSize*(1-lowestBottomMargin);
+							TLatex *MPYtitletext = new TLatex(whereTexteInPlotX,whereTexteInPlotY ,axistitleMPtilde);
+							MPYtitletext->SetTextSize(YaxistitleLatexSize);
+							if(iPanel==nPanels_MPnew) MPYtitletext->SetTextSize(YaxistitleLatexSize*(1-lowestBottomMargin));
+							MPYtitletext->SetTextColor(kBlack);
+							MPYtitletext->PaintLatex(whereTexteInPlotX-DeltaXminOVERALL,whereTexteInPlotY, YtitleAngle, YaxistitleLatexSize, axislabel);
+							MPYtitletext->Draw( "same" );
 
 
 
+							double increaseSize=1.25;
+							double SpecialShiftUpsilonLabel=0.9;
+							double SpecialShiftUpsilonLabelx=-3;
 
-					double TwoTOthreePanelScaleFactorCDF=deltaCoordY*1+deltaCoordY*lowestBottomMargin/(1-lowestBottomMargin)+(1-PadCoordYMax);//0.83125/3.*1.+0.16875;
-					int MPcanvasXpixel_MPnewTildeCDF=MPcanvasXpixelInitial*1.5;
-					int MPcanvasYpixel_MPnewTildeCDF=MPcanvasYpixelInitial*TwoTOthreePanelScaleFactorCDF;
+							char texTexMP[200];
+							if(rapBin==1) sprintf(texTexMP,"#psi(%dS), |#it{y}| < 0.6", iStateMP);
+							if(rapBin==2) sprintf(texTexMP,"#psi(%dS), 0.6 < |#it{y}| < 1.2", iStateMP);
+							TLatex *textMP = new TLatex(xRapTextTilde-DeltaXminOVERALL+SpecialShiftUpsilonLabelx,yMin+(yMax-yMin)*yRapText*0.92*SpecialShiftUpsilonLabel,texTexMP);
+							textMP->SetTextSize(textSizeRap*increaseSize);
+							if(iPanel==nPanels_MPnew) textMP->SetTextSize(textSizeRap*(1-lowestBottomMargin)*increaseSize);
+							textMP->Draw( "same" );
 
-					//			errorLegendFontSize*=TwoTOthreePanelScaleFactor;
+							char abcdef[200];
+							if(iStateMP==1&&iPanel==1) sprintf(abcdef,"a)");
+							if(iStateMP==1&&iPanel==2) sprintf(abcdef,"b)");
+							if(iStateMP==2&&iPanel==1) sprintf(abcdef,"c)");
+							if(iStateMP==2&&iPanel==2) sprintf(abcdef,"d)");
+							if(iStateMP==3&&iPanel==1) sprintf(abcdef,"e)");
+							if(iStateMP==3&&iPanel==2) sprintf(abcdef,"f)");
+							cout<<abcdef<<endl;
+							TLatex *tex_abcdef = new TLatex(xabcdefText-DeltaXminOVERALL,yMin+(yMax-yMin)*yRapText*0.92,abcdef);
+							tex_abcdef->SetTextSize(textSizeRap);
+							if(iPanel==nPanels_MPnew) tex_abcdef->SetTextSize(textSizeRap*(1-lowestBottomMargin));
+							//tex_abcdef->Draw( "same" );
 
-					const int nPanels_MPnewCDF=1;
+							if(PlotFinalData&&DrawLatexStuff){
 
-					double PadCoordYMax_MPnewCDF=PadCoordYMax;
-					double deltaCoordY_MPnewCDF=PadCoordYMax_MPnewCDF/(double(nPanels_MPnewCDF-1)+1./(1-lowestBottomMargin));
-					double startValCoordY_MPnewCDF=deltaCoordY_MPnewCDF/(1-lowestBottomMargin);
-					double PadCoordY_MPnewCDF[nPanels_MPnewCDF+1]={0.,PadCoordYMax_MPnewCDF};
+								TLine* extreme0MP = new TLine( PlotpTMin-DeltaXminOVERALL, 0, PlotpTMax ,0);
+								extreme0MP->SetLineWidth( 1 );
+								extreme0MP->SetLineStyle( 2 );
+								extreme0MP->SetLineColor( kBlack );
+								extreme0MP->Draw( "same" );
 
-					double PlotMattpTMin=0.;
+								TLine* extreme1MP = new TLine( PlotpTMin-DeltaXminOVERALL, 1, PlotpTMax , 1);
+								extreme1MP->SetLineWidth( 1 );
+								extreme1MP->SetLineStyle( 2 );
+								extreme1MP->SetLineColor( kBlack );
+								if(iLam==1||iLam==7||iLam==13) extreme1MP->Draw( "same" );
 
-					cout<<"begin NEW CDF MP plots"<<endl;
-					cout<<"if(iLam==1||iLam==7){"<<endl;
-					//begin Frame independent plots
-					if(NEW_MPplots&&PlotMatt){
-						if(iLam<1000&&rapBin==1){
+								TLine* extreme2MP = new TLine( PlotpTMin-DeltaXminOVERALL, -1, PlotpTMax ,-1);
+								extreme2MP->SetLineWidth( 1 );
+								extreme2MP->SetLineStyle( 2 );
+								extreme2MP->SetLineColor( kBlack );
+								if(iLam==1||iLam==7||iLam==13) extreme2MP->Draw( "same" );
+								//if(iLam==6||iLam==12||iLam==18) extreme2MP->Draw( "same" );
 
-							/*					yMin=-1;
-													yMax=1;
-
-													if(iLam==2||iLam==8||iLam==14||iLam==3||iLam==9||iLam==15){
-													yMin=-0.5;
-													yMax=0.5;
-													}
-
-													if(iLam==6||iLam==12||iLam==18){
-													yMin=-1;
-													yMax=1;
-													}
-
-													yMinMP=yMin+0.01;
-													yMaxMP=yMax-0.01;
-							 */
-							if(iLam==6||iLam==12||iLam==18||iLam==1||iLam==7||iLam==13){
-								yMin=-1;
-								yMax=1;
-								yMinMP=yMin+0.01;
-								yMaxMP=yMax-0.01;
 							}
 
-							int mainframe;
 
-							if(iLam>0&&iLam<7) mainframe=1;
-							if(iLam>6&&iLam<13) mainframe=2;
-							if(iLam>12&&iLam<19) mainframe=3;
+							if(iStateMP==1&&iPanel==1){
+								cout<<"DRAW CMS preliminary Latex"<<endl;
+								char text[200];
+								sprintf(text,"CMS     pp      #sqrt{s} = 7 TeV     L = 4.9 fb^{-1}");
+								TLatex *CentralsText1MP = new TLatex(MPlatexX-DeltaXminOVERALL,MPlatexYmax,text);
+								CentralsText1MP->SetTextSize(CentralsFontSizeMP);
+								CentralsText1MP->Draw( "same" );
+								sprintf(text,"preliminary");
+								CentralsText1MP = new TLatex(MPlatexX-DeltaXminOVERALL,(yMax-yMin)*0.75+yMin,text);
+								CentralsText1MP->SetTextSize(CentralsFontSizeMP);
+								if(DrawPreliminary) CentralsText1MP->Draw( "same" );
+								//sprintf(text,"L = 4.9 fb^{-1}");
+								//TLatex *CentralsText2MP = new TLatex(MPlatexX,MPlatexYmax-2*MPlatexDeltaYmax,text);
+								//CentralsText2MP->SetTextSize(CentralsFontSizeMP);
+								//CentralsText2MP->Draw( "same" );
+								//sprintf(text,"pp    #sqrt{s} = 7 TeV");
+								//TLatex *CentralsText3MP = new TLatex(MPlatexX,MPlatexYmax-MPlatexDeltaYmax,text);
+								//CentralsText3MP->SetTextSize(CentralsFontSizeMP);
+								//CentralsText3MP->Draw( "same" );
 
-							cout<<"iLam = "<<iLam<<endl;
-							cout<<"axislabel = "<<axislabel<<endl;
+							}
 
-							//if(iLam==1||iLam==7){
-							MPcanvasCDF = new TCanvas("MPcanvasCDF", "MPcanvasCDF",MPcanvasXpixel_MPnewTildeCDF,MPcanvasYpixel_MPnewTildeCDF);
-							MPcanvasCDF->SetFillColor(kWhite);
-							MPcanvasCDF->GetFrame()->SetFillColor(kWhite);
-							MPcanvasCDF->GetFrame()->SetBorderSize(0);
+							if(iStateMP==1&&iPanel==2){
+								graphMP1_1sig->SetLineColor(OneSigColor);
+								graphMP1_2sig->SetLineColor(TwoSigColor);
+								graphMP1_3sig->SetLineColor(ThreeSigColor);
+
+								TGraphAsymmErrors *legendPhantom = (TGraphAsymmErrors*) infileMP3_3sig->Get("ltilde_CS_rap1");
+
+								legendPhantom->SetMarkerColor(MarkerColorMP[0]);
+								legendPhantom->SetLineColor(MarkerColorMP[0]);
+								legendPhantom->SetMarkerStyle(MarkerStyleMP[1]);
+								legendPhantom->SetMarkerSize(MarkerSizeMP[0]);
+
+
+								if(PlotAlteredPPDResults) sprintf(MPframedepLegendEntry,"Stat. uncert., 68.3 %% CL");
+								if(!PlotAlteredPPDResults) sprintf(MPframedepLegendEntry,"Tot. sys. uncert.");
+								MPframedepLegendError->AddEntry(legendPhantom,MPframedepLegendEntry,"p");
+								if(PlotAlteredPPDResults) sprintf(MPframedepLegendEntry,"Tot. uncert., 68.3 %% CL");
+								if(!PlotAlteredPPDResults) sprintf(MPframedepLegendEntry,"68.3 %% CL");
+								MPframedepLegendError->AddEntry(graphMP1_1sig,MPframedepLegendEntry,"f");
+								if(PlotAlteredPPDResults) sprintf(MPframedepLegendEntry,"Tot. uncert., 95.5 %% CL");
+								if(!PlotAlteredPPDResults) sprintf(MPframedepLegendEntry,"95.5 %% CL");
+								MPframedepLegendError->AddEntry(graphMP1_2sig,MPframedepLegendEntry,"f");
+								if(PlotAlteredPPDResults) sprintf(MPframedepLegendEntry,"Tot. uncert., 99.7 %% CL");
+								if(!PlotAlteredPPDResults) sprintf(MPframedepLegendEntry,"99.7 %% CL");
+								MPframedepLegendError->AddEntry(graphMP1_3sig,MPframedepLegendEntry,"f");
+
+								MPtildeLegend->Draw("same");
+								MPframedepLegendError->Draw("same");
+
+								double xStatErrorLine=13.06-DeltaXminOVERALL+DeltaXminOVERALL*0.075;
+								double StatErrorLineShift=0.75;
+								double errorLegendY1Tilde=errorLegendY2-(errorLegendY2-errorLegendY1)*(1-lowestBottomMargin)+0.05;
+								double StatErrorLineLength=(errorLegendY2-errorLegendY1Tilde)*0.95;
+								double yMeanStatErrorLine=yMin+(yMax-yMin)*errorLegendY2-(errorLegendY2-errorLegendY1Tilde)*StatErrorLineShift;
+
+
+								TLine* StatErrorLine = new TLine( xStatErrorLine, yMeanStatErrorLine-StatErrorLineLength/2., xStatErrorLine ,yMeanStatErrorLine+StatErrorLineLength/2.);
+								StatErrorLine->SetLineWidth( 1 );
+								StatErrorLine->SetLineStyle( 1 );
+								StatErrorLine->SetLineColor( kBlack );
+								StatErrorLine->Draw( "same" );
+
+							}
+
+							//if(rapBin==2&&iPanel==1){
+							//	char frameMPtex[200];
+							//	if(MPframe==1) sprintf(frameMPtex,"CS frame");
+							//	if(MPframe==2) sprintf(frameMPtex,"HX frame");
+							//	if(MPframe==3) sprintf(frameMPtex,"PX frame");
+							//	char textStateFrame[200];
+							//	sprintf(textStateFrame,"%s", frameMPtex);
+							//	TLatex *TexStateFrame = new TLatex(MPlatexX,MPlatexYmax,textStateFrame);
+							//	TexStateFrame->SetTextSize(CentralsFontSizeMP);
+							//	TexStateFrame->Draw( "same" );
 							//}
 
+						}//end iStateMP loop
 
-							for(int iStateMP=1;iStateMP<4;iStateMP++){
-								iPanel=1;
+						MPcanvasTilde->cd();
 
-								cout<<"MultiPanel canvas"<<endl;
+						//whereTexteInPlotX=0.488;
+						//whereTexteInPlotY=startValCoordY-deltaCoordY-1.425*labelOffsetX;
+						//TLatex *M3Slabeltext = new TLatex(whereTexteInPlotX,whereTexteInPlotY ,"1");
+						//M3Slabeltext->SetTextSize(XaxislabelLatexSize);
+						//M3Slabeltext->SetTextColor(kBlack);
+						//if(iPanel==nPanels_MPnew) M3Slabeltext->Draw( "same" );
 
-								MPcanvasCDF->cd();
+						whereTexteInPlotX=0.36035;
+						whereTexteInPlotY=startValCoordY-deltaCoordY-0.006;
 
-								cout<<"MultiPanel pad"<<endl;
-								TPad *MPpad;
-								MPpad = new TPad("MPpad","MPpad",PadCoordX_newMP[iStateMP-1],PadCoordY_MPnewCDF[nPanels_MPnewCDF-iPanel],PadCoordX_newMP[iStateMP],PadCoordY_MPnewCDF[nPanels_MPnewCDF-iPanel+1]);
-								MPpad->Draw();
-								MPpad->cd();
-								MPpad->SetFillColor(kWhite);
-								MPpad->SetFrameFillColor(kWhite);
-								MPpad->SetBorderSize(0);
-								MPpad->SetLeftMargin(0.);
-								if(iStateMP==1) MPpad->SetLeftMargin(Left_margin);
-								MPpad->SetRightMargin(0.);
-								if(iStateMP==3) MPpad->SetRightMargin(Right_margin);
-								MPpad->SetTopMargin(Top_margin+0.0025);
-								MPpad->SetBottomMargin(0.0);
-								if(iPanel==nPanels_MPnewCDF) MPpad->SetBottomMargin(lowestBottomMargin);
+						TLatex *MPXlabeltext = new TLatex(whereTexteInPlotX,whereTexteInPlotY ,"1");
+						MPXlabeltext->SetTextSize(XaxislabelLatexSize/TwoTOthreePanelScaleFactor);
+						MPXlabeltext->SetTextColor(kBlack);
+						if(iPanel==nPanels_MPnew&&!ShiftXminOVERALL) MPXlabeltext->Draw( "same" );
 
-
-								cout<<"MultiPanel hist"<<endl;
-								TH1F *MPhist = new TH1F;
-								MPhist = MPcanvasCDF->DrawFrame(PlotMattpTMin,yMinMP,onia::pTRange[rapBin][ptBinMax],yMaxMP);
-
-								MPhist->SetXTitle("#it{p}_{T} [GeV]");
-								MPhist->GetXaxis()->SetTitleOffset(-1.35);
-
-								MPhist->SetYTitle(axislabel);
-								MPhist->GetYaxis()->SetTitleOffset(titleoffset);
-								MPhist->GetYaxis()->SetTitleSize(0.);
-								if(iPanel==nPanels_MPnewCDF) MPhist->GetYaxis()->SetTitleOffset(titleoffset*1.35);
-								if(iPanel==nPanels_MPnewCDF) MPhist->GetYaxis()->SetTitleSize(0.*(1-lowestBottomMargin));
-
-								MPhist->GetYaxis()->SetLabelSize(LabelSize*1.25);
-								MPhist->GetXaxis()->SetLabelSize(0.);
-								MPhist->GetYaxis()->SetLabelOffset(-0.015);
-								MPhist->GetXaxis()->SetLabelOffset(-0.06);
-
-								if(iPanel==nPanels_MPnewCDF) MPhist->GetYaxis()->SetLabelSize(LabelSize*1.25*(1-lowestBottomMargin));
-								MPhist->GetXaxis()->SetTitleSize(TitleSize*0.85);
-								MPhist->GetXaxis()->SetAxisColor(kWhite);
-								MPhist->GetYaxis()->SetAxisColor(kWhite);
-								MPhist->GetXaxis()->SetTicks("-");
-								MPhist->GetYaxis()->SetTicks("+");
-								if(iLam==6||iLam==12||iLam==18||iLam==1||iLam==7||iLam==13) MPhist->GetYaxis()->SetNdivisions(205);
-
-								TLegend* MPframedepLegendError;
-								//		   MPframedepLegendError=new TLegend(errorLegendX1-Left_margin,errorLegendY1,errorLegendX2-Left_margin,errorLegendY2);
-								MPframedepLegendError=new TLegend(errorLegendX1,errorLegendY2-(errorLegendY2-errorLegendY1)*(1-lowestBottomMargin),errorLegendX2,errorLegendY2);
-								MPframedepLegendError->SetFillColor(0);
-								//   MPframedepLegendError->SetTextFont(72);
-								MPframedepLegendError->SetTextSize(errorLegendFontSize*(1-lowestBottomMargin));
-								MPframedepLegendError->SetBorderSize(0);
-
-								char MPframedepLegendEntry[200];
+						whereTexteInPlotX+=x_tilde;
+						MPXlabeltext = new TLatex(whereTexteInPlotX,whereTexteInPlotY ,"1");
+						MPXlabeltext->SetTextSize(XaxislabelLatexSize/TwoTOthreePanelScaleFactor);
+						MPXlabeltext->SetTextColor(kBlack);
+						if(iPanel==nPanels_MPnew&&!ShiftXminOVERALL) MPXlabeltext->Draw( "same" );
 
 
-								TGraphAsymmErrors* graphCMS_Stat;
-								TGraphAsymmErrors* graphCDF_Stat;
-								TGraphAsymmErrors* graphCMS_Total;
-								TGraphAsymmErrors* graphCDF_Total;
+						if((iLam==6||iLam==12||iLam==18)&&rapBin==2){
+							if(mainframe==1) sprintf(filename,"%s/FinalResultsTildeCS.pdf",FigDir);
+							if(mainframe==2) sprintf(filename,"%s/FinalResultsTildeHX.pdf",FigDir);
+							if(mainframe==3) sprintf(filename,"%s/FinalResultsTildePX.pdf",FigDir);
+							if(PlotFinalData) MPcanvasTilde->SaveAs(filename);
+							if(mainframe==1) sprintf(filename,"%s/FinalResultsTildeCS.C",FigDir);
+							if(mainframe==2) sprintf(filename,"%s/FinalResultsTildeHX.C",FigDir);
+							if(mainframe==3) sprintf(filename,"%s/FinalResultsTildePX.C",FigDir);
+							if(PlotFinalData) MPcanvasTilde->SaveAs(filename);
+							MPcanvasTilde->Close();
+						}
+					}//end Frame independent plots NEW
+				}
 
-								if(iStateMP==1) graphCDF_Stat = (TGraphAsymmErrors*) infileMP1SCDF_Stat->Get(GraphName);
-								if(iStateMP==2) graphCDF_Stat = (TGraphAsymmErrors*) infileMP2SCDF_Stat->Get(GraphName);
-								if(iStateMP==3) graphCDF_Stat = (TGraphAsymmErrors*) infileMP3SCDF_Stat->Get(GraphName);
-								if(iStateMP==1) graphCDF_Total = (TGraphAsymmErrors*) infileMP1SCDF_Total->Get(GraphName);
-								if(iStateMP==2) graphCDF_Total = (TGraphAsymmErrors*) infileMP2SCDF_Total->Get(GraphName);
-								if(iStateMP==3) graphCDF_Total = (TGraphAsymmErrors*) infileMP3SCDF_Total->Get(GraphName);
 
-								if(iStateMP==1) graphCMS_Stat = (TGraphAsymmErrors*) infileMP1->Get(GraphName);
-								if(iStateMP==2) graphCMS_Stat = (TGraphAsymmErrors*) infileMP2->Get(GraphName);
-								if(iStateMP==3) graphCMS_Stat = (TGraphAsymmErrors*) infileMP3->Get(GraphName);
-								if(iStateMP==1) graphCMS_Total = (TGraphAsymmErrors*) infileMP1_1sig->Get(GraphName);
-								if(iStateMP==2) graphCMS_Total = (TGraphAsymmErrors*) infileMP2_1sig->Get(GraphName);
-								if(iStateMP==3) graphCMS_Total = (TGraphAsymmErrors*) infileMP3_1sig->Get(GraphName);
+				double TwoTOthreePanelScaleFactorCDF=deltaCoordY*1+deltaCoordY*lowestBottomMargin/(1-lowestBottomMargin)+(1-PadCoordYMax);//0.83125/3.*1.+0.16875;
+				int MPcanvasXpixel_MPnewTildeCDF=MPcanvasXpixelInitial*1.5;
+				int MPcanvasYpixel_MPnewTildeCDF=MPcanvasYpixelInitial*TwoTOthreePanelScaleFactorCDF;
 
+				//			errorLegendFontSize*=TwoTOthreePanelScaleFactor;
+
+				const int nPanels_MPnewCDF=1;
+
+				double PadCoordYMax_MPnewCDF=PadCoordYMax;
+				double deltaCoordY_MPnewCDF=PadCoordYMax_MPnewCDF/(double(nPanels_MPnewCDF-1)+1./(1-lowestBottomMargin));
+				double startValCoordY_MPnewCDF=deltaCoordY_MPnewCDF/(1-lowestBottomMargin);
+				double PadCoordY_MPnewCDF[nPanels_MPnewCDF+1]={0.,PadCoordYMax_MPnewCDF};
+
+				double PlotMattpTMin=0.;
+
+				cout<<"begin NEW CDF MP plots"<<endl;
+				cout<<"if(iLam==1||iLam==7){"<<endl;
+				//begin Frame independent plots
+				if(NEW_MPplots&&PlotMatt){
+					if(iLam<1000&&rapBin==1){
+
+						/*yMin=-1;
+							yMax=1;
+
+							if(iLam==2||iLam==8||iLam==14||iLam==3||iLam==9||iLam==15){
+							yMin=-0.5;
+							yMax=0.5;
+							}
+
+							if(iLam==6||iLam==12||iLam==18){
+							yMin=-1;
+							yMax=1;
+							}
+
+							yMinMP=yMin+0.01;
+							yMaxMP=yMax-0.01;
+							*/
+						if(iLam==6||iLam==12||iLam==18||iLam==1||iLam==7||iLam==13){
+							yMin=-1;
+							yMax=1;
+							yMinMP=yMin+0.01;
+							yMaxMP=yMax-0.01;
+						}
+
+						int mainframe;
+
+						if(iLam>0&&iLam<7) mainframe=1;
+						if(iLam>6&&iLam<13) mainframe=2;
+						if(iLam>12&&iLam<19) mainframe=3;
+
+						cout<<"iLam = "<<iLam<<endl;
+						cout<<"axislabel = "<<axislabel<<endl;
+
+						//if(iLam==1||iLam==7){
+						MPcanvasCDF = new TCanvas("MPcanvasCDF", "MPcanvasCDF",MPcanvasXpixel_MPnewTildeCDF,MPcanvasYpixel_MPnewTildeCDF);
+						MPcanvasCDF->SetFillColor(kWhite);
+						MPcanvasCDF->GetFrame()->SetFillColor(kWhite);
+						MPcanvasCDF->GetFrame()->SetBorderSize(0);
+						//}
+
+
+						for(int iStateMP=1;iStateMP<4;iStateMP++){
+							iPanel=1;
+
+							cout<<"MultiPanel canvas"<<endl;
+
+							MPcanvasCDF->cd();
+
+							cout<<"MultiPanel pad"<<endl;
+							TPad *MPpad;
+							MPpad = new TPad("MPpad","MPpad",PadCoordX_newMP[iStateMP-1],PadCoordY_MPnewCDF[nPanels_MPnewCDF-iPanel],PadCoordX_newMP[iStateMP],PadCoordY_MPnewCDF[nPanels_MPnewCDF-iPanel+1]);
+							MPpad->Draw();
+							MPpad->cd();
+							MPpad->SetFillColor(kWhite);
+							MPpad->SetFrameFillColor(kWhite);
+							MPpad->SetBorderSize(0);
+							MPpad->SetLeftMargin(0.);
+							if(iStateMP==1) MPpad->SetLeftMargin(Left_margin);
+							MPpad->SetRightMargin(0.);
+							if(iStateMP==3) MPpad->SetRightMargin(Right_margin);
+							MPpad->SetTopMargin(Top_margin+0.0025);
+							MPpad->SetBottomMargin(0.0);
+							if(iPanel==nPanels_MPnewCDF) MPpad->SetBottomMargin(lowestBottomMargin);
+
+
+							cout<<"MultiPanel hist"<<endl;
+							TH1F *MPhist = new TH1F;
+							MPhist = MPcanvasCDF->DrawFrame(PlotMattpTMin,yMinMP,onia::pTRange[rapBin][ptBinMax],yMaxMP);
+
+							MPhist->SetXTitle("#it{p}_{T} [GeV]");
+							MPhist->GetXaxis()->SetTitleOffset(-1.35);
+
+							MPhist->SetYTitle(axislabel);
+							MPhist->GetYaxis()->SetTitleOffset(titleoffset);
+							MPhist->GetYaxis()->SetTitleSize(0.);
+							if(iPanel==nPanels_MPnewCDF) MPhist->GetYaxis()->SetTitleOffset(titleoffset*1.35);
+							if(iPanel==nPanels_MPnewCDF) MPhist->GetYaxis()->SetTitleSize(0.*(1-lowestBottomMargin));
+
+							MPhist->GetYaxis()->SetLabelSize(LabelSize*1.25);
+							MPhist->GetXaxis()->SetLabelSize(0.);
+							MPhist->GetYaxis()->SetLabelOffset(-0.015);
+							MPhist->GetXaxis()->SetLabelOffset(-0.06);
+
+							if(iPanel==nPanels_MPnewCDF) MPhist->GetYaxis()->SetLabelSize(LabelSize*1.25*(1-lowestBottomMargin));
+							MPhist->GetXaxis()->SetTitleSize(TitleSize*0.85);
+							MPhist->GetXaxis()->SetAxisColor(kWhite);
+							MPhist->GetYaxis()->SetAxisColor(kWhite);
+							MPhist->GetXaxis()->SetTicks("-");
+							MPhist->GetYaxis()->SetTicks("+");
+							if(iLam==6||iLam==12||iLam==18||iLam==1||iLam==7||iLam==13) MPhist->GetYaxis()->SetNdivisions(205);
+
+							TLegend* MPframedepLegendError;
+							// MPframedepLegendError=new TLegend(errorLegendX1-Left_margin,errorLegendY1,errorLegendX2-Left_margin,errorLegendY2);
+							MPframedepLegendError=new TLegend(errorLegendX1,errorLegendY2-(errorLegendY2-errorLegendY1)*(1-lowestBottomMargin),errorLegendX2,errorLegendY2);
+							MPframedepLegendError->SetFillColor(0);
+							//MPframedepLegendError->SetTextFont(72);
+							MPframedepLegendError->SetTextSize(errorLegendFontSize*(1-lowestBottomMargin));
+							MPframedepLegendError->SetBorderSize(0);
+
+							char MPframedepLegendEntry[200];
+
+
+							TGraphAsymmErrors* graphCMS_Stat;
+							TGraphAsymmErrors* graphCDF_Stat;
+							TGraphAsymmErrors* graphCMS_Total;
+							TGraphAsymmErrors* graphCDF_Total;
+
+							if(iStateMP==1) graphCDF_Stat = (TGraphAsymmErrors*) infileMP1SCDF_Stat->Get(GraphName);
+							if(iStateMP==2) graphCDF_Stat = (TGraphAsymmErrors*) infileMP2SCDF_Stat->Get(GraphName);
+							if(iStateMP==3) graphCDF_Stat = (TGraphAsymmErrors*) infileMP3SCDF_Stat->Get(GraphName);
+							if(iStateMP==1) graphCDF_Total = (TGraphAsymmErrors*) infileMP1SCDF_Total->Get(GraphName);
+							if(iStateMP==2) graphCDF_Total = (TGraphAsymmErrors*) infileMP2SCDF_Total->Get(GraphName);
+							if(iStateMP==3) graphCDF_Total = (TGraphAsymmErrors*) infileMP3SCDF_Total->Get(GraphName);
+
+							if(iStateMP==1) graphCMS_Stat = (TGraphAsymmErrors*) infileMP1->Get(GraphName);
+							if(iStateMP==2) graphCMS_Stat = (TGraphAsymmErrors*) infileMP2->Get(GraphName);
+							if(iStateMP==3) graphCMS_Stat = (TGraphAsymmErrors*) infileMP3->Get(GraphName);
+							if(iStateMP==1) graphCMS_Total = (TGraphAsymmErrors*) infileMP1_1sig->Get(GraphName);
+							if(iStateMP==2) graphCMS_Total = (TGraphAsymmErrors*) infileMP2_1sig->Get(GraphName);
+							if(iStateMP==3) graphCMS_Total = (TGraphAsymmErrors*) infileMP3_1sig->Get(GraphName);
+
+
+							double ptCentre_CDF[nBinspT];
+							double lmean_CDF[nBinspT];
+							double lmean_errlow_CDF[nBinspT];
+							double lmean_errhigh_CDF[nBinspT];
+							double ptCentre_errlow_CDF[nBinspT];
+							double ptCentre_errhigh_CDF[nBinspT];
+
+							int nBinsCDF=graphCDF_Total->GetN();
+							int ptCDF=0;
+							for(int ptBinCDF=1;ptBinCDF<nBinsCDF+1;ptBinCDF++){
+								graphCDF_Total->GetPoint(ptBinCDF-1,ptCentre_CDF[ptCDF],lmean_CDF[ptCDF]);
+								lmean_errhigh_CDF[ptCDF]=graphCDF_Total->GetErrorYhigh(ptBinCDF-1);
+								lmean_errlow_CDF[ptCDF]=graphCDF_Total->GetErrorYlow(ptBinCDF-1);
+								ptCentre_errhigh_CDF[ptCDF]=graphCDF_Total->GetErrorXhigh(ptBinCDF-1);
+								ptCentre_errlow_CDF[ptCDF]=graphCDF_Total->GetErrorXlow(ptBinCDF-1);
+								/// Alter TGraph
+								ptCentre_errhigh_CDF[ptCDF]=ColordBandWidth;
+								ptCentre_errlow_CDF[ptCDF]=ColordBandWidth;
+
+								ptCDF++;
+							}
+							graphCDF_Total = new TGraphAsymmErrors(nBinsCDF,ptCentre_CDF,lmean_CDF,ptCentre_errlow_CDF,ptCentre_errhigh_CDF,lmean_errlow_CDF,lmean_errhigh_CDF);
+
+							nBinsCDF=5;
+							ptCDF=0;
+							for(int ptBinCDF=6;ptBinCDF<11;ptBinCDF++){
+								graphCMS_Total->GetPoint(ptBinCDF-1,ptCentre_CDF[ptCDF],lmean_CDF[ptCDF]);
+								lmean_errhigh_CDF[ptCDF]=graphCMS_Total->GetErrorYhigh(ptBinCDF-1);
+								lmean_errlow_CDF[ptCDF]=graphCMS_Total->GetErrorYlow(ptBinCDF-1);
+								ptCentre_errhigh_CDF[ptCDF]=graphCMS_Total->GetErrorXhigh(ptBinCDF-1);
+								ptCentre_errlow_CDF[ptCDF]=graphCMS_Total->GetErrorXlow(ptBinCDF-1);
+								/// Alter TGraph
+								ptCentre_errhigh_CDF[ptCDF]=ColordBandWidth;
+								ptCentre_errlow_CDF[ptCDF]=ColordBandWidth;
+
+								ptCDF++;
+							}
+							graphCMS_Total = new TGraphAsymmErrors(nBinsCDF,ptCentre_CDF,lmean_CDF,ptCentre_errlow_CDF,ptCentre_errhigh_CDF,lmean_errlow_CDF,lmean_errhigh_CDF);
+
+							TLegend* MPtildeLegend;
+							MPtildeLegend=new TLegend(0.8,0.75,1.,0.95);
+							MPtildeLegend->SetFillColor(0);
+							//MPtildeLegend->SetTextFont(72);
+							MPtildeLegend->SetTextSize(0.07);
+							MPtildeLegend->SetBorderSize(0);
+							char MPtildeLegendEntry[200];
+
+
+							//infileMP1SCDF_Total
+
+							int CDFFillStyle=1001;//3002
+
+							///// DRAW HERE
+							graphCDF_Total->SetLineColor(kCyan-9);
+							graphCDF_Total->SetFillColor(kCyan-9);
+							graphCDF_Total->SetFillStyle(CDFFillStyle);//3002
+							graphCDF_Total->SetLineWidth(0.);
+
+							graphCDF_Stat->SetMarkerColor(kRed);
+							graphCDF_Stat->SetLineColor(kRed);
+							graphCDF_Stat->SetMarkerStyle(25);
+							graphCDF_Stat->SetMarkerSize(2.5);
+
+							graphCMS_Stat->SetLineColor(kBlack);
+							graphCMS_Stat->SetMarkerColor(kBlack);
+							graphCMS_Stat->SetMarkerStyle(20);
+							graphCMS_Stat->SetMarkerSize(2.5);
+
+							graphCMS_Total->SetFillColor(kGreen-7);
+							graphCMS_Total->SetLineColor(kGreen-7);
+							graphCMS_Total->SetFillStyle(CDFFillStyle);
+
+							graphCDF_Total->Draw("2");
+							graphCMS_Total->Draw("2");
+
+							graphCDF_Stat->Draw("P[]");
+							graphCDF_Stat->Draw("PE");
+							if(PlotAlteredPPDResults){
+								graphCMS_Stat->Draw("P[]");//drawGraphStyle
+								graphCMS_Stat->Draw("PE");//drawGraphStyle
+							}
+
+							TGraphAsymmErrors* graphCMS_OtherTilde;
+							TGraphAsymmErrors* graphCDF_OtherTilde;
+							if(iLam==12){
+								if(iStateMP==1) graphCMS_OtherTilde = (TGraphAsymmErrors*) infileMP1->Get("ltilde_CS_rap1");
+								if(iStateMP==2) graphCMS_OtherTilde = (TGraphAsymmErrors*) infileMP2->Get("ltilde_CS_rap1");
+								if(iStateMP==3) graphCMS_OtherTilde = (TGraphAsymmErrors*) infileMP3->Get("ltilde_CS_rap1");
+								if(iStateMP==1) graphCDF_OtherTilde = (TGraphAsymmErrors*) infileMP1SCDF_Stat->Get("ltilde_CS_rap1");
+								if(iStateMP==2) graphCDF_OtherTilde = (TGraphAsymmErrors*) infileMP2SCDF_Stat->Get("ltilde_CS_rap1");
+								if(iStateMP==3) graphCDF_OtherTilde = (TGraphAsymmErrors*) infileMP3SCDF_Stat->Get("ltilde_CS_rap1");
 
 
 								double ptCentre_CDF[nBinspT];
@@ -4823,589 +5160,490 @@ int main(int argc, char** argv) {
 								double ptCentre_errlow_CDF[nBinspT];
 								double ptCentre_errhigh_CDF[nBinspT];
 
-								int nBinsCDF=graphCDF_Total->GetN();
+								double CDFshift=0.5;
+								int nBinsCDF=graphCDF_OtherTilde->GetN();
 								int ptCDF=0;
 								for(int ptBinCDF=1;ptBinCDF<nBinsCDF+1;ptBinCDF++){
-									graphCDF_Total->GetPoint(ptBinCDF-1,ptCentre_CDF[ptCDF],lmean_CDF[ptCDF]);
-									lmean_errhigh_CDF[ptCDF]=graphCDF_Total->GetErrorYhigh(ptBinCDF-1);
-									lmean_errlow_CDF[ptCDF]=graphCDF_Total->GetErrorYlow(ptBinCDF-1);
-									ptCentre_errhigh_CDF[ptCDF]=graphCDF_Total->GetErrorXhigh(ptBinCDF-1);
-									ptCentre_errlow_CDF[ptCDF]=graphCDF_Total->GetErrorXlow(ptBinCDF-1);
+									graphCDF_OtherTilde->GetPoint(ptBinCDF-1,ptCentre_CDF[ptCDF],lmean_CDF[ptCDF]);
+									lmean_errhigh_CDF[ptCDF]=graphCDF_OtherTilde->GetErrorYhigh(ptBinCDF-1);
+									lmean_errlow_CDF[ptCDF]=graphCDF_OtherTilde->GetErrorYlow(ptBinCDF-1);
+									ptCentre_errhigh_CDF[ptCDF]=graphCDF_OtherTilde->GetErrorXhigh(ptBinCDF-1);
+									ptCentre_errlow_CDF[ptCDF]=graphCDF_OtherTilde->GetErrorXlow(ptBinCDF-1);
 									/// Alter TGraph
-									ptCentre_errhigh_CDF[ptCDF]=ColordBandWidth;
-									ptCentre_errlow_CDF[ptCDF]=ColordBandWidth;
-
+									ptCentre_CDF[ptCDF]+=CDFshift;
 									ptCDF++;
 								}
-								graphCDF_Total = new TGraphAsymmErrors(nBinsCDF,ptCentre_CDF,lmean_CDF,ptCentre_errlow_CDF,ptCentre_errhigh_CDF,lmean_errlow_CDF,lmean_errhigh_CDF);
+								graphCDF_OtherTilde = new TGraphAsymmErrors(nBinsCDF,ptCentre_CDF,lmean_CDF,ptCentre_errlow_CDF,ptCentre_errhigh_CDF,lmean_errlow_CDF,lmean_errhigh_CDF);
 
 								nBinsCDF=5;
 								ptCDF=0;
 								for(int ptBinCDF=6;ptBinCDF<11;ptBinCDF++){
-									graphCMS_Total->GetPoint(ptBinCDF-1,ptCentre_CDF[ptCDF],lmean_CDF[ptCDF]);
-									lmean_errhigh_CDF[ptCDF]=graphCMS_Total->GetErrorYhigh(ptBinCDF-1);
-									lmean_errlow_CDF[ptCDF]=graphCMS_Total->GetErrorYlow(ptBinCDF-1);
-									ptCentre_errhigh_CDF[ptCDF]=graphCMS_Total->GetErrorXhigh(ptBinCDF-1);
-									ptCentre_errlow_CDF[ptCDF]=graphCMS_Total->GetErrorXlow(ptBinCDF-1);
+									graphCMS_OtherTilde->GetPoint(ptBinCDF-1,ptCentre_CDF[ptCDF],lmean_CDF[ptCDF]);
+									lmean_errhigh_CDF[ptCDF]=graphCMS_OtherTilde->GetErrorYhigh(ptBinCDF-1);
+									lmean_errlow_CDF[ptCDF]=graphCMS_OtherTilde->GetErrorYlow(ptBinCDF-1);
+									ptCentre_errhigh_CDF[ptCDF]=graphCMS_OtherTilde->GetErrorXhigh(ptBinCDF-1);
+									ptCentre_errlow_CDF[ptCDF]=graphCMS_OtherTilde->GetErrorXlow(ptBinCDF-1);
 									/// Alter TGraph
-									ptCentre_errhigh_CDF[ptCDF]=ColordBandWidth;
-									ptCentre_errlow_CDF[ptCDF]=ColordBandWidth;
-
+									ptCentre_CDF[ptCDF]-=CDFshift;
 									ptCDF++;
 								}
-								graphCMS_Total = new TGraphAsymmErrors(nBinsCDF,ptCentre_CDF,lmean_CDF,ptCentre_errlow_CDF,ptCentre_errhigh_CDF,lmean_errlow_CDF,lmean_errhigh_CDF);
+								graphCMS_OtherTilde = new TGraphAsymmErrors(nBinsCDF,ptCentre_CDF,lmean_CDF,ptCentre_errlow_CDF,ptCentre_errhigh_CDF,lmean_errlow_CDF,lmean_errhigh_CDF);
 
-								TLegend* MPtildeLegend;
-								MPtildeLegend=new TLegend(0.8,0.75,1.,0.95);
-								MPtildeLegend->SetFillColor(0);
-								//	MPtildeLegend->SetTextFont(72);
-								MPtildeLegend->SetTextSize(0.07);
-								MPtildeLegend->SetBorderSize(0);
-								char MPtildeLegendEntry[200];
+								graphCMS_OtherTilde->SetMarkerColor(kBlue);
+								graphCMS_OtherTilde->SetMarkerStyle(24);
+								graphCMS_OtherTilde->SetMarkerSize(2.5);
 
+								graphCDF_OtherTilde->SetMarkerColor(kMagenta);
+								graphCDF_OtherTilde->SetMarkerStyle(21);
+								graphCDF_OtherTilde->SetMarkerSize(2.5);
 
-								//infileMP1SCDF_Total
+								graphCMS_OtherTilde->Draw("PX");
+								graphCDF_OtherTilde->Draw("PX");
 
-								int CDFFillStyle=1001;//3002
-
-								///// DRAW HERE
-								graphCDF_Total->SetLineColor(kCyan-9);
-								graphCDF_Total->SetFillColor(kCyan-9);
-								graphCDF_Total->SetFillStyle(CDFFillStyle);//3002
-								graphCDF_Total->SetLineWidth(0.);
-
-								graphCDF_Stat->SetMarkerColor(kRed);
-								graphCDF_Stat->SetLineColor(kRed);
-								graphCDF_Stat->SetMarkerStyle(25);
-								graphCDF_Stat->SetMarkerSize(2.5);
-
-								graphCMS_Stat->SetLineColor(kBlack);
-								graphCMS_Stat->SetMarkerColor(kBlack);
-								graphCMS_Stat->SetMarkerStyle(20);
-								graphCMS_Stat->SetMarkerSize(2.5);
-
-								graphCMS_Total->SetFillColor(kGreen-7);
-								graphCMS_Total->SetLineColor(kGreen-7);
-								graphCMS_Total->SetFillStyle(CDFFillStyle);
-
-								graphCDF_Total->Draw("2");
-								graphCMS_Total->Draw("2");
-
-								graphCDF_Stat->Draw("P[]");
-								graphCDF_Stat->Draw("PE");
-								if(PlotAlteredPPDResults){
-									graphCMS_Stat->Draw("P[]");//drawGraphStyle
-									graphCMS_Stat->Draw("PE");//drawGraphStyle
-								}
-
-								TGraphAsymmErrors* graphCMS_OtherTilde;
-								TGraphAsymmErrors* graphCDF_OtherTilde;
-								if(iLam==12){
-									if(iStateMP==1) graphCMS_OtherTilde = (TGraphAsymmErrors*) infileMP1->Get("ltilde_CS_rap1");
-									if(iStateMP==2) graphCMS_OtherTilde = (TGraphAsymmErrors*) infileMP2->Get("ltilde_CS_rap1");
-									if(iStateMP==3) graphCMS_OtherTilde = (TGraphAsymmErrors*) infileMP3->Get("ltilde_CS_rap1");
-									if(iStateMP==1) graphCDF_OtherTilde = (TGraphAsymmErrors*) infileMP1SCDF_Stat->Get("ltilde_CS_rap1");
-									if(iStateMP==2) graphCDF_OtherTilde = (TGraphAsymmErrors*) infileMP2SCDF_Stat->Get("ltilde_CS_rap1");
-									if(iStateMP==3) graphCDF_OtherTilde = (TGraphAsymmErrors*) infileMP3SCDF_Stat->Get("ltilde_CS_rap1");
-
-
-									double ptCentre_CDF[nBinspT];
-									double lmean_CDF[nBinspT];
-									double lmean_errlow_CDF[nBinspT];
-									double lmean_errhigh_CDF[nBinspT];
-									double ptCentre_errlow_CDF[nBinspT];
-									double ptCentre_errhigh_CDF[nBinspT];
-
-									double CDFshift=0.5;
-									int nBinsCDF=graphCDF_OtherTilde->GetN();
-									int ptCDF=0;
-									for(int ptBinCDF=1;ptBinCDF<nBinsCDF+1;ptBinCDF++){
-										graphCDF_OtherTilde->GetPoint(ptBinCDF-1,ptCentre_CDF[ptCDF],lmean_CDF[ptCDF]);
-										lmean_errhigh_CDF[ptCDF]=graphCDF_OtherTilde->GetErrorYhigh(ptBinCDF-1);
-										lmean_errlow_CDF[ptCDF]=graphCDF_OtherTilde->GetErrorYlow(ptBinCDF-1);
-										ptCentre_errhigh_CDF[ptCDF]=graphCDF_OtherTilde->GetErrorXhigh(ptBinCDF-1);
-										ptCentre_errlow_CDF[ptCDF]=graphCDF_OtherTilde->GetErrorXlow(ptBinCDF-1);
-										/// Alter TGraph
-										ptCentre_CDF[ptCDF]+=CDFshift;
-										ptCDF++;
-									}
-									graphCDF_OtherTilde = new TGraphAsymmErrors(nBinsCDF,ptCentre_CDF,lmean_CDF,ptCentre_errlow_CDF,ptCentre_errhigh_CDF,lmean_errlow_CDF,lmean_errhigh_CDF);
-
-									nBinsCDF=5;
-									ptCDF=0;
-									for(int ptBinCDF=6;ptBinCDF<11;ptBinCDF++){
-										graphCMS_OtherTilde->GetPoint(ptBinCDF-1,ptCentre_CDF[ptCDF],lmean_CDF[ptCDF]);
-										lmean_errhigh_CDF[ptCDF]=graphCMS_OtherTilde->GetErrorYhigh(ptBinCDF-1);
-										lmean_errlow_CDF[ptCDF]=graphCMS_OtherTilde->GetErrorYlow(ptBinCDF-1);
-										ptCentre_errhigh_CDF[ptCDF]=graphCMS_OtherTilde->GetErrorXhigh(ptBinCDF-1);
-										ptCentre_errlow_CDF[ptCDF]=graphCMS_OtherTilde->GetErrorXlow(ptBinCDF-1);
-										/// Alter TGraph
-										ptCentre_CDF[ptCDF]-=CDFshift;
-										ptCDF++;
-									}
-									graphCMS_OtherTilde = new TGraphAsymmErrors(nBinsCDF,ptCentre_CDF,lmean_CDF,ptCentre_errlow_CDF,ptCentre_errhigh_CDF,lmean_errlow_CDF,lmean_errhigh_CDF);
-
-									graphCMS_OtherTilde->SetMarkerColor(kBlue);
-									graphCMS_OtherTilde->SetMarkerStyle(24);
-									graphCMS_OtherTilde->SetMarkerSize(2.5);
-
-									graphCDF_OtherTilde->SetMarkerColor(kMagenta);
-									graphCDF_OtherTilde->SetMarkerStyle(21);
-									graphCDF_OtherTilde->SetMarkerSize(2.5);
-
-									graphCMS_OtherTilde->Draw("PX");
-									graphCDF_OtherTilde->Draw("PX");
-
-								}
-
-								TGaxis *axisMPY1 = new TGaxis(PlotMattpTMin,yMinMP,PlotMattpTMin,yMaxMP,yMinMP,yMaxMP,AxisDivisions,"-US");
-								axisMPY1->SetTickSize(ticksize);
-								if(iPanel==nPanels_MPnewCDF) axisMPY1->SetTickSize(ticksize/(1-lowestBottomMargin));
-								axisMPY1->Draw("same");
-
-								TGaxis *axisMPY2 = new TGaxis(onia::pTRange[rapBin][ptBinMax],yMinMP,onia::pTRange[rapBin][ptBinMax],yMaxMP,yMinMP,yMaxMP,AxisDivisions,"+US");
-								axisMPY2->SetTickSize(ticksize);
-								if(iPanel==nPanels_MPnewCDF) axisMPY2->SetTickSize(ticksize/(1-lowestBottomMargin));
-								axisMPY2->Draw("same");
-
-
-								double deltaTrickAxisMax_MPnew;
-								double deltaTrickAxisMin_MPnew;
-								deltaTrickAxisMax_MPnew=-0.001;
-								deltaTrickAxisMin_MPnew=-0.001;
-								if(iStateMP>1) deltaTrickAxisMin_MPnew=+0.001;
-								//   if(iStateMP==3) deltaTrickAxisMax_MPnew=+0.001;
-
-								TGaxis *axisM3S1 = new TGaxis(PlotMattpTMin,yMinMP,onia::pTRange[rapBin][ptBinMax],yMinMP,PlotMattpTMin+deltaTrickAxisMin_MPnew,onia::pTRange[rapBin][ptBinMax]+deltaTrickAxisMax_MPnew,AxisDivisions,"+S");
-								axisM3S1->SetTickSize(ticksize*2);
-								if(iPanel==nPanels_MPnewCDF) axisM3S1->SetLabelSize(LabelSize);
-								if(iPanel<nPanels_MPnewCDF) axisM3S1->SetLabelSize(0);
-								axisM3S1->SetLabelOffset(labelOffsetX);
-								if(iPanel==nPanels_MPnewCDF) axisM3S1->SetTickSize(ticksize/(1-lowestBottomMargin));
-								axisM3S1->Draw("same");
-
-								TGaxis *axisM3S2 = new TGaxis(PlotMattpTMin,yMaxMP,onia::pTRange[rapBin][ptBinMax],yMaxMP,PlotMattpTMin+deltaTrickAxisMin_MPnew,onia::pTRange[rapBin][ptBinMax]+deltaTrickAxisMax_MPnew,AxisDivisions,"-US");
-								axisM3S2->SetTickSize(ticksize*2);
-								if(iPanel==nPanels_MPnewCDF) axisM3S2->SetTickSize(ticksize/(1-lowestBottomMargin));
-								axisM3S2->Draw("same");
-
-								whereTexteInPlotX=XtitlePosition-12.;
-								whereTexteInPlotY=(yMaxMP+yMinMP)/2.-(yMaxMP-yMinMP)*XtitlePositionYshift;
-
-								if(iLam==6||iLam==12||iLam==18||iLam==1||iLam==7||iLam==13) whereTexteInPlotY=0.65;
-
-								char axistitleMPtilde[200];
-								sprintf(axistitleMPtilde,"%s",axislabel);
-								if(iPanel==nPanels_MPnewCDF) YaxistitleLatexSize=YaxistitleLatexSize*(1-lowestBottomMargin);
-								TLatex *MPYtitletext = new TLatex(whereTexteInPlotX,whereTexteInPlotY ,axistitleMPtilde);
-								MPYtitletext->SetTextSize(YaxistitleLatexSize);
-								if(iPanel==nPanels_MPnewCDF) MPYtitletext->SetTextSize(YaxistitleLatexSize*(1-lowestBottomMargin));
-								MPYtitletext->SetTextColor(kBlack);
-								if(iLam==3||iLam==9) MPYtitletext->PaintLatex(whereTexteInPlotX,whereTexteInPlotY, YtitleAngle, YaxistitleLatexSize*2., axislabel);
-								else MPYtitletext->PaintLatex(whereTexteInPlotX,whereTexteInPlotY, YtitleAngle, YaxistitleLatexSize, axislabel);//axislabel
-								MPYtitletext->Draw( "same" );
-
-
-
-
-								char texTexMP[200];
-								if(rapBin==1) sprintf(texTexMP,"#psi(%dS)", iStateMP);
-								TLatex *textMP = new TLatex(xRapTextTilde+6,yMin+(yMax-yMin)*yRapText*0.92,texTexMP);
-								textMP->SetTextSize(textSizeRap);
-								if(iPanel==nPanels_MPnewCDF) textMP->SetTextSize(textSizeRap*(1-lowestBottomMargin));
-								textMP->Draw( "same" );
-
-								char abcdef[200];
-								if(iStateMP==1&&iPanel==1) sprintf(abcdef,"a)");
-								if(iStateMP==1&&iPanel==2) sprintf(abcdef,"b)");
-								if(iStateMP==2&&iPanel==1) sprintf(abcdef,"c)");
-								if(iStateMP==2&&iPanel==2) sprintf(abcdef,"d)");
-								if(iStateMP==3&&iPanel==1) sprintf(abcdef,"e)");
-								if(iStateMP==3&&iPanel==2) sprintf(abcdef,"f)");
-								cout<<abcdef<<endl;
-								TLatex *tex_abcdef = new TLatex(xabcdefText,yMin+(yMax-yMin)*yRapText*0.92,abcdef);
-								tex_abcdef->SetTextSize(textSizeRap);
-								if(iPanel==nPanels_MPnewCDF) tex_abcdef->SetTextSize(textSizeRap*(1-lowestBottomMargin));
-								//		   tex_abcdef->Draw( "same" );
-
-								if(PlotFinalData&&DrawLatexStuff){
-
-									TLine* extreme0MP = new TLine( PlotMattpTMin, 0, onia::pTRange[rapBin][ptBinMax] ,0);
-									extreme0MP->SetLineWidth( 1 );
-									extreme0MP->SetLineStyle( 2 );
-									extreme0MP->SetLineColor( kBlack );
-									extreme0MP->Draw( "same" );
-
-									TLine* extreme1MP = new TLine( PlotMattpTMin, 1, onia::pTRange[rapBin][ptBinMax] , 1);
-									extreme1MP->SetLineWidth( 1 );
-									extreme1MP->SetLineStyle( 2 );
-									extreme1MP->SetLineColor( kBlack );
-									//		if(iLam==1||iLam==7||iLam==13) extreme1MP->Draw( "same" );
-
-									TLine* extreme2MP = new TLine( PlotMattpTMin, -1, onia::pTRange[rapBin][ptBinMax] ,-1);
-									extreme2MP->SetLineWidth( 1 );
-									extreme2MP->SetLineStyle( 2 );
-									extreme2MP->SetLineColor( kBlack );
-									//		if(iLam==1||iLam==7||iLam==13) extreme2MP->Draw( "same" );
-									//		if(iLam==6||iLam==12||iLam==18) extreme2MP->Draw( "same" );
-
-								}
-
-
-								if(iStateMP==2&&iPanel==1){
-									cout<<"DRAW CMS preliminary Latex"<<endl;
-									char text[200];
-									sprintf(text,"CMS     pp      #sqrt{s} = 7 TeV     L = 4.9 fb^{-1}");
-									TLatex *CentralsText1MP = new TLatex(MPlatexX-10,MPlatexYmax,text);
-									CentralsText1MP->SetTextSize(CentralsFontSizeMP*TwoTOthreePanelScaleFactor*0.925);
-									//	 CentralsText1MP->Draw( "same" );
-									sprintf(text,"preliminary");
-									CentralsText1MP = new TLatex(MPlatexX-10,(yMax-yMin)*0.72+yMin,text);
-									CentralsText1MP->SetTextSize(CentralsFontSizeMP*TwoTOthreePanelScaleFactor*0.925);
-									//	 CentralsText1MP->Draw( "same" );
-									/*			 sprintf(text,"L = 4.9 fb^{-1}");
-													 TLatex *CentralsText2MP = new TLatex(MPlatexX,MPlatexYmax-2*MPlatexDeltaYmax,text);
-													 CentralsText2MP->SetTextSize(CentralsFontSizeMP);
-													 CentralsText2MP->Draw( "same" );
-													 sprintf(text,"pp    #sqrt{s} = 7 TeV");
-													 TLatex *CentralsText3MP = new TLatex(MPlatexX,MPlatexYmax-MPlatexDeltaYmax,text);
-													 CentralsText3MP->SetTextSize(CentralsFontSizeMP);
-													 CentralsText3MP->Draw( "same" );
-									 */
-
-								}
-
-								if(iStateMP==1&&iPanel==1){
-
-									TLegend* plotCDFLegend=new TLegend(0.165,0.8,0.5,0.95);
-									plotCDFLegend->SetFillColor(0);
-									//			plotCDFLegend->SetTextFont(72);
-									plotCDFLegend->SetTextSize(0.05);
-									plotCDFLegend->SetBorderSize(0);
-									char Mattlegendentry[200];
-									/*			sprintf(Mattlegendentry,"CMS tot. uncert., 68.3%% CL");
-													plotCDFLegend->AddEntry(graphCMS_Total,Mattlegendentry,"f");
-													sprintf(Mattlegendentry,"CMS stat. uncert., 68.3%% CL");
-													plotCDFLegend->AddEntry(graphCMS_Stat,Mattlegendentry,"elp");
-													sprintf(Mattlegendentry,"CDF tot. uncert., 68.3%% CL");
-													plotCDFLegend->AddEntry(graphCDF_Total,Mattlegendentry,"f");
-													sprintf(Mattlegendentry,"CDF stat. uncert., 68.3%% CL");
-													plotCDFLegend->AddEntry(graphCDF_Stat,Mattlegendentry,"elp");
-									 */
-									sprintf(Mattlegendentry,"CMS");
-									plotCDFLegend->AddEntry(graphCMS_Stat,Mattlegendentry,"elp");
-									sprintf(Mattlegendentry,"CDF");
-									plotCDFLegend->AddEntry(graphCDF_Stat,Mattlegendentry,"elp");
-
-									plotCDFLegend->Draw("same");
-
-									TLegend* plotCDFLegend2=new TLegend(0.8,0.8,0.95,0.95);
-									plotCDFLegend2->SetFillColor(0);
-									//			plotCDFLegend2->SetTextFont(72);
-									plotCDFLegend2->SetTextSize(0.05);
-									plotCDFLegend2->SetBorderSize(0);
-
-									sprintf(Mattlegendentry,"CMS #tilde{#lambda}^{CS}");
-									plotCDFLegend2->AddEntry(graphCMS_OtherTilde,Mattlegendentry,"p");
-									sprintf(Mattlegendentry,"CDF #tilde{#lambda}^{CS}");
-									plotCDFLegend2->AddEntry(graphCDF_OtherTilde,Mattlegendentry,"p");
-
-									if(iLam==12) plotCDFLegend2->Draw("same");
-								}
-
-								/*			 if(rapBin==2&&iPanel==1){
-
-												 char frameMPtex[200];
-												 if(MPframe==1) sprintf(frameMPtex,"CS frame");
-												 if(MPframe==2) sprintf(frameMPtex,"HX frame");
-												 if(MPframe==3) sprintf(frameMPtex,"PX frame");
-												 char textStateFrame[200];
-												 sprintf(textStateFrame,"%s", frameMPtex);
-												 TLatex *TexStateFrame = new TLatex(MPlatexX,MPlatexYmax,textStateFrame);
-												 TexStateFrame->SetTextSize(CentralsFontSizeMP);
-												 TexStateFrame->Draw( "same" );
-
-												 }
-								 */
-							}//end iStateMP loop
-
-							MPcanvasCDF->cd();
-
-							/*			whereTexteInPlotX=0.488;
-											whereTexteInPlotY=startValCoordY-deltaCoordY-1.425*labelOffsetX;
-
-											TLatex *M3Slabeltext = new TLatex(whereTexteInPlotX,whereTexteInPlotY ,"1");
-											M3Slabeltext->SetTextSize(XaxislabelLatexSize);
-											M3Slabeltext->SetTextColor(kBlack);
-											if(iPanel==nPanels_MPnewCDF) M3Slabeltext->Draw( "same" );
-							 */
-							whereTexteInPlotX=0.365;
-							whereTexteInPlotY=startValCoordY-deltaCoordY+0.05;
-
-							TLatex *MPXlabeltext = new TLatex(whereTexteInPlotX,whereTexteInPlotY ,"0");
-							MPXlabeltext->SetTextSize(XaxislabelLatexSize/TwoTOthreePanelScaleFactorCDF*1.05);
-							MPXlabeltext->SetTextColor(kBlack);
-							if(iPanel==nPanels_MPnewCDF) MPXlabeltext->Draw( "same" );
-
-							whereTexteInPlotX+=x_tilde;
-							MPXlabeltext = new TLatex(whereTexteInPlotX,whereTexteInPlotY ,"0");
-							MPXlabeltext->SetTextSize(XaxislabelLatexSize/TwoTOthreePanelScaleFactorCDF*1.05);
-							MPXlabeltext->SetTextColor(kBlack);
-							if(iPanel==nPanels_MPnewCDF) MPXlabeltext->Draw( "same" );
-
-
-							if((iLam==1||iLam==7)){
-								if(mainframe==1) sprintf(filename,"%s/FinalResultsCDF_lamthCS.pdf",FigDir);
-								if(mainframe==2) sprintf(filename,"%s/FinalResultsCDF_lamthHX.pdf",FigDir);
-								//			MPcanvasCDF->SetRightMargin(0.05);
-								//			MPcanvasCDF->Modified();
-
-								if(PlotFinalData) MPcanvasCDF->SaveAs(filename);
-								MPcanvasCDF->Close();
-							}
-							if((iLam==2||iLam==8)){
-								if(mainframe==1) sprintf(filename,"%s/FinalResultsCDF_lamphCS.pdf",FigDir);
-								if(mainframe==2) sprintf(filename,"%s/FinalResultsCDF_lamphHX.pdf",FigDir);
-								if(PlotFinalData) MPcanvasCDF->SaveAs(filename);
-								MPcanvasCDF->Close();
-							}
-							if((iLam==3||iLam==9)){
-								if(mainframe==1) sprintf(filename,"%s/FinalResultsCDF_lamtpCS.pdf",FigDir);
-								if(mainframe==2) sprintf(filename,"%s/FinalResultsCDF_lamtpHX.pdf",FigDir);
-								if(PlotFinalData) MPcanvasCDF->SaveAs(filename);
-								MPcanvasCDF->Close();
-							}
-							if((iLam==6||iLam==12)){
-								if(mainframe==1) sprintf(filename,"%s/FinalResultsCDF_lamtildeCS.pdf",FigDir);
-								if(mainframe==2) sprintf(filename,"%s/FinalResultsCDF_lamtildeHX.pdf",FigDir);
-								if(PlotFinalData) MPcanvasCDF->SaveAs(filename);
-								MPcanvasCDF->Close();
 							}
 
-						}//end CDF MP plots NEW
-					}
+							TGaxis *axisMPY1 = new TGaxis(PlotMattpTMin,yMinMP,PlotMattpTMin,yMaxMP,yMinMP,yMaxMP,AxisDivisions,"-US");
+							axisMPY1->SetTickSize(ticksize);
+							if(iPanel==nPanels_MPnewCDF) axisMPY1->SetTickSize(ticksize/(1-lowestBottomMargin));
+							axisMPY1->Draw("same");
+
+							TGaxis *axisMPY2 = new TGaxis(onia::pTRange[rapBin][ptBinMax],yMinMP,onia::pTRange[rapBin][ptBinMax],yMaxMP,yMinMP,yMaxMP,AxisDivisions,"+US");
+							axisMPY2->SetTickSize(ticksize);
+							if(iPanel==nPanels_MPnewCDF) axisMPY2->SetTickSize(ticksize/(1-lowestBottomMargin));
+							axisMPY2->Draw("same");
+
+
+							double deltaTrickAxisMax_MPnew;
+							double deltaTrickAxisMin_MPnew;
+							deltaTrickAxisMax_MPnew=-0.001;
+							deltaTrickAxisMin_MPnew=-0.001;
+							if(iStateMP>1) deltaTrickAxisMin_MPnew=+0.001;
+							//if(iStateMP==3) deltaTrickAxisMax_MPnew=+0.001;
+
+							TGaxis *axisM3S1 = new TGaxis(PlotMattpTMin,yMinMP,onia::pTRange[rapBin][ptBinMax],yMinMP,PlotMattpTMin+deltaTrickAxisMin_MPnew,onia::pTRange[rapBin][ptBinMax]+deltaTrickAxisMax_MPnew,AxisDivisions,"+S");
+							axisM3S1->SetTickSize(ticksize*2);
+							if(iPanel==nPanels_MPnewCDF) axisM3S1->SetLabelSize(LabelSize);
+							if(iPanel<nPanels_MPnewCDF) axisM3S1->SetLabelSize(0);
+							axisM3S1->SetLabelOffset(labelOffsetX);
+							if(iPanel==nPanels_MPnewCDF) axisM3S1->SetTickSize(ticksize/(1-lowestBottomMargin));
+							axisM3S1->Draw("same");
+
+							TGaxis *axisM3S2 = new TGaxis(PlotMattpTMin,yMaxMP,onia::pTRange[rapBin][ptBinMax],yMaxMP,PlotMattpTMin+deltaTrickAxisMin_MPnew,onia::pTRange[rapBin][ptBinMax]+deltaTrickAxisMax_MPnew,AxisDivisions,"-US");
+							axisM3S2->SetTickSize(ticksize*2);
+							if(iPanel==nPanels_MPnewCDF) axisM3S2->SetTickSize(ticksize/(1-lowestBottomMargin));
+							axisM3S2->Draw("same");
+
+							whereTexteInPlotX=XtitlePosition-12.;
+							whereTexteInPlotY=(yMaxMP+yMinMP)/2.-(yMaxMP-yMinMP)*XtitlePositionYshift;
+
+							if(iLam==6||iLam==12||iLam==18||iLam==1||iLam==7||iLam==13) whereTexteInPlotY=0.65;
+
+							char axistitleMPtilde[200];
+							sprintf(axistitleMPtilde,"%s",axislabel);
+							if(iPanel==nPanels_MPnewCDF) YaxistitleLatexSize=YaxistitleLatexSize*(1-lowestBottomMargin);
+							TLatex *MPYtitletext = new TLatex(whereTexteInPlotX,whereTexteInPlotY ,axistitleMPtilde);
+							MPYtitletext->SetTextSize(YaxistitleLatexSize);
+							if(iPanel==nPanels_MPnewCDF) MPYtitletext->SetTextSize(YaxistitleLatexSize*(1-lowestBottomMargin));
+							MPYtitletext->SetTextColor(kBlack);
+							if(iLam==3||iLam==9) MPYtitletext->PaintLatex(whereTexteInPlotX,whereTexteInPlotY, YtitleAngle, YaxistitleLatexSize*2., axislabel);
+							else MPYtitletext->PaintLatex(whereTexteInPlotX,whereTexteInPlotY, YtitleAngle, YaxistitleLatexSize, axislabel);//axislabel
+							MPYtitletext->Draw( "same" );
 
 
 
 
+							char texTexMP[200];
+							if(rapBin==1) sprintf(texTexMP,"#psi(%dS)", iStateMP);
+							TLatex *textMP = new TLatex(xRapTextTilde+6,yMin+(yMax-yMin)*yRapText*0.92,texTexMP);
+							textMP->SetTextSize(textSizeRap);
+							if(iPanel==nPanels_MPnewCDF) textMP->SetTextSize(textSizeRap*(1-lowestBottomMargin));
+							textMP->Draw( "same" );
+
+							char abcdef[200];
+							if(iStateMP==1&&iPanel==1) sprintf(abcdef,"a)");
+							if(iStateMP==1&&iPanel==2) sprintf(abcdef,"b)");
+							if(iStateMP==2&&iPanel==1) sprintf(abcdef,"c)");
+							if(iStateMP==2&&iPanel==2) sprintf(abcdef,"d)");
+							if(iStateMP==3&&iPanel==1) sprintf(abcdef,"e)");
+							if(iStateMP==3&&iPanel==2) sprintf(abcdef,"f)");
+							cout<<abcdef<<endl;
+							TLatex *tex_abcdef = new TLatex(xabcdefText,yMin+(yMax-yMin)*yRapText*0.92,abcdef);
+							tex_abcdef->SetTextSize(textSizeRap);
+							if(iPanel==nPanels_MPnewCDF) tex_abcdef->SetTextSize(textSizeRap*(1-lowestBottomMargin));
+							//tex_abcdef->Draw( "same" );
+
+							if(PlotFinalData&&DrawLatexStuff){
+
+								TLine* extreme0MP = new TLine( PlotMattpTMin, 0, onia::pTRange[rapBin][ptBinMax] ,0);
+								extreme0MP->SetLineWidth( 1 );
+								extreme0MP->SetLineStyle( 2 );
+								extreme0MP->SetLineColor( kBlack );
+								extreme0MP->Draw( "same" );
+
+								TLine* extreme1MP = new TLine( PlotMattpTMin, 1, onia::pTRange[rapBin][ptBinMax] , 1);
+								extreme1MP->SetLineWidth( 1 );
+								extreme1MP->SetLineStyle( 2 );
+								extreme1MP->SetLineColor( kBlack );
+								//if(iLam==1||iLam==7||iLam==13) extreme1MP->Draw( "same" );
+
+								TLine* extreme2MP = new TLine( PlotMattpTMin, -1, onia::pTRange[rapBin][ptBinMax] ,-1);
+								extreme2MP->SetLineWidth( 1 );
+								extreme2MP->SetLineStyle( 2 );
+								extreme2MP->SetLineColor( kBlack );
+								//if(iLam==1||iLam==7||iLam==13) extreme2MP->Draw( "same" );
+								//if(iLam==6||iLam==12||iLam==18) extreme2MP->Draw( "same" );
+
+							}
 
 
+							if(iStateMP==2&&iPanel==1){
+								cout<<"DRAW CMS preliminary Latex"<<endl;
+								char text[200];
+								sprintf(text,"CMS     pp      #sqrt{s} = 7 TeV     L = 4.9 fb^{-1}");
+								TLatex *CentralsText1MP = new TLatex(MPlatexX-10,MPlatexYmax,text);
+								CentralsText1MP->SetTextSize(CentralsFontSizeMP*TwoTOthreePanelScaleFactor*0.925);
+								//CentralsText1MP->Draw( "same" );
+								sprintf(text,"preliminary");
+								CentralsText1MP = new TLatex(MPlatexX-10,(yMax-yMin)*0.72+yMin,text);
+								CentralsText1MP->SetTextSize(CentralsFontSizeMP*TwoTOthreePanelScaleFactor*0.925);
+								//CentralsText1MP->Draw( "same" );
 
-				} //MultiPanelPlots
+								//sprintf(text,"L = 4.9 fb^{-1}");
+								//TLatex *CentralsText2MP = new TLatex(MPlatexX,MPlatexYmax-2*MPlatexDeltaYmax,text);
+								//CentralsText2MP->SetTextSize(CentralsFontSizeMP);
+								//CentralsText2MP->Draw( "same" );
+								//sprintf(text,"pp    #sqrt{s} = 7 TeV");
+								//TLatex *CentralsText3MP = new TLatex(MPlatexX,MPlatexYmax-MPlatexDeltaYmax,text);
+								//CentralsText3MP->SetTextSize(CentralsFontSizeMP);
+								//CentralsText3MP->Draw( "same" );
+
+							}
+
+							if(iStateMP==1&&iPanel==1){
+
+								TLegend* plotCDFLegend=new TLegend(0.165,0.8,0.5,0.95);
+								plotCDFLegend->SetFillColor(0);
+								//plotCDFLegend->SetTextFont(72);
+								plotCDFLegend->SetTextSize(0.05);
+								plotCDFLegend->SetBorderSize(0);
+								char Mattlegendentry[200];
+
+								//sprintf(Mattlegendentry,"CMS tot. uncert., 68.3%% CL");
+								//plotCDFLegend->AddEntry(graphCMS_Total,Mattlegendentry,"f");
+								//sprintf(Mattlegendentry,"CMS stat. uncert., 68.3%% CL");
+								//plotCDFLegend->AddEntry(graphCMS_Stat,Mattlegendentry,"elp");
+								//sprintf(Mattlegendentry,"CDF tot. uncert., 68.3%% CL");
+								//plotCDFLegend->AddEntry(graphCDF_Total,Mattlegendentry,"f");
+								//sprintf(Mattlegendentry,"CDF stat. uncert., 68.3%% CL");
+								//plotCDFLegend->AddEntry(graphCDF_Stat,Mattlegendentry,"elp");
+
+								sprintf(Mattlegendentry,"CMS");
+								plotCDFLegend->AddEntry(graphCMS_Stat,Mattlegendentry,"elp");
+								sprintf(Mattlegendentry,"CDF");
+								plotCDFLegend->AddEntry(graphCDF_Stat,Mattlegendentry,"elp");
+
+								plotCDFLegend->Draw("same");
+
+								TLegend* plotCDFLegend2=new TLegend(0.8,0.8,0.95,0.95);
+								plotCDFLegend2->SetFillColor(0);
+								//plotCDFLegend2->SetTextFont(72);
+								plotCDFLegend2->SetTextSize(0.05);
+								plotCDFLegend2->SetBorderSize(0);
+
+								sprintf(Mattlegendentry,"CMS #tilde{#lambda}^{CS}");
+								plotCDFLegend2->AddEntry(graphCMS_OtherTilde,Mattlegendentry,"p");
+								sprintf(Mattlegendentry,"CDF #tilde{#lambda}^{CS}");
+								plotCDFLegend2->AddEntry(graphCDF_OtherTilde,Mattlegendentry,"p");
+
+								if(iLam==12) plotCDFLegend2->Draw("same");
+							}
+
+							//if(rapBin==2&&iPanel==1){
+							//	char frameMPtex[200];
+							//	if(MPframe==1) sprintf(frameMPtex,"CS frame");
+							//	if(MPframe==2) sprintf(frameMPtex,"HX frame");
+							//	if(MPframe==3) sprintf(frameMPtex,"PX frame");
+							//	char textStateFrame[200];
+							//	sprintf(textStateFrame,"%s", frameMPtex);
+							//	TLatex *TexStateFrame = new TLatex(MPlatexX,MPlatexYmax,textStateFrame);
+							//	TexStateFrame->SetTextSize(CentralsFontSizeMP);
+							//	TexStateFrame->Draw( "same" );
+							//}
+
+						}//end iStateMP loop
+
+						MPcanvasCDF->cd();
+
+						//whereTexteInPlotX=0.488;
+						//whereTexteInPlotY=startValCoordY-deltaCoordY-1.425*labelOffsetX;
+						//TLatex *M3Slabeltext = new TLatex(whereTexteInPlotX,whereTexteInPlotY ,"1");
+						//M3Slabeltext->SetTextSize(XaxislabelLatexSize);
+						//M3Slabeltext->SetTextColor(kBlack);
+						//if(iPanel==nPanels_MPnewCDF) M3Slabeltext->Draw( "same" );
+
+						whereTexteInPlotX=0.365;
+						whereTexteInPlotY=startValCoordY-deltaCoordY+0.05;
+
+						TLatex *MPXlabeltext = new TLatex(whereTexteInPlotX,whereTexteInPlotY ,"0");
+						MPXlabeltext->SetTextSize(XaxislabelLatexSize/TwoTOthreePanelScaleFactorCDF*1.05);
+						MPXlabeltext->SetTextColor(kBlack);
+						if(iPanel==nPanels_MPnewCDF) MPXlabeltext->Draw( "same" );
+
+						whereTexteInPlotX+=x_tilde;
+						MPXlabeltext = new TLatex(whereTexteInPlotX,whereTexteInPlotY ,"0");
+						MPXlabeltext->SetTextSize(XaxislabelLatexSize/TwoTOthreePanelScaleFactorCDF*1.05);
+						MPXlabeltext->SetTextColor(kBlack);
+						if(iPanel==nPanels_MPnewCDF) MPXlabeltext->Draw( "same" );
 
 
+						if((iLam==1||iLam==7)){
+							if(mainframe==1) sprintf(filename,"%s/FinalResultsCDF_lamthCS.pdf",FigDir);
+							if(mainframe==2) sprintf(filename,"%s/FinalResultsCDF_lamthHX.pdf",FigDir);
+							//MPcanvasCDF->SetRightMargin(0.05);
+							//MPcanvasCDF->Modified();
 
+							if(PlotFinalData) MPcanvasCDF->SaveAs(filename);
+							MPcanvasCDF->Close();
+						}
+						if((iLam==2||iLam==8)){
+							if(mainframe==1) sprintf(filename,"%s/FinalResultsCDF_lamphCS.pdf",FigDir);
+							if(mainframe==2) sprintf(filename,"%s/FinalResultsCDF_lamphHX.pdf",FigDir);
+							if(PlotFinalData) MPcanvasCDF->SaveAs(filename);
+							MPcanvasCDF->Close();
+						}
+						if((iLam==3||iLam==9)){
+							if(mainframe==1) sprintf(filename,"%s/FinalResultsCDF_lamtpCS.pdf",FigDir);
+							if(mainframe==2) sprintf(filename,"%s/FinalResultsCDF_lamtpHX.pdf",FigDir);
+							if(PlotFinalData) MPcanvasCDF->SaveAs(filename);
+							MPcanvasCDF->Close();
+						}
+						if((iLam==6||iLam==12)){
+							if(mainframe==1) sprintf(filename,"%s/FinalResultsCDF_lamtildeCS.pdf",FigDir);
+							if(mainframe==2) sprintf(filename,"%s/FinalResultsCDF_lamtildeHX.pdf",FigDir);
+							if(PlotFinalData) MPcanvasCDF->SaveAs(filename);
+							MPcanvasCDF->Close();
+						}
 
-
-
-
-
-				// Systematic uncertainties
-
-				if(iLam==1)  sprintf(filename,"%s/Systematics_CS_lth_rap%d.pdf",FigDir,rapBin);
-				if(iLam==2)  sprintf(filename,"%s/Systematics_CS_lph_rap%d.pdf",FigDir,rapBin);
-				if(iLam==3)  sprintf(filename,"%s/Systematics_CS_ltp_rap%d.pdf",FigDir,rapBin);
-				if(iLam==4)  sprintf(filename,"%s/Systematics_CS_lthstar_rap%d.pdf",FigDir,rapBin);
-				if(iLam==5)  sprintf(filename,"%s/Systematics_CS_lphstar_rap%d.pdf",FigDir,rapBin);
-				if(iLam==6)  sprintf(filename,"%s/Systematics_CS_ltilde_rap%d.pdf",FigDir,rapBin);
-
-				if(iLam==7)  sprintf(filename,"%s/Systematics_HX_lth_rap%d.pdf",FigDir,rapBin);
-				if(iLam==8)  sprintf(filename,"%s/Systematics_HX_lph_rap%d.pdf",FigDir,rapBin);
-				if(iLam==9)  sprintf(filename,"%s/Systematics_HX_ltp_rap%d.pdf",FigDir,rapBin);
-				if(iLam==10) sprintf(filename,"%s/Systematics_HX_lthstar_rap%d.pdf",FigDir,rapBin);
-				if(iLam==11) sprintf(filename,"%s/Systematics_HX_lphstar_rap%d.pdf",FigDir,rapBin);
-				if(iLam==12) sprintf(filename,"%s/Systematics_HX_ltilde_rap%d.pdf",FigDir,rapBin);
-
-				if(iLam==13) sprintf(filename,"%s/Systematics_PX_lth_rap%d.pdf",FigDir,rapBin);
-				if(iLam==14) sprintf(filename,"%s/Systematics_PX_lph_rap%d.pdf",FigDir,rapBin);
-				if(iLam==15) sprintf(filename,"%s/Systematics_PX_ltp_rap%d.pdf",FigDir,rapBin);
-				if(iLam==16) sprintf(filename,"%s/Systematics_PX_lthstar_rap%d.pdf",FigDir,rapBin);
-				if(iLam==17) sprintf(filename,"%s/Systematics_PX_lphstar_rap%d.pdf",FigDir,rapBin);
-				if(iLam==18) sprintf(filename,"%s/Systematics_PX_ltilde_rap%d.pdf",FigDir,rapBin);
-
-				TCanvas *SystCanvas = new TCanvas("SystCanvas","SystCanvas",1000,800);
-
-				SystCanvas->SetFillColor(kWhite);
-				SystCanvas->SetGrid();
-				SystCanvas->GetFrame()->SetFillColor(kWhite);
-				SystCanvas->GetFrame()->SetBorderSize(0);
-				//SystCanvas->SetRightMargin(0.05) ;
-
-				double ParametrizedFontSize[8]={0.05,0.05,0.05,0.05,0.04,0.04,0.03,0.03};
-				double LegendYmin[8]={0.8,0.75,0.7,0.65,0.65,0.6,0.6,0.6};
-
-				double LegendXmin=0.6; // for FrameworkIII: 0.5
-				if(ExtendLegendInX) LegendXmin=0.25;
-
-				//TLegend* plotLegend=new TLegend(LegendXmin,LegendYmin[nSystematics-1],0.95,0.9);
-				TLegend* plotLegend=new TLegend(LegendXmin,LegendYmin[nSystematics-1],0.98,0.98);
-				plotLegend->SetFillColor(kWhite);
-				//plotLegend->SetTextFont(72);
-				plotLegend->SetTextSize(ParametrizedFontSize[nSystematics-1]);
-				plotLegend->SetBorderSize(1);
-				char legendentry[200];
-
-
-				double lineWidth=3;
-				sprintf(drawGraphStyle,"LX");
-				//sprintf(drawGraphStyle,"PE");
-
-				TH1F *SystHisto = new TH1F;
-			  SystHisto = SystCanvas->DrawFrame(PlotpTMin,yMin,PlotpTMax,yMax); //to be consistant for Psi 1S and 2S
-				SystHisto->SetXTitle("#it{p}_{T} [GeV]");
-				SystHisto->SetYTitle(axislabel);
-				//SystHisto->GetYaxis()->SetTitleOffset(1.5);
-
-				TGraphAsymmErrors *graphStat = new TGraphAsymmErrors(nBinspT,ptCentre_,lmean_errmean_minus,ptCentreErr_low,ptCentreErr_high,0,lmean_errmean);
-				graphStat->SetFillColor(kGreen-2);
-				graphStat->SetFillStyle(1001);
-				graphStat->SetLineColor(kGreen-2);
-				graphStat->SetLineWidth(lineWidth);
-				if(!PlotAsymm) graphStat->Draw("2");
-				sprintf(legendentry,"Statistical Error");
-
-				if(nSystematics>7){
-					TGraphAsymmErrors *graphSyst12345678 = new TGraphAsymmErrors(nBinspT,ptCentre_,SystError12345678,ptCentreErr_low,ptCentreErr_high,SystError12345678,0);
-					graphSyst12345678->SetFillColor(41);
-					graphSyst12345678->SetFillStyle(1001);
-					graphSyst12345678->SetLineColor(41);
-					graphSyst12345678->SetLineWidth(lineWidth);
-					if(!PlotAsymm) graphSyst12345678->Draw("2");
-					else graphSyst12345678->Draw(drawGraphStyle);
-					if(!PlotAsymm) plotLegend->AddEntry(graphSyst12345678,SystID8Title,"f");
-					else plotLegend->AddEntry(graphSyst12345678,SystID8Title,"l");
+					}//end CDF MP plots NEW
 				}
-				if(nSystematics>6){
-					TGraphAsymmErrors *graphSyst1234567 = new TGraphAsymmErrors(nBinspT,ptCentre_,SystError1234567,ptCentreErr_low,ptCentreErr_high,SystError1234567,0);
-					graphSyst1234567->SetFillColor(46);
-					graphSyst1234567->SetFillStyle(1001);
-					graphSyst1234567->SetLineColor(46);
-					graphSyst1234567->SetLineWidth(lineWidth);
-					if(!PlotAsymm) graphSyst1234567->Draw("2");
-					else graphSyst1234567->Draw(drawGraphStyle);
-					if(!PlotAsymm) plotLegend->AddEntry(graphSyst1234567,SystID7Title,"f");
-					else plotLegend->AddEntry(graphSyst1234567,SystID7Title,"l");
-				}
-				if(nSystematics>5){
-					TGraphAsymmErrors *graphSyst123456 = new TGraphAsymmErrors(nBinspT,ptCentre_,SystError123456,ptCentreErr_low,ptCentreErr_high,SystError123456,0);
-					graphSyst123456->SetFillColor(kMagenta);//kYellow
-					graphSyst123456->SetFillStyle(1001);
-					graphSyst123456->SetLineColor(kMagenta);//kYellow
-					graphSyst123456->SetLineWidth(lineWidth);
-					if(!PlotAsymm) graphSyst123456->Draw("2");
-					else graphSyst123456->Draw(drawGraphStyle);
-					if(!PlotAsymm) plotLegend->AddEntry(graphSyst123456,SystID6Title,"f");
-					else plotLegend->AddEntry(graphSyst123456,SystID6Title,"l");
-				}
-				if(nSystematics>4){
-					TGraphAsymmErrors *graphSyst12345 = new TGraphAsymmErrors(nBinspT,ptCentre_,SystError12345,ptCentreErr_low,ptCentreErr_high,SystError12345,0);
-					graphSyst12345->SetFillColor(9);//9 //IfLamTildeClosure: kOrange
-					if(DeltaTildeplots) graphSyst12345->SetFillColor(kOrange);
-					graphSyst12345->SetFillStyle(1001);
-					graphSyst12345->SetLineColor(9);//9 //IfLamTildeClosure: kOrange
-					if(DeltaTildeplots) graphSyst12345->SetLineColor(kOrange);
-					graphSyst12345->SetLineWidth(lineWidth);
-					if(!PlotAsymm||DeltaTildeplots) graphSyst12345->Draw("2");
-					else graphSyst12345->Draw(drawGraphStyle);
-					if(!PlotAsymm&&!DeltaTildeplots) plotLegend->AddEntry(graphSyst12345,SystID5Title,"f");
-					if(PlotAsymm&&!DeltaTildeplots) plotLegend->AddEntry(graphSyst12345,SystID5Title,"l");
-
-					//		graphSyst12345->Draw("2");//IfLamTildeClosure
-
-				}
-				if(nSystematics>3){
-					TGraphAsymmErrors *graphSyst1234 = new TGraphAsymmErrors(nBinspT,ptCentre_,SystError1234,ptCentreErr_low,ptCentreErr_high,SystError1234,0);
-					graphSyst1234->SetFillColor(kOrange);
-					graphSyst1234->SetFillStyle(1001);
-					graphSyst1234->SetLineColor(kOrange);
-					graphSyst1234->SetLineWidth(lineWidth);
-					if(!PlotAsymm||DeltaTildeplots) graphSyst1234->Draw("2");
-					else graphSyst1234->Draw(drawGraphStyle);
-					if(!PlotAsymm||DeltaTildeplots) plotLegend->AddEntry(graphSyst1234,SystID4Title,"f");
-					else plotLegend->AddEntry(graphSyst1234,SystID4Title,"l");
-
-					//graphSyst1234->Draw("2");//IfLamTildeClosure
-					//plotLegend->AddEntry(graphSyst1234,SystID4Title,"f");//IfLamTildeClosure
-
-				}
-				if(nSystematics>2){
-					TGraphAsymmErrors *graphSyst123 = new TGraphAsymmErrors(nBinspT,ptCentre_,SystError123,ptCentreErr_low,ptCentreErr_high,SystError123,0);
-					graphSyst123->SetFillColor(8);
-					graphSyst123->SetFillStyle(1001);
-					graphSyst123->SetLineColor(8);
-					graphSyst123->SetLineWidth(lineWidth);
-					if(!PlotAsymm) graphSyst123->Draw("2"); //if!Pull
-					else graphSyst123->Draw(drawGraphStyle); //if!Pull
-
-					/*graphSyst123->SetMarkerStyle(20); //ifPull
-						graphSyst123->SetMarkerSize(2); //ifPull
-						graphSyst123->SetMarkerColor(kGreen+2); //ifPull
-						graphSyst123->Draw("PX"); //ifPull
-					 */
-					if(!PlotAsymm) plotLegend->AddEntry(graphSyst123,SystID3Title,"f");
-					else plotLegend->AddEntry(graphSyst123,SystID3Title,"l");
-				}
-				if(nSystematics>1){
-					TGraphAsymmErrors *graphSyst12 = new TGraphAsymmErrors(nBinspT,ptCentre_,SystError12,ptCentreErr_low,ptCentreErr_high,SystError12,0);
-					graphSyst12->SetFillColor(kRed);
-					graphSyst12->SetFillStyle(1001);
-					graphSyst12->SetLineColor(kRed);
-					graphSyst12->SetLineWidth(lineWidth);
-					if(!PlotAsymm) graphSyst12->Draw("2"); //if!Pull
-					else graphSyst12->Draw(drawGraphStyle); //if!Pull
-
-					/*		graphSyst12->SetMarkerStyle(20); //ifPull
-								graphSyst12->SetMarkerSize(2); //ifPull
-								graphSyst12->SetMarkerColor(kRed); //ifPull
-								graphSyst12->Draw("PX"); //ifPull
-					 */
-					if(!PlotAsymm) plotLegend->AddEntry(graphSyst12,SystID2Title,"f");
-					else plotLegend->AddEntry(graphSyst12,SystID2Title,"l");
-				}
-				////---debug
-				//for(int i=0; i<nBinspT; i++){
-				//	cout<<"ptCentre_["<<i<<"]: "<<ptCentre_[i]<<endl;
-				//	cout<<"SystError1["<<i<<"]: "<<SystError1[i]<<endl;
-				//}
-				////---debug
-				TGraphAsymmErrors *graphSyst1_ = new TGraphAsymmErrors(nBinspT,ptCentre_,SystError1,ptCentreErr_low,ptCentreErr_high,SystError1,0);
-				graphSyst1_->SetFillColor(kBlue);
-				graphSyst1_->SetFillStyle(1001);
-				graphSyst1_->SetLineColor(kBlue);
-				graphSyst1_->SetLineWidth(lineWidth);
-				if(!PlotAsymm) graphSyst1_->Draw("2"); //if!Pull
-				else graphSyst1_->Draw(drawGraphStyle); //if!Pull
-				if(!PlotAsymm) plotLegend->AddEntry(graphSyst1_,SystID1Title,"f");
-				else plotLegend->AddEntry(graphSyst1_,SystID1Title,"l");
-
-				/*		graphSyst1_->SetMarkerStyle(20); //ifPull
-							graphSyst1_->SetMarkerSize(2); //ifPull
-							graphSyst1_->SetMarkerColor(kBlue); //ifPull
-							graphSyst1_->Draw("PX"); //ifPull
-				 */
-
-				if(!PlotAsymm) plotLegend->AddEntry(graphStat,legendentry,"f");
 
 
 
-				if(rapBin==1) sprintf(texTex,"      |#it{y}| < 0.6");
-				if(rapBin==2) sprintf(texTex,"0.6 < |#it{y}| < 1.2");
-				if(rapBin==3) sprintf(texTex,"1.2 < |#it{y}| < 1.5");
-				//TLatex *Systtext = new TLatex(onia::pTRange[rapBin][ptBinMax]*0.75,yMin+(yMax-yMin)*0.1,texTex);
-				TLatex *Systtext = new TLatex(PlotpTMax*0.75,yMin+(yMax-yMin)*0.1,texTex);
-				Systtext->SetTextSize(0.035);
-				Systtext->Draw( "same" );
-
-				if(PlotLegend) plotLegend->Draw();
-
-				if(BGratioChi2Fits) SystCanvas->SetLogy(true);
-				if(PlotSystematics) SystCanvas->SaveAs(filename);
-				SystCanvas->Close();
-
-				delete SystCanvas;
+			} //MultiPanelPlots
 
 
-			} // rapBin
+
+
+
+			double PlotpTMin = PlotpTMinInitial, 
+						 PlotpTMax = PlotpTMaxInitial;
+
+			// Systematic uncertainties
+
+			if(iLam==1)  sprintf(filename,"%s/Systematics_CS_lth_rap%d.pdf",FigDir,rapBin);
+			if(iLam==2)  sprintf(filename,"%s/Systematics_CS_lph_rap%d.pdf",FigDir,rapBin);
+			if(iLam==3)  sprintf(filename,"%s/Systematics_CS_ltp_rap%d.pdf",FigDir,rapBin);
+			if(iLam==4)  sprintf(filename,"%s/Systematics_CS_lthstar_rap%d.pdf",FigDir,rapBin);
+			if(iLam==5)  sprintf(filename,"%s/Systematics_CS_lphstar_rap%d.pdf",FigDir,rapBin);
+			if(iLam==6)  sprintf(filename,"%s/Systematics_CS_ltilde_rap%d.pdf",FigDir,rapBin);
+
+			if(iLam==7)  sprintf(filename,"%s/Systematics_HX_lth_rap%d.pdf",FigDir,rapBin);
+			if(iLam==8)  sprintf(filename,"%s/Systematics_HX_lph_rap%d.pdf",FigDir,rapBin);
+			if(iLam==9)  sprintf(filename,"%s/Systematics_HX_ltp_rap%d.pdf",FigDir,rapBin);
+			if(iLam==10) sprintf(filename,"%s/Systematics_HX_lthstar_rap%d.pdf",FigDir,rapBin);
+			if(iLam==11) sprintf(filename,"%s/Systematics_HX_lphstar_rap%d.pdf",FigDir,rapBin);
+			if(iLam==12) sprintf(filename,"%s/Systematics_HX_ltilde_rap%d.pdf",FigDir,rapBin);
+
+			if(iLam==13) sprintf(filename,"%s/Systematics_PX_lth_rap%d.pdf",FigDir,rapBin);
+			if(iLam==14) sprintf(filename,"%s/Systematics_PX_lph_rap%d.pdf",FigDir,rapBin);
+			if(iLam==15) sprintf(filename,"%s/Systematics_PX_ltp_rap%d.pdf",FigDir,rapBin);
+			if(iLam==16) sprintf(filename,"%s/Systematics_PX_lthstar_rap%d.pdf",FigDir,rapBin);
+			if(iLam==17) sprintf(filename,"%s/Systematics_PX_lphstar_rap%d.pdf",FigDir,rapBin);
+			if(iLam==18) sprintf(filename,"%s/Systematics_PX_ltilde_rap%d.pdf",FigDir,rapBin);
+
+			TCanvas *SystCanvas = new TCanvas("SystCanvas","SystCanvas",1000,800);
+
+			SystCanvas->SetFillColor(kWhite);
+			SystCanvas->SetGrid();
+			SystCanvas->GetFrame()->SetFillColor(kWhite);
+			SystCanvas->GetFrame()->SetBorderSize(0);
+			//SystCanvas->SetRightMargin(0.05) ;
+
+			double ParametrizedFontSize[8]={0.05,0.05,0.05,0.05,0.04,0.04,0.03,0.03};
+			double LegendYmin[8]={0.8,0.75,0.7,0.65,0.65,0.6,0.6,0.6};
+
+			double LegendXmin=0.6; // for FrameworkIII: 0.5
+			if(ExtendLegendInX) LegendXmin=0.25;
+
+			//TLegend* plotLegend=new TLegend(LegendXmin,LegendYmin[nSystematics-1],0.95,0.9);
+			TLegend* plotLegend=new TLegend(LegendXmin,LegendYmin[nSystematics-1],0.98,0.98);
+			plotLegend->SetFillColor(kWhite);
+			//plotLegend->SetTextFont(72);
+			plotLegend->SetTextSize(ParametrizedFontSize[nSystematics-1]);
+			plotLegend->SetBorderSize(1);
+			char legendentry[200];
+
+
+			double lineWidth=3;
+			sprintf(drawGraphStyle,"LX");
+			//sprintf(drawGraphStyle,"PE");
+
+			TH1F *SystHisto = new TH1F;
+			SystHisto = SystCanvas->DrawFrame(PlotpTMin,yMin,PlotpTMax,yMax); //to be consistant for Psi 1S and 2S
+			SystHisto->SetXTitle("#it{p}_{T} [GeV]");
+			SystHisto->SetYTitle(axislabel);
+			//SystHisto->GetYaxis()->SetTitleOffset(1.5);
+
+			TGraphAsymmErrors *graphStat = new TGraphAsymmErrors(nBinspT,ptCentre_,lmean_errmean_minus,ptCentreErr_low,ptCentreErr_high,0,lmean_errmean);
+			graphStat->SetFillColor(kGreen-2);
+			graphStat->SetFillStyle(1001);
+			graphStat->SetLineColor(kGreen-2);
+			graphStat->SetLineWidth(lineWidth);
+			if(!PlotAsymm) graphStat->Draw("2");
+			sprintf(legendentry,"Statistical Error");
+
+			if(nSystematics>7){
+				TGraphAsymmErrors *graphSyst12345678 = new TGraphAsymmErrors(nBinspT,ptCentre_,SystError12345678,ptCentreErr_low,ptCentreErr_high,SystError12345678,0);
+				graphSyst12345678->SetFillColor(41);
+				graphSyst12345678->SetFillStyle(1001);
+				graphSyst12345678->SetLineColor(41);
+				graphSyst12345678->SetLineWidth(lineWidth);
+				if(!PlotAsymm) graphSyst12345678->Draw("2");
+				else graphSyst12345678->Draw(drawGraphStyle);
+				if(!PlotAsymm) plotLegend->AddEntry(graphSyst12345678,SystID8Title,"f");
+				else plotLegend->AddEntry(graphSyst12345678,SystID8Title,"l");
+			}
+			if(nSystematics>6){
+				TGraphAsymmErrors *graphSyst1234567 = new TGraphAsymmErrors(nBinspT,ptCentre_,SystError1234567,ptCentreErr_low,ptCentreErr_high,SystError1234567,0);
+				graphSyst1234567->SetFillColor(46);
+				graphSyst1234567->SetFillStyle(1001);
+				graphSyst1234567->SetLineColor(46);
+				graphSyst1234567->SetLineWidth(lineWidth);
+				if(!PlotAsymm) graphSyst1234567->Draw("2");
+				else graphSyst1234567->Draw(drawGraphStyle);
+				if(!PlotAsymm) plotLegend->AddEntry(graphSyst1234567,SystID7Title,"f");
+				else plotLegend->AddEntry(graphSyst1234567,SystID7Title,"l");
+			}
+			if(nSystematics>5){
+				TGraphAsymmErrors *graphSyst123456 = new TGraphAsymmErrors(nBinspT,ptCentre_,SystError123456,ptCentreErr_low,ptCentreErr_high,SystError123456,0);
+				graphSyst123456->SetFillColor(kMagenta);//kYellow
+				graphSyst123456->SetFillStyle(1001);
+				graphSyst123456->SetLineColor(kMagenta);//kYellow
+				graphSyst123456->SetLineWidth(lineWidth);
+				if(!PlotAsymm) graphSyst123456->Draw("2");
+				else graphSyst123456->Draw(drawGraphStyle);
+				if(!PlotAsymm) plotLegend->AddEntry(graphSyst123456,SystID6Title,"f");
+				else plotLegend->AddEntry(graphSyst123456,SystID6Title,"l");
+			}
+			if(nSystematics>4){
+				TGraphAsymmErrors *graphSyst12345 = new TGraphAsymmErrors(nBinspT,ptCentre_,SystError12345,ptCentreErr_low,ptCentreErr_high,SystError12345,0);
+				graphSyst12345->SetFillColor(9);//9 //IfLamTildeClosure: kOrange
+				if(DeltaTildeplots) graphSyst12345->SetFillColor(kOrange);
+				graphSyst12345->SetFillStyle(1001);
+				graphSyst12345->SetLineColor(9);//9 //IfLamTildeClosure: kOrange
+				if(DeltaTildeplots) graphSyst12345->SetLineColor(kOrange);
+				graphSyst12345->SetLineWidth(lineWidth);
+				if(!PlotAsymm||DeltaTildeplots) graphSyst12345->Draw("2");
+				else graphSyst12345->Draw(drawGraphStyle);
+				if(!PlotAsymm&&!DeltaTildeplots) plotLegend->AddEntry(graphSyst12345,SystID5Title,"f");
+				if(PlotAsymm&&!DeltaTildeplots) plotLegend->AddEntry(graphSyst12345,SystID5Title,"l");
+
+				//		graphSyst12345->Draw("2");//IfLamTildeClosure
+
+			}
+			if(nSystematics>3){
+				TGraphAsymmErrors *graphSyst1234 = new TGraphAsymmErrors(nBinspT,ptCentre_,SystError1234,ptCentreErr_low,ptCentreErr_high,SystError1234,0);
+				graphSyst1234->SetFillColor(kOrange);
+				graphSyst1234->SetFillStyle(1001);
+				graphSyst1234->SetLineColor(kOrange);
+				graphSyst1234->SetLineWidth(lineWidth);
+				if(!PlotAsymm||DeltaTildeplots) graphSyst1234->Draw("2");
+				else graphSyst1234->Draw(drawGraphStyle);
+				if(!PlotAsymm||DeltaTildeplots) plotLegend->AddEntry(graphSyst1234,SystID4Title,"f");
+				else plotLegend->AddEntry(graphSyst1234,SystID4Title,"l");
+
+				//graphSyst1234->Draw("2");//IfLamTildeClosure
+				//plotLegend->AddEntry(graphSyst1234,SystID4Title,"f");//IfLamTildeClosure
+
+			}
+			if(nSystematics>2){
+				TGraphAsymmErrors *graphSyst123 = new TGraphAsymmErrors(nBinspT,ptCentre_,SystError123,ptCentreErr_low,ptCentreErr_high,SystError123,0);
+				graphSyst123->SetFillColor(8);
+				graphSyst123->SetFillStyle(1001);
+				graphSyst123->SetLineColor(8);
+				graphSyst123->SetLineWidth(lineWidth);
+				if(!PlotAsymm) graphSyst123->Draw("2"); //if!Pull
+				else graphSyst123->Draw(drawGraphStyle); //if!Pull
+
+				/*graphSyst123->SetMarkerStyle(20); //ifPull
+					graphSyst123->SetMarkerSize(2); //ifPull
+					graphSyst123->SetMarkerColor(kGreen+2); //ifPull
+					graphSyst123->Draw("PX"); //ifPull
+					*/
+				if(!PlotAsymm) plotLegend->AddEntry(graphSyst123,SystID3Title,"f");
+				else plotLegend->AddEntry(graphSyst123,SystID3Title,"l");
+			}
+			if(nSystematics>1){
+				TGraphAsymmErrors *graphSyst12 = new TGraphAsymmErrors(nBinspT,ptCentre_,SystError12,ptCentreErr_low,ptCentreErr_high,SystError12,0);
+				graphSyst12->SetFillColor(kRed);
+				graphSyst12->SetFillStyle(1001);
+				graphSyst12->SetLineColor(kRed);
+				graphSyst12->SetLineWidth(lineWidth);
+				if(!PlotAsymm) graphSyst12->Draw("2"); //if!Pull
+				else graphSyst12->Draw(drawGraphStyle); //if!Pull
+
+				/*		graphSyst12->SetMarkerStyle(20); //ifPull
+							graphSyst12->SetMarkerSize(2); //ifPull
+							graphSyst12->SetMarkerColor(kRed); //ifPull
+							graphSyst12->Draw("PX"); //ifPull
+							*/
+				if(!PlotAsymm) plotLegend->AddEntry(graphSyst12,SystID2Title,"f");
+				else plotLegend->AddEntry(graphSyst12,SystID2Title,"l");
+			}
+			////---debug
+			//for(int i=0; i<nBinspT; i++){
+			//	cout<<"ptCentre_["<<i<<"]: "<<ptCentre_[i]<<endl;
+			//	cout<<"SystError1["<<i<<"]: "<<SystError1[i]<<endl;
+			//}
+			////---debug
+			TGraphAsymmErrors *graphSyst1_ = new TGraphAsymmErrors(nBinspT,ptCentre_,SystError1,ptCentreErr_low,ptCentreErr_high,SystError1,0);
+			graphSyst1_->SetFillColor(kBlue);
+			graphSyst1_->SetFillStyle(1001);
+			graphSyst1_->SetLineColor(kBlue);
+			graphSyst1_->SetLineWidth(lineWidth);
+			if(!PlotAsymm) graphSyst1_->Draw("2"); //if!Pull
+			else graphSyst1_->Draw(drawGraphStyle); //if!Pull
+			if(!PlotAsymm) plotLegend->AddEntry(graphSyst1_,SystID1Title,"f");
+			else plotLegend->AddEntry(graphSyst1_,SystID1Title,"l");
+
+			/*		graphSyst1_->SetMarkerStyle(20); //ifPull
+						graphSyst1_->SetMarkerSize(2); //ifPull
+						graphSyst1_->SetMarkerColor(kBlue); //ifPull
+						graphSyst1_->Draw("PX"); //ifPull
+						*/
+
+			if(!PlotAsymm) plotLegend->AddEntry(graphStat,legendentry,"f");
+
+
+
+			if(rapBin==1) sprintf(texTex,"      |#it{y}| < 0.6");
+			if(rapBin==2) sprintf(texTex,"0.6 < |#it{y}| < 1.2");
+			if(rapBin==3) sprintf(texTex,"1.2 < |#it{y}| < 1.5");
+			//TLatex *Systtext = new TLatex(onia::pTRange[rapBin][ptBinMax]*0.75,yMin+(yMax-yMin)*0.1,texTex);
+			TLatex *Systtext = new TLatex(PlotpTMax*0.75,yMin+(yMax-yMin)*0.1,texTex);
+			Systtext->SetTextSize(0.035);
+			Systtext->Draw( "same" );
+
+			if(PlotLegend) plotLegend->Draw();
+
+			if(BGratioChi2Fits) SystCanvas->SetLogy(true);
+			if(PlotSystematics) SystCanvas->SaveAs(filename);
+			SystCanvas->Close();
+
+			delete SystCanvas;
+
+
+		} // rapBin
 
 
 		} // iLam
@@ -5482,16 +5720,16 @@ int main(int argc, char** argv) {
 
 				if(iTab==1){
 					if(nState>3)
-					 	fprintf(NumFile, "\\begin{table}[!H]\n\\centering\n \\caption{Results of polarization parameters of the $\\Psi(%dS)$ analysis}\n \\begin{tabular}{|c|cccc|}\n\\hline\n",nState-3);
+						fprintf(NumFile, "\\begin{table}[!H]\n\\centering\n \\caption{Results of polarization parameters of the $\\Psi(%dS)$ analysis}\n \\begin{tabular}{|c|cccc|}\n\\hline\n",nState-3);
 					else 
 						fprintf(NumFile, "\\begin{table}[!H]\n\\centering\n \\caption{Results of polarization parameters of the $\\Upsilon(%dS)$ analysis}\n \\begin{tabular}{|c|cccc|}\n\\hline\n",nState);
 					fprintf(NumFile, "$p_{T}$ [GeV] & $\\lambda_{\\vartheta}$ & $\\lambda_{\\varphi}$ &  $\\lambda_{\\vartheta \\varphi}$ & $\\tilde{\\lambda}$ \\\\\n");
 				}
 				if(iTab==2){
 					if(nState>3)
-					 	fprintf(NumFile, "\\begin{table}[!H]\n\\centering\n \\caption{Total systematic uncertainty on the polarization parameters of the $\\Psi(%dS)$ analysis}\n \\begin{tabular}{|c|cccc|}\n\\hline\n",nState-3);
+						fprintf(NumFile, "\\begin{table}[!H]\n\\centering\n \\caption{Total systematic uncertainty on the polarization parameters of the $\\Psi(%dS)$ analysis}\n \\begin{tabular}{|c|cccc|}\n\\hline\n",nState-3);
 					else
-					 	fprintf(NumFile, "\\begin{table}[!H]\n\\centering\n \\caption{Total systematic uncertainty on the polarization parameters of the $\\Upsilon(%dS)$ analysis}\n \\begin{tabular}{|c|cccc|}\n\\hline\n",nState);
+						fprintf(NumFile, "\\begin{table}[!H]\n\\centering\n \\caption{Total systematic uncertainty on the polarization parameters of the $\\Upsilon(%dS)$ analysis}\n \\begin{tabular}{|c|cccc|}\n\\hline\n",nState);
 					fprintf(NumFile, "$p_{T}$ [GeV] & $\\sigma^{syst}(\\lambda_{\\vartheta})$ & $\\sigma^{syst}(\\lambda_{\\varphi})$ &  $\\sigma^{syst}(\\lambda_{\\vartheta \\varphi})$ & $\\sigma^{syst}(\\tilde{\\lambda})$ \\\\\n");
 				}
 
@@ -5509,16 +5747,16 @@ int main(int argc, char** argv) {
 
 
 							/*
-							syst_table[iLam-1][rapBin-1][pt][0]=SystError[pt];
-							syst_table[iLam-1][rapBin-1][pt][1]=TMath::Abs(SystError1[pt]);
-							syst_table[iLam-1][rapBin-1][pt][2]=TMath::Abs(SystError2[pt]);
-							syst_table[iLam-1][rapBin-1][pt][3]=TMath::Abs(SystError3[pt]);
-							syst_table[iLam-1][rapBin-1][pt][4]=TMath::Abs(SystError4[pt]);
-							syst_table[iLam-1][rapBin-1][pt][5]=TMath::Abs(SystError5[pt]);
-							syst_table[iLam-1][rapBin-1][pt][6]=TMath::Abs(SystError6[pt]);
-							syst_table[iLam-1][rapBin-1][pt][7]=TMath::Abs(SystError7[pt]);
-							syst_table[iLam-1][rapBin-1][pt][8]=TMath::Abs(SystError8[pt]);
-							*/
+								 syst_table[iLam-1][rapBin-1][pt][0]=SystError[pt];
+								 syst_table[iLam-1][rapBin-1][pt][1]=TMath::Abs(SystError1[pt]);
+								 syst_table[iLam-1][rapBin-1][pt][2]=TMath::Abs(SystError2[pt]);
+								 syst_table[iLam-1][rapBin-1][pt][3]=TMath::Abs(SystError3[pt]);
+								 syst_table[iLam-1][rapBin-1][pt][4]=TMath::Abs(SystError4[pt]);
+								 syst_table[iLam-1][rapBin-1][pt][5]=TMath::Abs(SystError5[pt]);
+								 syst_table[iLam-1][rapBin-1][pt][6]=TMath::Abs(SystError6[pt]);
+								 syst_table[iLam-1][rapBin-1][pt][7]=TMath::Abs(SystError7[pt]);
+								 syst_table[iLam-1][rapBin-1][pt][8]=TMath::Abs(SystError8[pt]);
+								 */
 							if(iTab==1){
 								if(iFrame==1){
 									lth_tab=val_table[1][rap][pt]			;   ltherr_tab=errLow_table[1][rap][pt];            ltherr_high_tab=errHigh_table[1][rap][pt];
@@ -5602,7 +5840,7 @@ int main(int argc, char** argv) {
 			char SuppFileName[200];
 			sprintf(SuppFileName,"%s/SupplementalMaterial.txt",SuppDir);
 			if(nState>3)
-			 	sprintf(SuppFileName,"%s/SupplementalMaterial_Psi%dS.txt",SuppDir,nState-3);
+				sprintf(SuppFileName,"%s/SupplementalMaterial_Psi%dS.txt",SuppDir,nState-3);
 			if(nState==1 || nState ==4 || nState == 5) SuppFile = fopen(SuppFileName,"w");
 			else SuppFile = fopen(SuppFileName,"a");
 
@@ -5703,9 +5941,9 @@ int main(int argc, char** argv) {
 
 					if(rapBin==1){
 						if(nState<4) // Y
-						 	fprintf(SuppFile,"Table %s, %s, Y(%dS):\n",TabParChar, TabFrameChar,nState);
+							fprintf(SuppFile,"Table %s, %s, Y(%dS):\n",TabParChar, TabFrameChar,nState);
 						else // Psi
-						 	fprintf(SuppFile,"Table %s, %s, Psi(%dS):\n",TabParChar, TabFrameChar,nState-3);
+							fprintf(SuppFile,"Table %s, %s, Psi(%dS):\n",TabParChar, TabFrameChar,nState-3);
 					}
 					if(rapBin==1)fprintf(SuppFile,"pT-min   pT-max   |y|-min   |y|-max   %s   -T.U.68.3%%CL    +T.U.68.3%%CL   -T.U.95.5%%CL   +T.U.95.5%%CL   -T.U.99.7%%CL   +T.U.99.7%%CL   -S.U.68.3%%CL   +S.U.68.3%%CL\n",TabParCharSpace);
 
@@ -5741,8 +5979,8 @@ int main(int argc, char** argv) {
 
 			fclose(SuppFile);
 
-		}
-
-
-		return 0;
 	}
+
+
+	return 0;
+}
