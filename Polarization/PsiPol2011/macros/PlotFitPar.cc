@@ -76,17 +76,17 @@ int main(int argc, char* argv[]){
 	}
 
 	PlotMassPar(nState);
-	PlotLifePar(nState);
-	if(nState==4)
-		PlotBFrac_1S(nState);
-	if(nState==5)
-		PlotBFrac_2S(nState);
+	//PlotLifePar(nState);
+	//if(nState==4)
+	//	PlotBFrac_1S(nState);
+	//if(nState==5)
+	//	PlotBFrac_2S(nState);
 
-	double nSigma=2.5;
-	if(nState==4) nSigma=2.5;
-	if(nState==5) nSigma=2.0;
-	evaluateCtauCut(nSigma, nState, 0, doCtauUncer);
-	evaluateCtauCut(nSigma, nState, 1, doCtauUncer);
+	//double nSigma=2.5;
+	//if(nState==4) nSigma=2.5;
+	//if(nState==5) nSigma=2.0;
+	//evaluateCtauCut(nSigma, nState, 0, doCtauUncer);
+	//evaluateCtauCut(nSigma, nState, 1, doCtauUncer);
 
 	return 0;
 }
@@ -110,6 +110,7 @@ void PlotMassPar(int  nState){
 	double evtBkgSB[RapBins][PtBins];
 	double fracLSB[RapBins][PtBins];
 	double alphaCB[RapBins][PtBins];
+	double lambdaBG[RapBins][PtBins];
 	double fracSigInLSB[RapBins][PtBins];
 	double fracSigInRSB[RapBins][PtBins];
 	double evtInLSB[RapBins][PtBins];
@@ -125,6 +126,7 @@ void PlotMassPar(int  nState){
 	double evtBkgSBErr[RapBins][PtBins];
 	double fracLSBErr[RapBins][PtBins];
 	double alphaCBErr[RapBins][PtBins];
+	double lambdaBGErr[RapBins][PtBins];
 	double fracSigInLSBErr[RapBins][PtBins];
 	double fracSigInRSBErr[RapBins][PtBins];
 	double evtInLSBErr[RapBins][PtBins];
@@ -299,6 +301,7 @@ void PlotMassPar(int  nState){
 			sigma2[rapBin-1][ptBin-1] = Sigma2*1000;
 
 			alphaCB[rapBin-1][ptBin-1] = Alpha;
+			lambdaBG[rapBin-1][ptBin-1] = -lambda;
 
 
 			meanErr[rapBin-1][ptBin-1] = MeanErr;
@@ -308,6 +311,7 @@ void PlotMassPar(int  nState){
 			sigma2Err[rapBin-1][ptBin-1] = Sigma2Err*1000;
 
 			alphaCBErr[rapBin-1][ptBin-1] = AlphaErr;
+			lambdaBGErr[rapBin-1][ptBin-1] = lambdaErr;
 
 		}
 	}
@@ -323,6 +327,7 @@ void PlotMassPar(int  nState){
 			cout<<"evtBkgSB: "<<evtBkgSB[rapBin-1][ptBin-1]<<"    evtBkgSBErr: "<<evtBkgSBErr[rapBin-1][ptBin-1]<<endl;
 			cout<<"fracLSB: "<<fracLSB[rapBin-1][ptBin-1]<<"    fracLSBErr: "<<fracLSBErr[rapBin-1][ptBin-1]<<endl;
 			cout<<"alphaCB: "<<alphaCB[rapBin-1][ptBin-1]<<"    alphaCBErr: "<<alphaCBErr[rapBin-1][ptBin-1]<<endl;
+			cout<<"lambdaBG: "<<lambdaBG[rapBin-1][ptBin-1]<<"    lambdaBGErr: "<<lambdaBGErr[rapBin-1][ptBin-1]<<endl;
 			cout<<"fracSigInLSB: "<<fracSigInLSB[rapBin-1][ptBin-1]<<"    fracSigInLSBErr: "<<fracSigInLSBErr[rapBin-1][ptBin-1]<<endl;
 			cout<<"fracSigInRSB: "<<fracSigInRSB[rapBin-1][ptBin-1]<<"    fracSigInRSBErr: "<<fracSigInRSBErr[rapBin-1][ptBin-1]<<endl;
 			cout<<"fracBkgInLSB: "<<fracBkgInLSB[rapBin-1][ptBin-1]<<"    fracBkgInLSBErr: "<<fracBkgInLSBErr[rapBin-1][ptBin-1]<<endl;
@@ -334,7 +339,7 @@ void PlotMassPar(int  nState){
 	RooRealVar JpsiMass(*ws->var("JpsiMass"));
 	TGraphErrors *graph_mean[RapBins], *graph_sigmaWei[RapBins], *graph_bkgRatio3Sig[RapBins],
 							 *graph_sigma1[RapBins], *graph_sigma2[RapBins], *graph_evtBkgSB[RapBins],
-							 *graph_fracLSB[RapBins], *graph_alphaCB[RapBins], 
+							 *graph_fracLSB[RapBins], *graph_alphaCB[RapBins], *graph_lambdaBG[RapBins], 
 							 *graph_fracSigInLSB[RapBins], *graph_fracSigInRSB[RapBins], *graph_evtInLSB[RapBins],
 							 *graph_fracBkgInLSB[RapBins], *graph_fracBkgInRSB[RapBins];
 
@@ -355,6 +360,8 @@ void PlotMassPar(int  nState){
 				pT[rapBin-1], fracLSB[rapBin-1], pTErr[rapBin-1], fracLSBErr[rapBin-1]);
 		graph_alphaCB[rapBin-1] = new TGraphErrors(PtBins,
 				pT[rapBin-1], alphaCB[rapBin-1], pTErr[rapBin-1], alphaCBErr[rapBin-1]);
+		graph_lambdaBG[rapBin-1] = new TGraphErrors(PtBins,
+				pT[rapBin-1], lambdaBG[rapBin-1], pTErr[rapBin-1], lambdaBGErr[rapBin-1]);
 		graph_fracSigInLSB[rapBin-1] = new TGraphErrors(PtBins,
 				pT[rapBin-1], fracSigInLSB[rapBin-1], pTErr[rapBin-1], fracSigInLSBErr[rapBin-1]);
 		graph_fracSigInRSB[rapBin-1] = new TGraphErrors(PtBins,
@@ -724,6 +731,34 @@ void PlotMassPar(int  nState){
 		graph_alphaCB[2]->SetLineColor(onia::colour_rapForPTBins[4]);
 	}
 
+	Ymin = 0.; Ymax = 4.;
+	graph_lambdaBG[0]->SetTitle("");
+	graph_lambdaBG[0]->GetXaxis()->SetTitle("p_{T} (GeV)");
+	graph_lambdaBG[0]->GetYaxis()->SetTitle("#lambda_{BG}");
+	graph_lambdaBG[0]->GetXaxis()->SetLimits(Xmin, Xmax);
+	graph_lambdaBG[0]->GetYaxis()->SetRangeUser(Ymin, Ymax);
+	graph_lambdaBG[0]->SetMarkerStyle(onia::marker_rapForPTBins[2]);
+	graph_lambdaBG[0]->SetMarkerColor(onia::colour_rapForPTBins[2]);
+	graph_lambdaBG[0]->SetLineColor(onia::colour_rapForPTBins[2]);
+	graph_lambdaBG[1]->SetTitle("");
+	graph_lambdaBG[1]->GetXaxis()->SetTitle("p_{T} (GeV)");
+	graph_lambdaBG[1]->GetYaxis()->SetTitle("#lambda_{BG}");
+	graph_lambdaBG[1]->GetXaxis()->SetLimits(Xmin, Xmax);
+	graph_lambdaBG[1]->GetYaxis()->SetRangeUser(Ymin, Ymax);
+	graph_lambdaBG[1]->SetMarkerStyle(onia::marker_rapForPTBins[3]);
+	graph_lambdaBG[1]->SetMarkerColor(onia::colour_rapForPTBins[3]);
+	graph_lambdaBG[1]->SetLineColor(onia::colour_rapForPTBins[3]);
+	if(nState==5){
+		graph_lambdaBG[2]->SetTitle("");
+		graph_lambdaBG[2]->GetXaxis()->SetTitle("p_{T} (GeV)");
+		graph_lambdaBG[2]->GetYaxis()->SetTitle("#lambda_{BG}");
+		graph_lambdaBG[2]->GetXaxis()->SetLimits(Xmin, Xmax);
+		graph_lambdaBG[2]->GetYaxis()->SetRangeUser(Ymin, Ymax);
+		graph_lambdaBG[2]->SetMarkerStyle(onia::marker_rapForPTBins[4]);
+		graph_lambdaBG[2]->SetMarkerColor(onia::colour_rapForPTBins[4]);
+		graph_lambdaBG[2]->SetLineColor(onia::colour_rapForPTBins[4]);
+	}
+
 	Ymin = 0.0; Ymax = 0.4;
 	graph_fracSigInLSB[0]->SetTitle("");
 	graph_fracSigInLSB[0]->GetXaxis()->SetTitle("p_{T} (GeV)");
@@ -953,6 +988,17 @@ void PlotMassPar(int  nState){
 	if(nState==5)
 		latex->DrawLatex(left,top,"#psi(2S)");
 	c1->SaveAs(Form("%s/alphaCB.pdf",savePath.str().c_str()));
+
+	graph_lambdaBG[0]->Draw("AP");
+	graph_lambdaBG[1]->Draw("P");
+	if(nState==5)
+		graph_lambdaBG[2]->Draw("P");
+	legendRight->Draw();
+	if(nState==4)
+		latex->DrawLatex(left,top,"J/#psi");
+	if(nState==5)
+		latex->DrawLatex(left,top,"#psi(2S)");
+	c1->SaveAs(Form("%s/lambdaBG.pdf",savePath.str().c_str()));
 
 	graph_fracSigInLSB[0]->Draw("AP");
 	graph_fracSigInLSB[1]->Draw("P");
