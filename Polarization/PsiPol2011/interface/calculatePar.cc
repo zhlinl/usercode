@@ -34,7 +34,7 @@ double getFracBkg(int rapBin, int ptBin, const std::string &massfile){
     return fBkg_->getVal();
 }
 
-double getFracBkgIn3Sigma(int rapBin, int ptBin, const std::string &massfile){
+double getFracBkgIn3Sigma(int rapBin, int ptBin, const std::string &massfile, int nSigMass){
     RooWorkspace* ws = getFromTFile<RooWorkspace>(massfile, "ws_masslifetime");
 
     RooAbsData *data=  ws->data(Form("data_rap%d_pt%d",rapBin,ptBin));
@@ -58,8 +58,8 @@ double getFracBkgIn3Sigma(int rapBin, int ptBin, const std::string &massfile){
     double SigmaWei = sqrt(pow(Sigma,2)*fracCB1+pow(Sigma2,2)*(1-fracCB1));
     double SigmaWeiErr = sqrt(pow((Sigma-Sigma2)*fracCB1Err,2)+pow(fracCB1*SigmaErr,2)+pow((1-fracCB1)*Sigma2Err,2)); //to correct
 
-    double sigMaxMass = Mean+SigmaWei*onia::nSigMass;
-    double sigMinMass = Mean-SigmaWei*onia::nSigMass;
+    double sigMaxMass = Mean+SigmaWei*nSigMass;
+    double sigMinMass = Mean-SigmaWei*nSigMass;
     double sbHighMass = Mean+SigmaWei*onia::nSigBkgHigh;
     double sbLowMass =  Mean-SigmaWei*onia::nSigBkgLow;
 
@@ -98,7 +98,7 @@ double getFracBkgErr(int rapBin, int ptBin, const std::string &massfile){
     return FracBkgErr;
 }
 
-double getFracBkgErrIn3Sigma(int rapBin, int ptBin, const std::string &massfile){
+double getFracBkgErrIn3Sigma(int rapBin, int ptBin, const std::string &massfile, int nSigMass){
     TFile *inFile=new TFile(massfile.c_str(),"R");
     if(!inFile) {std::cout<<"Error: failed to opne root file"<<std::endl;}
     RooWorkspace *ws=(RooWorkspace *)inFile->Get("ws_masslifetime");
@@ -123,8 +123,8 @@ double getFracBkgErrIn3Sigma(int rapBin, int ptBin, const std::string &massfile)
     double SigmaWei = sqrt(pow(Sigma,2)*fracCB1+pow(Sigma2,2)*(1-fracCB1));
     double SigmaWeiErr = sqrt(pow((Sigma-Sigma2)*fracCB1Err,2)+pow(fracCB1*SigmaErr,2)+pow((1-fracCB1)*Sigma2Err,2)); //to correct
 
-    double sigMaxMass = Mean+SigmaWei*onia::nSigMass;
-    double sigMinMass = Mean-SigmaWei*onia::nSigMass;
+    double sigMaxMass = Mean+SigmaWei*nSigMass;
+    double sigMinMass = Mean-SigmaWei*nSigMass;
     double sbHighMass = Mean+SigmaWei*onia::nSigBkgHigh;
     double sbLowMass =  Mean-SigmaWei*onia::nSigBkgLow;
 

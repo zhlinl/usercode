@@ -178,6 +178,12 @@ int main(int argc, char* argv[]) {
 				ptCentre_[pt]=(ptCentre1_[pt]+ptCentre2_[pt])/2.;
 				ptCentreErr_low[pt]=(ptCentreErr1_low[pt]+ptCentreErr2_low[pt])/2.;
 				ptCentreErr_high[pt]=(ptCentreErr1_high[pt]+ptCentreErr2_high[pt])/2.;
+				cout<<"ptCentre1_: "<<ptCentre1_[pt]<<endl;
+				cout<<"ptCentre2_: "<<ptCentre2_[pt]<<endl;
+				cout<<"ptCentreErr1_low: "<<ptCentreErr1_low[pt]<<endl;
+				cout<<"ptCentreErr2_low: "<<ptCentreErr2_low[pt]<<endl;
+				cout<<"ptCentreErr1_high: "<<ptCentreErr1_high[pt]<<endl;
+				cout<<"ptCentreErr2_high: "<<ptCentreErr2_high[pt]<<endl;
 
 				lmeanErr1_high[pt]=graph1->GetErrorYhigh(pt);
 				lmeanErr1_low[pt]=graph1->GetErrorYlow(pt);

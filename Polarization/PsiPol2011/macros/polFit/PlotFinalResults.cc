@@ -101,6 +101,7 @@ int main(int argc, char** argv) {
 	bool ExtendLegendInX(false);
 	bool ShiftInX(true);
 	bool PlotVsComp(false);
+	bool PlotSysSquare(false);
 
 	for( int i=0;i < argc; ++i ) {
 
@@ -175,7 +176,8 @@ int main(int argc, char** argv) {
 		if(std::string(argv[i]).find("PlotMattForICHEP=1") != std::string::npos) {PlotMattForICHEP=true; cout<<"PlotMattForICHEP"<<endl;}
 		if(std::string(argv[i]).find("ExtendLegendInX=1") != std::string::npos) {ExtendLegendInX=true; cout<<"ExtendLegendInX"<<endl;}
 		if(std::string(argv[i]).find("ShiftInX=0") != std::string::npos) {ShiftInX=false; cout<<"ShiftInX false"<<endl;}
-		if(std::string(argv[i]).find("PlotVsComp=1") != std::string::npos) {PlotVsComp=false; cout<<"PlotVsComp"<<endl;}
+		if(std::string(argv[i]).find("PlotVsComp=1") != std::string::npos) {PlotVsComp=true; cout<<"PlotVsComp"<<endl;}
+		if(std::string(argv[i]).find("PlotSysSquare=1") != std::string::npos) {PlotSysSquare=true; cout<<"PlotSysSquare"<<endl;}
 
 	}
 
@@ -493,6 +495,7 @@ int main(int argc, char** argv) {
 			if(PlotSystematics) sprintf(beginLamLabel,"#Delta");
 			if(PlotFinalData) sprintf(beginLamLabel,"");
 			if(PlotSystematics&&!PlotAsymm) sprintf(beginLamLabel,"#sigma");
+			if(PlotSystematics&&PlotSysSquare) sprintf(beginLamLabel,"#sigma^{2}");
 			char endLamLabel[200];
 			sprintf(endLamLabel,"");
 
@@ -518,6 +521,30 @@ int main(int argc, char** argv) {
 			if(iLam==17) sprintf(axislabel,"%s#lambda^{*PX}_{#varphi}%s",beginLamLabel,endLamLabel);
 			if(iLam==18) sprintf(axislabel,"%s#tilde{#lambda}^{PX}%s",beginLamLabel,endLamLabel);//IfLamTildeClosure no PX
 			if(iLam==18&&DeltaTildeplots) sprintf(axislabel,"%s#tilde{#lambda}%s",beginLamLabel,endLamLabel);
+
+			if(PlotSystematics&&PlotSysSquare){
+				if(iLam==1)  sprintf(axislabel,"%s (#lambda^{CS}_{#vartheta}) %s",beginLamLabel,endLamLabel);
+				if(iLam==2)  sprintf(axislabel,"%s (#lambda^{CS}_{#varphi}) %s",beginLamLabel,endLamLabel);
+				if(iLam==3)  sprintf(axislabel,"%s (#lambda^{CS}_{#vartheta#varphi}) %s",beginLamLabel,endLamLabel);
+				if(iLam==4)  sprintf(axislabel,"%s (#lambda^{*CS}_{#vartheta}) %s",beginLamLabel,endLamLabel);
+				if(iLam==5)  sprintf(axislabel,"%s (#lambda^{*CS}_{#varphi}) %s",beginLamLabel,endLamLabel);
+				if(iLam==6)  sprintf(axislabel,"%s (#tilde{#lambda}^{CS}) %s",beginLamLabel,endLamLabel);
+
+				if(iLam==7)  sprintf(axislabel,"%s (#lambda^{HX}_{#vartheta}) %s",beginLamLabel,endLamLabel);
+				if(iLam==8)  sprintf(axislabel,"%s (#lambda^{HX}_{#varphi}) %s",beginLamLabel,endLamLabel);
+				if(iLam==9)  sprintf(axislabel,"%s (#lambda^{HX}_{#vartheta#varphi}) %s",beginLamLabel,endLamLabel);
+				if(iLam==10) sprintf(axislabel,"%s (#lambda^{*HX}_{#vartheta}) %s",beginLamLabel,endLamLabel);
+				if(iLam==11) sprintf(axislabel,"%s (#lambda^{*HX}_{#varphi}) %s",beginLamLabel,endLamLabel);
+				if(iLam==12) sprintf(axislabel,"%s (#tilde{#lambda}^{HX}) %s",beginLamLabel,endLamLabel);
+
+				if(iLam==13) sprintf(axislabel,"%s (#lambda^{PX}_{#vartheta}) %s",beginLamLabel,endLamLabel);
+				if(iLam==14) sprintf(axislabel,"%s (#lambda^{PX}_{#varphi}) %s",beginLamLabel,endLamLabel);
+				if(iLam==15) sprintf(axislabel,"%s (#lambda^{PX}_{#vartheta#varphi}) %s",beginLamLabel,endLamLabel);
+				if(iLam==16) sprintf(axislabel,"%s (#lambda^{*PX}_{#vartheta}) %s",beginLamLabel,endLamLabel);
+				if(iLam==17) sprintf(axislabel,"%s (#lambda^{*PX}_{#varphi}) %s",beginLamLabel,endLamLabel);
+				if(iLam==18) sprintf(axislabel,"%s (#tilde{#lambda}^{PX}) %s",beginLamLabel,endLamLabel);//IfLamTildeClosure no PX
+				if(iLam==18&&DeltaTildeplots) sprintf(axislabel,"%s (#tilde{#lambda}) %s",beginLamLabel,endLamLabel);
+			}
 
 
 			if(iLam==1)  sprintf(filename,"%s/FinalResults_CS_lth_rap%d.pdf",FigDir,rapBin);
@@ -579,10 +606,6 @@ int main(int argc, char** argv) {
 					//yMax=0.55;
 					yMin=-0.6;
 					yMax=0.6;
-				}
-				if(iLam==3||iLam==9||iLam==15){
-					yMin=-0.5;
-					yMax=0.5;
 				}
 
 				if(iLam==6||iLam==12||iLam==18){
@@ -679,19 +702,21 @@ int main(int argc, char** argv) {
 				}
 			}
 
+			if(PlotSystematics&&PlotSysSquare){
+				yMin=-0.1;
+				yMax=0.1;
+				if(iLam==2||iLam==8||iLam==14||iLam==3||iLam==9||iLam==15){
+					yMin=-0.025;
+					yMax=0.025;
+				} 
 
-			/* yMin=-3;
-				 yMax=3;
+				if(iLam==6||iLam==12||iLam==18){
+					yMin=-0.25;
+					yMax=0.25;
+				}
 
-				 if(iLam==2||iLam==8||iLam==14||iLam==3||iLam==9||iLam==15){
-				 yMin=-1;
-				 yMax=1;
-				 }
+			}
 
-				 if(iLam==6||iLam==12||iLam==18){
-				 yMin=-3;
-				 yMax=3;
-				 } */
 			TGraphAsymmErrors* graphDefaultRes = (TGraphAsymmErrors*) infileRes->Get(GraphName);
 			TGraphAsymmErrors* graphDefaultRes2sigma = (TGraphAsymmErrors*) infileRes2sigma->Get(GraphName);
 			TGraphAsymmErrors* graphDefaultRes3sigma = (TGraphAsymmErrors*) infileRes3sigma->Get(GraphName);
@@ -797,6 +822,12 @@ int main(int argc, char** argv) {
 				}
 				ptCentre_ForTable[pt]=ptCentre_[pt];
 
+				if(PlotSystematics&&PlotSysSquare) {
+					lmean_errmean[pt] = TMath::Power(lmean_errmean[pt],2);
+					lmean_errmean_minus[pt] = -TMath::Power(lmean_errmean_minus[pt],2);
+				}
+				//cout<<"debug---lmean_errmean_minus["<<pt<<"]: "<<lmean_errmean_minus[pt]<<endl;
+
 				if(nSystematics>0) {graphSyst1->GetPoint(ptBin-1,Buffer[pt],SystError1[pt]);	ErrSystError1[pt]=graphSyst1->GetErrorY(pt);    if(!PlotAsymm) SystError1[pt]=TMath::Abs(SystError1[pt]); }
 				if(nSystematics>1) {graphSyst2->GetPoint(ptBin-1,Buffer[pt],SystError2[pt]);	ErrSystError2[pt]=graphSyst2->GetErrorY(pt);    if(!PlotAsymm) SystError2[pt]=TMath::Abs(SystError2[pt]); }
 				if(nSystematics>2) {graphSyst3->GetPoint(ptBin-1,Buffer[pt],SystError3[pt]);	ErrSystError3[pt]=graphSyst3->GetErrorY(pt);    if(!PlotAsymm) SystError3[pt]=TMath::Abs(SystError3[pt]); }
@@ -878,6 +909,11 @@ int main(int argc, char** argv) {
 			gStyle->SetTitleOffset(1.3, "y");
 			gStyle->SetTitleFillColor(kWhite);
 
+			if(PlotSystematics&&PlotSysSquare){
+				gStyle->SetPadLeftMargin(0.15);
+				gStyle->SetTitleOffset(1.7, "y");
+			}
+
 			TCanvas *plotCanvas = new TCanvas("plotCanvas","plotCanvas",1000,800);
 
 			plotCanvas->SetFillColor(kWhite);
@@ -897,8 +933,6 @@ int main(int argc, char** argv) {
 			//plotHisto->GetYaxis()->SetTitleOffset(1.5);
 
 			TLegend* plotcompLegend=new TLegend(0.12,0.12,0.62,0.3);
-			//TLegend* plotcompLegend=new TLegend(0.13,0.12,0.6,0.3);
-			//TLegend* plotcompLegend=new TLegend(0.13,0.12,0.6,0.2);
 			plotcompLegend->SetFillColor(0);
 			//plotcompLegend->SetTextFont(72);
 			plotcompLegend->SetTextSize(0.04);
@@ -2341,6 +2375,7 @@ int main(int argc, char** argv) {
 				float Right_margin = 0.01;//0.015
 				const int nPanels=3;
 				double lowestBottomMargin=0.2;//0.2
+				double PadCoordXMax=0.99;
 				double PadCoordYMax=0.985;//0.985
 				double deltaCoordY=PadCoordYMax/(double(nPanels-1)+1./(1-lowestBottomMargin));
 				double startValCoordY=deltaCoordY/(1-lowestBottomMargin);
@@ -2382,9 +2417,13 @@ int main(int argc, char** argv) {
 				double xRapTextTilde;
 				double yRapText=0.06;
 				if(rapBin==1) xRapText=PlotpTMax * 0.8; //0.825
-				if(rapBin==2 || rapBin==3) xRapText=PlotpTMax * 0.7; //0.725
-				if(rapBin==1) xRapTextTilde=PlotpTMax * 0.6;
-				if(rapBin==2 || rapBin==3) xRapTextTilde=PlotpTMax * 0.5;
+				if(rapBin==2 || rapBin==3) xRapText=PlotpTMax * 0.69; //0.725
+				if(rapBin==1) xRapTextTilde=PlotpTMax * 0.71;
+				if(rapBin==2 || rapBin==3) xRapTextTilde=PlotpTMax * 0.60;
+				if(nState==5){
+					if(rapBin==1) xRapTextTilde=PlotpTMax * 0.66;
+					if(rapBin==2 || rapBin==3) xRapTextTilde=PlotpTMax * 0.55;
+				}
 				double xabcdefText=PlotpTMax * 0.11; //0.225
 
 				double XaxislabelLatexSize=0.0245;
@@ -2411,7 +2450,7 @@ int main(int argc, char** argv) {
 				if(Psi_MPplots){
 
 					MPcanvasXpixel=MPcanvasXpixelInitial;
-					if(nState==5) MPcanvasXpixel = MPcanvasXpixelInitial * 1.5;
+					if(nState==5) MPcanvasXpixel = MPcanvasXpixelInitial * (2.+1./(1-Left_margin)) / (1.+1./(1-Left_margin)) ; // * 1.46
 					MPcanvasYpixel = MPcanvasYpixelInitial;
 					cout<<"MPcanvasXpixel: "<<MPcanvasXpixel<<" MPcanvasYpixel: "<<MPcanvasYpixel<<endl;
 
@@ -2452,17 +2491,25 @@ int main(int argc, char** argv) {
 
 						cout<<"MultiPanel pad"<<endl;
 						TPad *MPpad;
+						double X1panel = 0.373;
+						double deltaCoordX = 0.;
 						if(nState==5){
-							double X1panel = 0.373;
+							deltaCoordX = PadCoordXMax/(2. + 1./(1-Left_margin));
+							X1panel = deltaCoordX/(1.-Left_margin);
 							if(rapBin==1) MPpad = new TPad("MPpad","MPpad",0.,PadCoordY[nPanels-iPanel],X1panel,PadCoordY[nPanels-iPanel+1]);
 							if(rapBin==2) MPpad = new TPad("MPpad","MPpad",X1panel,PadCoordY[nPanels-iPanel],
-									(1.+X1panel)/2.,PadCoordY[nPanels-iPanel+1]);
-							if(rapBin==3) MPpad = new TPad("MPpad","MPpad",(1.+X1panel)/2.,PadCoordY[nPanels-iPanel],
-									1.,PadCoordY[nPanels-iPanel+1]);
+									(PadCoordXMax+X1panel)/2.,PadCoordY[nPanels-iPanel+1]);
+							if(rapBin==3) MPpad = new TPad("MPpad","MPpad",(PadCoordXMax+X1panel)/2.,PadCoordY[nPanels-iPanel],
+									PadCoordXMax,PadCoordY[nPanels-iPanel+1]);
 						}
 						else{
-							if(rapBin==1) MPpad = new TPad("MPpad","MPpad",0.,PadCoordY[nPanels-iPanel],0.53,PadCoordY[nPanels-iPanel+1]);
-							if(rapBin==2) MPpad = new TPad("MPpad","MPpad",0.53,PadCoordY[nPanels-iPanel],1.,PadCoordY[nPanels-iPanel+1]);
+							deltaCoordX = PadCoordXMax/(1. + 1./(1-Left_margin));
+							X1panel = deltaCoordX/(1.-Left_margin);
+							if(rapBin==1) MPpad = new TPad("MPpad","MPpad",0.,PadCoordY[nPanels-iPanel],X1panel,PadCoordY[nPanels-iPanel+1]);
+							if(rapBin==2) MPpad = new TPad("MPpad","MPpad",X1panel,PadCoordY[nPanels-iPanel],
+									PadCoordXMax,PadCoordY[nPanels-iPanel+1]);
+							//if(rapBin==1) MPpad = new TPad("MPpad","MPpad",0.,PadCoordY[nPanels-iPanel],0.53,PadCoordY[nPanels-iPanel+1]);
+							//if(rapBin==2) MPpad = new TPad("MPpad","MPpad",0.53,PadCoordY[nPanels-iPanel],1.,PadCoordY[nPanels-iPanel+1]);
 						}
 
 						MPpad->Draw();
@@ -2584,8 +2631,10 @@ int main(int argc, char** argv) {
 						if(iPanel==nPanels) axisMPX2->SetTickSize(ticksize/(1-lowestBottomMargin));
 						axisMPX2->Draw("same");
 
+						XtitlePositionYshift=0.06;
 						whereTexteInPlotX=XtitlePosition;
 						whereTexteInPlotY=(yMaxMP+yMinMP)/2.-(yMaxMP-yMinMP)*XtitlePositionYshift;
+						XtitlePositionYshift=0.025;
 
 						char axistitleMPdep[200];
 						if(iLam==1||iLam==7||iLam==13)  sprintf(axistitleMPdep,"#lambda_{#vartheta}");
@@ -2661,7 +2710,7 @@ int main(int argc, char** argv) {
 							CentralsText1MP->Draw( "same" );
 
 							sprintf(text,"Preliminary");
-							TLatex *CentralsText2MP = new TLatex(PlotpTMax-22.,MPlatexYmax-2*MPlatexDeltaYmax,text);
+							TLatex *CentralsText2MP = new TLatex(PlotpTMax-22.,MPlatexYmax-1.5*MPlatexDeltaYmax,text);
 							CentralsText2MP->SetTextSize(CentralsFontSizeMP);
 							CentralsText2MP->Draw( "same" );
 
@@ -2742,10 +2791,13 @@ int main(int argc, char** argv) {
 
 				if(Psi_MPplots){
 
+					//lowestBottomMargin =  lowestBottomMargin - 0.08;
+					lowestBottomMargin =  lowestBottomMargin;
+
 					if(nState>3) {
-						if(nState==5) MPcanvasXpixel = MPcanvasXpixelInitial * 1.5;
-						else MPcanvasXpixel = MPcanvasXpixelInitial ;
-						MPcanvasYpixel = MPcanvasYpixelInitial * 0.5;
+						if(nState==5) MPcanvasXpixel = MPcanvasXpixelInitial * (2.+1./(1-Left_margin)) / (1.+1./(1-Left_margin) ); //* 1.46
+						else MPcanvasXpixel = MPcanvasXpixelInitial;
+						MPcanvasYpixel = MPcanvasYpixelInitial  / ( (2.+1./(1-lowestBottomMargin)) * (1.-lowestBottomMargin) ); // *0.384 
 					}
 					cout<<"MPcanvasXpixel: "<<MPcanvasXpixel<<" MPcanvasYpixel: "<<MPcanvasYpixel<<endl;
 
@@ -2771,15 +2823,21 @@ int main(int argc, char** argv) {
 
 						cout<<"MultiPanel pad"<<endl;
 						TPad *MPpad;
+						double X1panel = 0.373;
+						double deltaCoordX = 0.;
 						if(nState==5){
-							double X1panel = 0.373;
+							deltaCoordX = PadCoordXMax/(2. + 1./(1-Left_margin));
+							X1panel = deltaCoordX/(1.-Left_margin);
 							if(rapBin==1) MPpad = new TPad("MPpad","MPpad",0.,   0.,X1panel,1.);
-							if(rapBin==2) MPpad = new TPad("MPpad","MPpad",X1panel,0.,(1.+X1panel)/2.,1.);
-							if(rapBin==3) MPpad = new TPad("MPpad","MPpad",(1.+X1panel)/2.,0.,1.,   1.);
+							if(rapBin==2) MPpad = new TPad("MPpad","MPpad",X1panel,0.,(PadCoordXMax+X1panel)/2.,1.);
+							if(rapBin==3) MPpad = new TPad("MPpad","MPpad",(PadCoordXMax+X1panel)/2.,0.,PadCoordXMax,   1.);
 						}
 						else{
-							if(rapBin==1) MPpad = new TPad("MPpad","MPpad",0., 0.,0.53,1.);
-							if(rapBin==2) MPpad = new TPad("MPpad","MPpad",0.53,0.,1., 1.);
+							//deltaCoordX = PadCoordXMax/(1.+1./(1-Left_margin));
+							deltaCoordX = PadCoordXMax/(1./(1-Left_margin) + 1./(1-Right_margin));
+							X1panel = deltaCoordX/(1.-Left_margin);
+							if(rapBin==1) MPpad = new TPad("MPpad","MPpad",0., 0.,X1panel,1.);
+							if(rapBin==2) MPpad = new TPad("MPpad","MPpad",X1panel,0.,PadCoordXMax, 1.);
 						}
 
 						MPpad->Draw();
@@ -2790,19 +2848,19 @@ int main(int argc, char** argv) {
 						MPpad->SetLeftMargin(0.);
 						if(rapBin==1) MPpad->SetLeftMargin(Left_margin);
 						MPpad->SetRightMargin(0.);
-						if(nState<=4 && rapBin==2) MPpad->SetRightMargin(Right_margin+0.05);
-						if(nState==5 && rapBin==3) MPpad->SetRightMargin(Right_margin+0.05);
+						if(nState<=4 && rapBin==2) MPpad->SetRightMargin(Right_margin); //+0.05
+						if(nState==5 && rapBin==3) MPpad->SetRightMargin(Right_margin); //+0.05
 						MPpad->SetTopMargin(Top_margin+0.025);
 						MPpad->SetBottomMargin(0.0);
-						MPpad->SetBottomMargin(lowestBottomMargin-0.08);
+						MPpad->SetBottomMargin(lowestBottomMargin);
 
 						cout<<"MultiPanel hist"<<endl;
 						TH1F *MPhist = new TH1F;
 						MPhist = MPcanvasTilde_Psi->DrawFrame(PlotpTMin-DeltaXminOVERALL,yMinMP,PlotpTMax,yMaxMP);
 
 						MPhist->SetXTitle("#it{p}_{T} [GeV]");
-						MPhist->GetXaxis()->SetTitleOffset(-1.2);
-						if(rapBin==1) MPhist->GetXaxis()->SetTitleOffset(-1.2);
+						MPhist->GetXaxis()->SetTitleOffset(-1.35); //-1.2
+						//if(rapBin==1) MPhist->GetXaxis()->SetTitleOffset(-1.35);
 
 						MPhist->SetYTitle(axislabel);
 						MPhist->GetYaxis()->SetTitleOffset(titleoffset*0.2);
@@ -2810,15 +2868,14 @@ int main(int argc, char** argv) {
 						if(rapBin==1) MPhist->GetYaxis()->SetTitleOffset(titleoffset*1.35);
 						if(rapBin==1) MPhist->GetYaxis()->SetTitleSize(0.*(1-lowestBottomMargin));
 
-						MPhist->GetYaxis()->SetLabelSize(LabelSize*0.5);
+						MPhist->GetYaxis()->SetLabelSize(LabelSize*1.25); //0.5
 						MPhist->GetXaxis()->SetLabelSize(0.);
 						MPhist->GetYaxis()->SetLabelOffset(-0.015);
 						MPhist->GetXaxis()->SetLabelOffset(-0.08);
-						if(rapBin==1) MPhist->GetXaxis()->SetLabelOffset(-0.08*(1-Left_margin));
+						//if(rapBin==1) MPhist->GetXaxis()->SetLabelOffset(-0.08*(1-Left_margin));
 
-						if(rapBin==1) MPhist->GetYaxis()->SetLabelSize(LabelSize*.8*(1-lowestBottomMargin));
-						MPhist->GetXaxis()->SetTitleSize(TitleSize*0.55);
-						if(rapBin==1) MPhist->GetXaxis()->SetTitleSize(TitleSize*0.6*(1-Left_margin));
+						if(rapBin==1) MPhist->GetYaxis()->SetLabelSize(LabelSize*1.25*(1-lowestBottomMargin));
+						MPhist->GetXaxis()->SetTitleSize(TitleSize*0.85); //0.55
 						MPhist->GetXaxis()->SetAxisColor(kWhite);
 						MPhist->GetYaxis()->SetAxisColor(kWhite);
 						MPhist->GetXaxis()->SetTicks("-");
@@ -3096,11 +3153,10 @@ int main(int argc, char** argv) {
 						TGaxis *axisM3S1 = new TGaxis(PlotpTMin-DeltaXminOVERALL,yMinMP,PlotpTMax,yMinMP,
 								PlotpTMin-DeltaXminOVERALL+deltaTrickAxisMin,PlotpTMax+deltaTrickAxisMax,AxisDivisions,"+S");
 						axisM3S1->SetTickSize(ticksize*2);
-						axisM3S1->SetLabelSize(LabelSize*0.62);
-						if(rapBin==1) axisM3S1->SetLabelSize(LabelSize*0.72*(1-Left_margin));
-						axisM3S1->SetLabelOffset(labelOffsetX*0.7);
-						if(rapBin==1) axisM3S1->SetLabelOffset(labelOffsetX*0.8);
-						//if(rapBin==1) axisM3S1->SetLabelOffset(labelOffsetX*0.8*(1-Left_margin));
+						axisM3S1->SetLabelSize(LabelSize); //*0.62
+						//if(rapBin==1) axisM3S1->SetLabelSize(LabelSize*(1-Left_margin)); //*0.72
+						axisM3S1->SetLabelOffset(labelOffsetX);//*0.7
+						if(rapBin==1) axisM3S1->SetLabelOffset(labelOffsetX/(1-Left_margin)); //*0.8
 						axisM3S1->SetTickSize(ticksize*0.7/(1-lowestBottomMargin));
 						axisM3S1->Draw("same");
 
@@ -3115,7 +3171,7 @@ int main(int argc, char** argv) {
 
 						char axistitleMPtilde[200];
 						sprintf(axistitleMPtilde,"#tilde{#lambda}");
-						YaxistitleLatexSize=YaxistitleLatexSize*(1-lowestBottomMargin)*0.7;
+						YaxistitleLatexSize=YaxistitleLatexSize*(1-lowestBottomMargin);//*0.7
 						TLatex *MPYtitletext = new TLatex(whereTexteInPlotX,whereTexteInPlotY ,axistitleMPtilde);
 						MPYtitletext->SetTextSize(YaxistitleLatexSize);
 						MPYtitletext->SetTextSize(YaxistitleLatexSize*(1-lowestBottomMargin));
@@ -3131,9 +3187,9 @@ int main(int argc, char** argv) {
 							if(rapBin==1) sprintf(texTexMP,"J/#psi, |#it{y}| < 0.6");
 							if(rapBin==2) sprintf(texTexMP,"J/#psi, 0.6 < |#it{y}| < 1.2");
 						}
-						TLatex *textMP = new TLatex(xRapTextTilde,yMin+(yMax-yMin)*yRapText*0.92,texTexMP);
-						textMP->SetTextSize(textSizeRap*0.7);
-						if(rapBin==1) textMP->SetTextSize(textSizeRap*0.75*(1-Left_margin));
+						TLatex *textMP = new TLatex(xRapTextTilde,yMin+(yMax-yMin)*yRapText,texTexMP);//*0.92
+						textMP->SetTextSize(textSizeRap*0.8);//*0.7
+						//if(rapBin==1) textMP->SetTextSize(textSizeRap*(1-Left_margin));//*0.75
 						textMP->Draw( "same" );
 
 						char abcdef[200];
@@ -3173,14 +3229,14 @@ int main(int argc, char** argv) {
 						if(rapBin==1){
 							cout<<"DRAW CMS preliminary Latex"<<endl;
 							char text[200];
-							sprintf(text,"CMS  pp  #sqrt{s} = 7 TeV  L = 4.9 fb^{-1}");
+							sprintf(text,"CMS  pp  #sqrt{s} = 7 TeV   L = 4.9 fb^{-1}");
 							TLatex *CentralsText1MP = new TLatex(MPlatexX,MPlatexYmax,text);
-							CentralsText1MP->SetTextSize(CentralsFontSizeMP*0.5);
+							CentralsText1MP->SetTextSize(CentralsFontSizeMP*0.75);
 							CentralsText1MP->Draw( "same" );
 
 							sprintf(text,"Preliminary");
-							TLatex *CentralsText2MP = new TLatex(MPlatexX,MPlatexYmax-1*MPlatexDeltaYmax,text);
-							CentralsText2MP->SetTextSize(CentralsFontSizeMP*0.5);
+							TLatex *CentralsText2MP = new TLatex(PlotpTMax-22,MPlatexYmax-1.5*MPlatexDeltaYmax,text);
+							CentralsText2MP->SetTextSize(CentralsFontSizeMP*0.75);
 							CentralsText2MP->Draw( "same" );
 
 							//sprintf(text,"L = 4.9 fb^{-1}");
@@ -4267,7 +4323,6 @@ int main(int argc, char** argv) {
 							MPhist->GetYaxis()->SetTicks("+");
 
 							TLegend* MPframedepLegendError;
-							//MPframedepLegendError=new TLegend(errorLegendX1-Left_margin,errorLegendY1,errorLegendX2-Left_margin,errorLegendY2);
 							MPframedepLegendError=new TLegend(errorLegendX1,errorLegendY2-(errorLegendY2-errorLegendY1)*(1-lowestBottomMargin),errorLegendX2,errorLegendY2);
 							MPframedepLegendError->SetFillColor(0);
 							//MPframedepLegendError->SetTextFont(72);
@@ -5030,7 +5085,6 @@ int main(int argc, char** argv) {
 							if(iLam==6||iLam==12||iLam==18||iLam==1||iLam==7||iLam==13) MPhist->GetYaxis()->SetNdivisions(205);
 
 							TLegend* MPframedepLegendError;
-							// MPframedepLegendError=new TLegend(errorLegendX1-Left_margin,errorLegendY1,errorLegendX2-Left_margin,errorLegendY2);
 							MPframedepLegendError=new TLegend(errorLegendX1,errorLegendY2-(errorLegendY2-errorLegendY1)*(1-lowestBottomMargin),errorLegendX2,errorLegendY2);
 							MPframedepLegendError->SetFillColor(0);
 							//MPframedepLegendError->SetTextFont(72);
@@ -5465,6 +5519,7 @@ int main(int argc, char** argv) {
 
 			SystCanvas->SetFillColor(kWhite);
 			SystCanvas->SetGrid();
+			if(PlotSystematics&&PlotSysSquare) {SystCanvas->SetGridx(0);SystCanvas->SetGridy(0);}
 			SystCanvas->GetFrame()->SetFillColor(kWhite);
 			SystCanvas->GetFrame()->SetBorderSize(0);
 			//SystCanvas->SetRightMargin(0.05) ;
@@ -5475,8 +5530,9 @@ int main(int argc, char** argv) {
 			double LegendXmin=0.6; // for FrameworkIII: 0.5
 			if(ExtendLegendInX) LegendXmin=0.25;
 
-			//TLegend* plotLegend=new TLegend(LegendXmin,LegendYmin[nSystematics-1],0.95,0.9);
-			TLegend* plotLegend=new TLegend(LegendXmin,LegendYmin[nSystematics-1],0.98,0.98);
+			TLegend* plotLegend; 
+			plotLegend=new TLegend(LegendXmin,LegendYmin[nSystematics-1],0.98,0.98);
+			if(PlotSystematics&&PlotSysSquare) plotLegend=new TLegend(LegendXmin+0.12,LegendYmin[nSystematics-1],0.98,0.98);
 			plotLegend->SetFillColor(kWhite);
 			//plotLegend->SetTextFont(72);
 			plotLegend->SetTextSize(ParametrizedFontSize[nSystematics-1]);
@@ -5500,7 +5556,7 @@ int main(int argc, char** argv) {
 			graphStat->SetLineColor(kGreen-2);
 			graphStat->SetLineWidth(lineWidth);
 			if(!PlotAsymm) graphStat->Draw("2");
-			sprintf(legendentry,"Statistical Error");
+			sprintf(legendentry,"Statistics");
 
 			if(nSystematics>7){
 				TGraphAsymmErrors *graphSyst12345678 = new TGraphAsymmErrors(nBinspT,ptCentre_,SystError12345678,ptCentreErr_low,ptCentreErr_high,SystError12345678,0);

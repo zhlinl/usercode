@@ -184,12 +184,13 @@ int main(int argc, char** argv) {
 				for(int iSyst=0;iSyst<nSystematics;iSyst++){
 					//lmean_Buffer=lmean_Buffer+TMath::Abs(lmean_[iSyst][pt]); //ifMean
 					//lmean_Buffer=lmean_Buffer+lmean_[iSyst][pt]; //ifChange
+					//lmean_[iSyst][pt] = lmean_[iSyst][pt] / 2. ;  //fracBg0_TO_default_half
 					lmean_Buffer=lmean_Buffer+lmean_[iSyst][pt]*lmean_[iSyst][pt]; //ifSquare
 					ptCentre_Buffer=ptCentre_Buffer+ptCentre__[iSyst][pt];
 					ptCentreErr_low_Buffer=ptCentreErr_low_Buffer+ptCentreErr_low_[iSyst][pt];
 					ptCentreErr_high_Buffer=ptCentreErr_high_Buffer+ptCentreErr_high_[iSyst][pt];
 
-					if(iSyst==1) {//delete loop
+					if(iSyst==0) {//delete loop
 						pTcentreReal=ptCentre__[iSyst][pt];
 						pTcentreReallow=ptCentreErr_low_[iSyst][pt];
 						pTcentreRealhigh=ptCentreErr_high_[iSyst][pt];
@@ -207,8 +208,8 @@ int main(int argc, char** argv) {
 
 				//lmean[pt]=lmean_Buffer/nSystematics; //ifMean
 				//if(pt>3) {lmean[pt]=0; std::cout << "point 4 set to 0" << std::endl;} // ifrho
-				lmean[pt]=TMath::Sqrt(lmean_Buffer); //ifSquare
-				//lmean[pt]=lmean_Buffer;
+				//lmean[pt]=TMath::Sqrt(lmean_Buffer); //ifSquare
+				lmean[pt]=lmean_Buffer;
 				std::cout << pt << ": pT = " << ptCentre_[pt] << ", lambda = " << lmean[pt] << std::endl;
 
 				// IF FIT THE NSYSTEMATIC VALUES INSTEAD OF USING THE MEAN:::

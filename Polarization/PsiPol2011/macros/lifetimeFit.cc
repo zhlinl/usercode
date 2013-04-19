@@ -75,6 +75,15 @@ void lifetimeFit(const std::string &infilename, int rapBin, int ptBin, int nStat
 		dataSBR = data->reduce(Cut(cutSBR.str().c_str()),
 				EventRange(0,events));
 	}
+	//else if(nState==5 && rapBin==2 && ptBin==1){
+	//	events = data->numEntries()/5;
+	//	dataSR  = data->reduce(Cut(cutSR.str().c_str()),
+	//			    EventRange(0,events));
+	//	dataSBL = data->reduce(Cut(cutSBL.str().c_str()),
+	//			    EventRange(0,events));
+	//	dataSBR = data->reduce(Cut(cutSBR.str().c_str()),
+	//			    EventRange(0,events));
+	//}
 	else{
 		dataSR	= data->reduce(Cut(cutSR.str().c_str()));
 		dataSBL = data->reduce(Cut(cutSBL.str().c_str()));
@@ -129,11 +138,11 @@ void lifetimeFit(const std::string &infilename, int rapBin, int ptBin, int nStat
 		<< "----------------------------" << std::endl;
 
 	// calculate background fraction in signal region
-	double BkgRatio3Sig = getFracBkgIn3Sigma(rapBin, ptBin, infilename.c_str());
-	double BkgRatio3SigErr = getFracBkgErrIn3Sigma(rapBin, ptBin, infilename.c_str());
+	double BkgRatio3Sig = getFracBkgIn3Sigma(rapBin, ptBin, infilename.c_str(), onia::nSigMass);
+	double BkgRatio3SigErr = getFracBkgErrIn3Sigma(rapBin, ptBin, infilename.c_str(), onia::nSigMass);
 
 	std::cout << "------------ background fraction ----------------" << "\n"
-		<< "background fraction in 3 sigma mass window: " << BkgRatio3Sig << "\n"
+		<< "background fraction in "<<onia::nSigMass<<" sigma mass window: " << BkgRatio3Sig << "\n"
 		<< "error on background fraction: " << BkgRatio3SigErr << "\n"
 		<< "-------------------------------------------------" << std::endl;
 
