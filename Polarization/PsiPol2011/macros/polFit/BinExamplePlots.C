@@ -77,7 +77,7 @@ void BinExamplePlots(){
 	//sprintf(Fig_directory,"FigBuffer/BinExamplePlots/%s",DataID);
 	//gSystem->mkdir(Fig_directory,true);
 
-	bool PlotBGnormCorr=true;
+	bool PlotBGnormCorr=false;
 	double normCorr1S[2][12], normCorr1SErr[2][12];
 	double normCorr2S[3][5],  normCorr2SErr[3][5];
 	TGraphErrors *BGnormCorr1S[2];
@@ -102,11 +102,11 @@ void BinExamplePlots(){
 	int rapmin=1;
 	int rapmax=2;
 	int nStatemin=4;
-	int nStatemax=5;
+	int nStatemax=4;
 
 	for(int iState=nStatemin;iState<nStatemax+1;iState++){
 
-		if(iState==4) {pTmin=5; pTmax=12; rapmin=1; rapmax=2;}
+		if(iState==4) {pTmin=1; pTmax=12; rapmin=1; rapmax=2;}
 		if(iState==5) {pTmin=1; pTmax=5; rapmin=1; rapmax=3;}
 
 		//sprintf(DataID,Form("Psi%dS_3.00Sigma_11Dec2012",iState-3));
@@ -116,7 +116,13 @@ void BinExamplePlots(){
 		//sprintf(DataID,Form("Psi%dS_ctauScen0_FracLSB-1_rho_25Feb2013_massRange_Bin5_8_8",iState-3));
 		//sprintf(DataID,Form("Psi%dS_ctauScen0_FracLSB-1_rho_26Feb2013_BgNoRebin",iState-3));
 		//sprintf(DataID,Form("Psi%dS_ctauScen0_FracLSB-1_16Mar2013",iState-3));
-		sprintf(DataID,Form("Psi%dS_ctauScen0_FracLSB-1_16Mar2013_scaleFracBg",iState-3));
+		//sprintf(DataID,Form("Psi%dS_ctauScen0_FracLSB-1_16Mar2013_2",iState-3));
+		//sprintf(DataID,Form("Psi%dS_ctauScen0_FracLSB-1_16Mar2013_scaleFracBg",iState-3));
+		//sprintf(DataID,Form("Psi%dS_ctauScen0_FracLSB-1_19Mar2013_0FracBg_0BgModel_1Rho",iState-3));
+		//sprintf(DataID,Form("Psi%dS_ctauScen0_FracLSB-1_19Mar2013_0FracBg_1BgModel_0Rho",iState-3));
+		//sprintf(DataID,Form("Psi%dS_ctauScen0_FracLSB-1_19Mar2013_1FracBg_0BgModel_0Rho",iState-3));
+		//sprintf(DataID,Form("Psi%dS_ctauScen0_FracLSB-1_19Mar2013_1FracBg_1BgModel_1Rho",iState-3));
+		sprintf(DataID,Form("Psi%dS_ctauScen0_FracLSB-1_19Mar2013_1FracBg_1BgModel_1Rho_AlteredPPD_BKGlinPLUSRestSquaredGauss_5nRand_Apr5",iState-3));
 
 		sprintf(Fig_directory,"FigBuffer/BinExamplePlots/%s",DataID);
 		gSystem->mkdir(Fig_directory,true);

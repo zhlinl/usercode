@@ -206,6 +206,10 @@ int main(int argc, char** argv) {
 				if(iSyst==7) {graphSyst = (TGraphAsymmErrors*) infileSyst7->Get(GraphName); ProbDist[iSyst]=SystID7ProbDist; }
 				if(iSyst==8) {graphSyst = (TGraphAsymmErrors*) infileSyst8->Get(GraphName); ProbDist[iSyst]=SystID8ProbDist; }
 
+				///////////////////////////////////////////
+				if(nState == 4 && iSyst==3 && ptBin>9) //Rho factor, Jpsi, pT > 35: SystID2ProbDist = 2
+				 	ProbDist[iSyst]=2; 
+				///////////////////////////////////////////
 
 				graphSyst->GetPoint(ptBin-1,BufferDouble,SystVariation[iSyst][iFrame][iLam]);
 

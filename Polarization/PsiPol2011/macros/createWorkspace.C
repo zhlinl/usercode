@@ -7,15 +7,13 @@
 
 using namespace RooFit;
 
-void createWorkspace(const std::string &infilename, int nState){
-
+void createWorkspace(const std::string &infilename, int nState, bool correctCtau, bool drawRapPt2D){
 	gROOT->SetStyle("Plain");
 	gStyle->SetTitleBorderSize(0);
 
 	// Set some strings
-	const std::string
-		workspacename = "ws_masslifetime",
-		treename = "selectedData";
+	const std::string workspacename = "ws_masslifetime",
+				treename = "selectedData";
 
 	// Get the tree from the data file
 	TFile *f = TFile::Open(infilename.c_str());
@@ -43,16 +41,12 @@ void createWorkspace(const std::string &infilename, int nState){
 	RooRealVar* JpsiPt =
 		new RooRealVar("JpsiPt", "p_{T} [GeV]", 0. ,100.);
 	RooRealVar* Jpsict =
-		new RooRealVar("Jpsict", "#ell^{J/#psi} [mm]", -1., 2.5);
+		new RooRealVar("Jpsict", "lifetime [mm]", -1., 2.5);
 	RooRealVar* JpsictErr =
-		new RooRealVar("JpsictErr", "Error on #ell^{J/#psi} [mm]", 0.0001, 1);
+		new RooRealVar("JpsictErr", "Error on lifetime [mm]", 0.0001, 1);
 	RooRealVar* JpsiVprob =
 		new RooRealVar("JpsiVprob", "", 0.01, 1.);
 
-	if(nState==5){
-		Jpsict->SetTitle("#ell^{#psi(2S)} [mm]");
-		JpsictErr->SetTitle("Error on #ell^{#psi(2S)} [mm]");
-	}
 	// Set bins
 	Jpsict->setBins(10000,"cache");
 	Jpsict->setBins(100);
@@ -84,15 +78,30 @@ void createWorkspace(const std::string &infilename, int nState){
 				&& lifetime > Jpsict->getMin() && lifetime < Jpsict->getMax()
 				&& lifetimeErr > JpsictErr->getMin() && lifetimeErr < JpsictErr->getMax()
 				&& Vprob > JpsiVprob->getMin() && Vprob < JpsiVprob->getMax()
-				){
+			 ){
 
-			JpsiPt->setVal(pt); 
-			JpsiRap->setVal(y); 
-			JpsiMass->setVal(M);
-			JpsiMassErr->setVal(massErr);
-			Jpsict->setVal(lifetime);
-			JpsictErr->setVal(lifetimeErr);
-			JpsiVprob->setVal(Vprob);
+			JpsiPt      ->setVal(pt); 
+			JpsiRap     ->setVal(y); 
+			JpsiMass    ->setVal(M);
+			JpsiMassErr ->setVal(massErr);
+			JpsiVprob   ->setVal(Vprob);
+
+			//cout<<"before lifetime correction \n"
+			//	<<"Jpsict: "<<lifetime<<" JpsictErr: "<<lifetimeErr<<endl;
+
+			if(correctCtau){
+				lifetime    = lifetime    * onia::MpsiPDG / M ;
+				lifetimeErr = lifetimeErr * onia::MpsiPDG / M ;
+				Jpsict    ->setVal(lifetime);
+				JpsictErr ->setVal(lifetimeErr);
+				//cout<<"MpsiPDG: "<<onia::MpsiPDG<<endl;
+				//cout<<"after lifetime correction \n"
+				//	<<"Jpsict: "<<lifetime<<" JpsictErr: "<<lifetimeErr<<endl;
+			}
+			else{
+				Jpsict    ->setVal(lifetime);
+				JpsictErr ->setVal(lifetimeErr);
+			}
 
 			fullData->add(dataVars);
 		}
@@ -100,7 +109,7 @@ void createWorkspace(const std::string &infilename, int nState){
 
 
 	//------------------------------------------------------------------------------------------------------------------
-	// Define workspace and import datasets
+	//// Define workspace and import datasets
 
 	// Get datasets binned in pT an y
 	for(int iRap = 1; iRap <= onia::kNbRapForPTBins; iRap++){ 
@@ -116,7 +125,7 @@ void createWorkspace(const std::string &infilename, int nState){
 		}
 
 		for(int iPT = 1; iPT <= onia::kNbPTBins[iRap]; iPT++){
-		//for(int iPT = 0; iPT <= 0; iPT++){
+			//for(int iPT = 0; iPT <= 0; iPT++)
 
 			Double_t ptMin;
 			Double_t ptMax;
@@ -150,115 +159,120 @@ void createWorkspace(const std::string &infilename, int nState){
 		}//iPT
 	}//iRap
 
-	////Integrating rapidity and pt bins, in +/- 3*sigma mass window
-	//double yMin = onia::rapForPTRange[0];
-	//double yMax = onia::rapForPTRange[onia::kNbRapForPTBins];
-	//double ptMin =  onia::pTRange[0][0];
-	//double ptMax =  onia::pTRange[0][onia::kNbPTBins[0]];
+	////---------------------------------------------------------------
+	////--Integrating rapidity and pt bins, in +/- 3*sigma mass window
+	////---------------------------------------------------------------
+	if(drawRapPt2D){
+		double yMin = onia::rapForPTRange[0];
+		double yMax = onia::rapForPTRange[onia::kNbRapForPTBins];
+		double ptMin =  onia::pTRange[0][0];
+		double ptMax =  onia::pTRange[0][onia::kNbPTBins[0]];
 
-	//std::stringstream cutRapPt;
-	//cutRapPt << "(JpsiPt > " << ptMin << " && JpsiPt < "<< ptMax << ") && "
-	//	<< "(TMath::Abs(JpsiRap) > " << yMin << " && TMath::Abs(JpsiRap) < " << yMax << ")";
-	//cout<<"cutRapPt: "<<cutRapPt.str().c_str()<<endl;
+		std::stringstream cutRapPt;
+		cutRapPt << "(JpsiPt > " << ptMin << " && JpsiPt < "<< ptMax << ") && "
+			<< "(TMath::Abs(JpsiRap) > " << yMin << " && TMath::Abs(JpsiRap) < " << yMax << ")";
+		cout<<"cutRapPt: "<<cutRapPt.str().c_str()<<endl;
 
-	//RooDataSet* rapPtData = (RooDataSet*)fullData->reduce(cutRapPt.str().c_str());
-	//std::stringstream nameRapPt;
-	//nameRapPt << "data_rap0_pt0";
-	//rapPtData->SetNameTitle(nameRapPt.str().c_str(), "Data For full rap and pt");
+		RooDataSet* rapPtData = (RooDataSet*)fullData->reduce(cutRapPt.str().c_str());
+		std::stringstream nameRapPt;
+		nameRapPt << "data_rap0_pt0";
+		rapPtData->SetNameTitle(nameRapPt.str().c_str(), "Data For full rap and pt");
 
-	//// output file name and workspace
-	//std::stringstream outfilename;
-	//outfilename << "tmpFiles/backupWorkSpace/fit_Psi" << nState-3 << "S_rap0_pt0.root";
-	//RooWorkspace* ws_RapPt = new RooWorkspace(workspacename.c_str());
-	//// Import variables to workspace
-	//ws_RapPt->import(*rapPtData);
-	//ws_RapPt->writeToFile(outfilename.str().c_str());
-	//
-	//TH2D* rapPt;
-	//TH1D* rap1p2;
-	//double MassMin;
-	//double MassMax;
+		// output file name and workspace
+		std::stringstream outfilename;
+		outfilename << "tmpFiles/backupWorkSpace/fit_Psi" << nState-3 << "S_rap0_pt0.root";
+		RooWorkspace* ws_RapPt = new RooWorkspace(workspacename.c_str());
+		//Import variables to workspace
+		ws_RapPt->import(*rapPtData);
+		ws_RapPt->writeToFile(outfilename.str().c_str());
 
-	//rap1p2 = new TH1D("rap1p2","rap1p2",30,1.2, 1.8); 
-	//if(nState==4){
-	//	rapPt = new TH2D( "rapPt", "rapPt", 52,-1.3,1.3,144,0,72);
-	//	MassMin=3.011;//massPsi1S-onia::nSigMass*sigma1S;
-	//	MassMax=3.174;//massPsi1S+onia::nSigMass*sigma1S;
-	//	// sigma  27.2 MeV
-	//	// mean 3.093 GeV
-	//}
-	//if(nState==5){
-	//	rapPt = new TH2D( "rapPt", "rapPt", 76,-1.9,1.9,144,0,72); //  rap<1.8
-	//	//rapPt = new TH2D( "rapPt", "rapPt", 52,-1.3,1.3,144,0,72); //  rap<1.2
-	//	MassMin=3.576;//massPsi2S-onia::nSigMass*sigma2S;
-	//	MassMax=3.786;//massPsi2S+onia::nSigMass*sigma2S;
-	//	// sigma 34.9 MeV // pT > 7
-	//	// sigma 34.3 MeV // pT > 10
-	//	// mean 3.681 GeV
-	//}
+		TH2D* rapPt;
+		TH1D* rap1p2;
+		double MassMin;
+		double MassMax;
 
-	//cout<<"Plotting rap-Pt for Psi"<<nState-3<<"S"<<endl;
-	//cout<<"MassMin for rap-Pt plot = "<<MassMin<<endl;
-	//cout<<"MassMax for rap-Pt plot = "<<MassMax<<endl;
+		rap1p2 = new TH1D("rap1p2","rap1p2",30,1.2, 1.8); 
+		if(nState==4){
+			rapPt = new TH2D( "rapPt", "rapPt", 52,-1.3,1.3,144,0,72);
+			MassMin=3.011;//massPsi1S-onia::nSigMass*sigma1S;
+			MassMax=3.174;//massPsi1S+onia::nSigMass*sigma1S;
+			// sigma  27.2 MeV
+			// mean 3.093 GeV
+		}
+		if(nState==5){
+			rapPt = new TH2D( "rapPt", "rapPt", 64,-1.6,1.6,144,0,72); //  rap<1.5
+			//rapPt = new TH2D( "rapPt", "rapPt", 52,-1.3,1.3,144,0,72); //  rap<1.2
+			MassMin=3.576;//massPsi2S-onia::nSigMass*sigma2S;
+			MassMax=3.786;//massPsi2S+onia::nSigMass*sigma2S;
+			// sigma 34.9 MeV // pT > 7
+			// sigma 34.3 MeV // pT > 10
+			// mean 3.681 GeV
+		}
 
-	//TTree *rapPtTree = (TTree*)rapPtData->tree();
-	//std::stringstream cutMass;
-	//cutMass<<"(JpsiMass > " << MassMin << " && JpsiMass < "<< MassMax << ")";
-	////following two methods can only be used in root_v30, 34 does not work
-	//rapPtTree->Draw("JpsiPt::JpsiRap>>rapPt",cutMass.str().c_str(),"colz");
-	//rapPtTree->Draw("TMath::Abs(JpsiRap)>>rap1p2",cutMass.str().c_str());
+		cout<<"Plotting rap-Pt for Psi"<<nState-3<<"S"<<endl;
+		cout<<"MassMin for rap-Pt plot = "<<MassMin<<endl;
+		cout<<"MassMax for rap-Pt plot = "<<MassMax<<endl;
 
-	//TCanvas* c2 = new TCanvas("c2","c2",1200,1500);
-	//rapPt->SetYTitle("p_{T}(#mu#mu) [GeV]");
-	//rapPt->SetXTitle("y(#mu#mu)");
-	//gStyle->SetPalette(1);
-	//gPad->SetFillColor(kWhite);
-	//rapPt->SetTitle(0);
-	//rapPt->SetStats(0);
-	//gPad->SetLeftMargin(0.15);
-	//gPad->SetRightMargin(0.17);
-	//rapPt->GetYaxis()->SetTitleOffset(1.5);
+		TTree *rapPtTree = (TTree*)rapPtData->tree();
+		std::stringstream cutMass;
+		cutMass<<"(JpsiMass > " << MassMin << " && JpsiMass < "<< MassMax << ")";
+		//following two methods can only be used in root_v30, 34 does not work
+		rapPtTree->Draw("JpsiPt:JpsiRap>>rapPt",cutMass.str().c_str(),"colz");
+		cout<<"debug"<<endl;
+		rapPtTree->Draw("TMath::Abs(JpsiRap)>>rap1p2",cutMass.str().c_str());
 
-	//rapPt->Draw("colz");
+		TCanvas* c2 = new TCanvas("c2","c2",1200,1500);
+		rapPt->SetYTitle("p_{T}(#mu#mu) [GeV]");
+		rapPt->SetXTitle("y(#mu#mu)");
+		gStyle->SetPalette(1);
+		gPad->SetFillColor(kWhite);
+		rapPt->SetTitle(0);
+		rapPt->SetStats(0);
+		gPad->SetLeftMargin(0.15);
+		gPad->SetRightMargin(0.17);
+		rapPt->GetYaxis()->SetTitleOffset(1.5);
 
-	//TLine* rapPtLine;
+		rapPt->Draw("colz");
 
-	//for(int iRap=0;iRap<onia::kNbRapForPTBins+1;iRap++){
-	//	rapPtLine= new TLine( -onia::rapForPTRange[iRap], onia::pTRange[0][0], -onia::rapForPTRange[iRap], onia::pTRange[0][onia::kNbPTBins[iRap]] );
-	//	rapPtLine->SetLineWidth( 2 );
-	//	rapPtLine->SetLineStyle( 1 );
-	//	rapPtLine->SetLineColor( kWhite );
-	//	rapPtLine->Draw();
-	//	rapPtLine= new TLine( onia::rapForPTRange[iRap], onia::pTRange[0][0], onia::rapForPTRange[iRap], onia::pTRange[0][onia::kNbPTBins[iRap]] );
-	//	rapPtLine->SetLineWidth( 2 );
-	//	rapPtLine->SetLineStyle( 1 );
-	//	rapPtLine->SetLineColor( kWhite );
-	//	rapPtLine->Draw();
+		TLine* rapPtLine;
 
-	//	int pTBegin = 0;
-	//	if(nState==5) pTBegin = 1;
-	//	for(int iPt=pTBegin;iPt<onia::kNbPTBins[iRap+1]+1;iPt++){
-	//		rapPtLine= new TLine( -onia::rapForPTRange[onia::kNbRapForPTBins], onia::pTRange[0][iPt], onia::rapForPTRange[onia::kNbRapForPTBins], onia::pTRange[0][iPt] );
-	//		rapPtLine->SetLineWidth( 2 );
-	//		rapPtLine->SetLineStyle( 1 );
-	//		rapPtLine->SetLineColor( kWhite );
-	//		rapPtLine->Draw();
-	//	}
-	//}
+		for(int iRap=0;iRap<onia::kNbRapForPTBins+1;iRap++){
+			rapPtLine= new TLine( -onia::rapForPTRange[iRap], onia::pTRange[0][0], -onia::rapForPTRange[iRap], onia::pTRange[0][onia::kNbPTBins[iRap]] );
+			rapPtLine->SetLineWidth( 2 );
+			rapPtLine->SetLineStyle( 1 );
+			rapPtLine->SetLineColor( kWhite );
+			rapPtLine->Draw();
+			rapPtLine= new TLine( onia::rapForPTRange[iRap], onia::pTRange[0][0], onia::rapForPTRange[iRap], onia::pTRange[0][onia::kNbPTBins[iRap]] );
+			rapPtLine->SetLineWidth( 2 );
+			rapPtLine->SetLineStyle( 1 );
+			rapPtLine->SetLineColor( kWhite );
+			rapPtLine->Draw();
 
-	//char savename[200];
-	//sprintf(savename,"Fit/rapPt_Psi%dS.pdf",nState-3);
-	//c2->SaveAs(savename);
+			int pTBegin = 0;
+			if(nState==5) pTBegin = 1;
+			for(int iPt=pTBegin;iPt<onia::kNbPTBins[iRap+1]+1;iPt++){
+				rapPtLine= new TLine( -onia::rapForPTRange[onia::kNbRapForPTBins], onia::pTRange[0][iPt], onia::rapForPTRange[onia::kNbRapForPTBins], onia::pTRange[0][iPt] );
+				rapPtLine->SetLineWidth( 2 );
+				rapPtLine->SetLineStyle( 1 );
+				rapPtLine->SetLineColor( kWhite );
+				rapPtLine->Draw();
+			}
+		}
 
-	//TCanvas* c3 = new TCanvas("c3","c3",1500,1200);
-	//rap1p2->SetYTitle("Events");
-	//rap1p2->SetXTitle("y(#mu#mu)");
-	//rap1p2->SetTitle(0);
-	//rap1p2->SetStats(0);
-	//rap1p2->GetYaxis()->SetTitleOffset(1.2);
-	//rap1p2->Draw();
-	//sprintf(savename,"Fit/rapDimuon_1p2_Psi%dS_ptFull.pdf",nState-3);
-	//c3->SaveAs(savename);
+		char savename[200];
+		sprintf(savename,"Fit/rapPt_Psi%dS.pdf",nState-3);
+		c2->SaveAs(savename);
+
+		TCanvas* c3 = new TCanvas("c3","c3",1500,1200);
+		rap1p2->SetYTitle("Events");
+		rap1p2->SetXTitle("y(#mu#mu)");
+		rap1p2->SetTitle(0);
+		rap1p2->SetStats(0);
+		rap1p2->GetYaxis()->SetTitleOffset(1.2);
+		rap1p2->Draw();
+		sprintf(savename,"Fit/rapDimuon_1p2_Psi%dS.pdf",nState-3);
+		c3->SaveAs(savename);
+	}
 
 	f->Close();
 }

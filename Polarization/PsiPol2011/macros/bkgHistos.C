@@ -15,6 +15,8 @@ TH2D *subtract2D(TH2D* hist1, TH2D* hist2);
 TH3D *subtract3D(TH3D* hist1, TH3D* hist2);
 TH2D* ReSetBin(TH2D* hist, int nBinX, int nBinY, const std::stringstream& name, const std::stringstream& title);
 
+double calcuFracL(RooWorkspace *ws, double mean, double sigma);
+
 //---------------------------------------------------------------------------------------------------------------
 void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, bool folding, bool MC, bool doCtauUncer, bool PolLSB, bool PolRSB, bool PolNP, int ctauScen, int FracLSB, bool forceBinning, bool normApproach, bool scaleFracBg, char *polDataPath){
 
@@ -38,6 +40,10 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 		return;
 	}
 	RooWorkspace *ws = (RooWorkspace*)fitfile->Get(wsname.c_str());
+	if(!ws){
+		std::cout << "workspace not found" << std::endl;
+		return;
+	}
 
 	gStyle->SetPadRightMargin(0.2);
 	gROOT->SetStyle("Plain");
@@ -234,7 +240,8 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 	double mean_LSB = mean_LSB_ws->getVal();
 	RooRealVar *mean_RSB_ws = (RooRealVar*)ws->var("MeanSBR");
 	double mean_RSB = mean_RSB_ws->getVal();
-	double fracLSB = 1 - (mean - mean_LSB)/(mean_RSB - mean_LSB);
+	//double fracLSB = 1. - (mean - mean_LSB)/(mean_RSB - mean_LSB);
+	double fracLSB = calcuFracL(ws, mass, sigma); // using the median value
 	if(FracLSB!=-1) fracLSB = double(FracLSB)/100.;
 
 	RooRealVar* fBkg_ws = (RooRealVar*)ws->var("FracBkg");
@@ -330,8 +337,16 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 	} //more can be added if need
 
 	double ctauCut = nSigma*l_pdecay;
+
+	if(ctauScen==3){
+		ctauCut = 0.1 ; // mm 
+	}
+
+	cout << "ctauCut: " << ctauCut << endl;
+
 	double ctCutMinPR = -ctauCut, ctCutMaxPR = ctauCut;
 	double ctCutMinNP =  ctauCut, ctCutMaxNP = 6.;
+
 
 	// histogram method
 	// calculate fractions in prompt signal region
@@ -570,6 +585,7 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 	tbkgname << ";;fraction of total BG in " << onia::nSigMass << "  sigma window, prompt region";
 	TH1D* hFracTBG = new TH1D("background_fraction", tbkgname.str().c_str(), 1, 0., 1.);
 	if(scaleFracBg){
+		//fTBGsig = 0.001;
 		char Filename[200];
 		sprintf(Filename,"%s/results_Psi%dS_rap%d_pT%d.root",polDataPath,nState-3,rapBin,ptBin);
 		TFile *resultFile = new TFile(Filename,"R");
@@ -1756,3 +1772,59 @@ int findEvenNum(double number){
 	}
 	return thisNum;
 }
+
+double calcuFracL(RooWorkspace *ws, double mean, double sigma){
+	RooRealVar JpsiMass(*ws->var("JpsiMass"));
+	double sigMaxMass = mean+sigma*onia::nSigMass;
+	double sigMinMass = mean-sigma*onia::nSigMass;
+	double sbHighMass = mean+sigma*onia::nSigBkgHigh;
+	double sbLowMass =  mean-sigma*onia::nSigBkgLow;
+	JpsiMass.setRange("SR",sigMinMass,sigMaxMass);
+	JpsiMass.setRange("LSB",JpsiMass.getMin(), sbLowMass);
+	JpsiMass.setRange("RSB",sbHighMass, JpsiMass.getMax()); 
+
+	RooAddPdf *bkgMassShape = (RooAddPdf*)ws->pdf("bkgMassShape");
+
+	RooRealVar* InteLSB = (RooRealVar*)bkgMassShape->createIntegral(JpsiMass,NormSet(JpsiMass),Range("LSB"));
+	RooRealVar* InteRSB = (RooRealVar*)bkgMassShape->createIntegral(JpsiMass,NormSet(JpsiMass),Range("RSB"));
+	RooRealVar* InteSR  = (RooRealVar*)bkgMassShape->createIntegral(JpsiMass,NormSet(JpsiMass),Range("SR"));
+	double inteLSB = InteLSB->getVal();
+	double inteRSB = InteRSB->getVal();
+	double inteSR  = InteSR->getVal();
+
+	double mean_LSB, mean_RSB, mean_SR;
+
+	double MassDist=0.001;
+	for(int i=0; i<10000; i++){
+		JpsiMass.setRange(Form("LSB_%d",i),JpsiMass.getMin(), JpsiMass.getMin()+i*MassDist);
+		RooRealVar* tempLSB = (RooRealVar*)bkgMassShape->createIntegral(JpsiMass,NormSet(JpsiMass),Range(Form("LSB_%d",i)));
+		if(tempLSB->getVal() > inteLSB/2.){
+			mean_LSB = JpsiMass.getMin()+i*MassDist;
+			break;
+		}
+	}
+	for(int i=0; i<10000; i++){
+		JpsiMass.setRange(Form("RSB_%d",i),sbHighMass,sbHighMass+i*MassDist);
+		RooRealVar* tempRSB = (RooRealVar*)bkgMassShape->createIntegral(JpsiMass,NormSet(JpsiMass),Range(Form("RSB_%d",i)));
+		if(tempRSB->getVal() > inteRSB/2.){
+			mean_RSB = sbHighMass+i*MassDist;
+			break;
+		}
+	}
+	for(int i=0; i<10000; i++){
+		JpsiMass.setRange(Form("SR_%d",i),sigMinMass,sigMinMass+i*MassDist);
+		RooRealVar* tempSR = (RooRealVar*)bkgMassShape->createIntegral(JpsiMass,NormSet(JpsiMass),Range(Form("SR_%d",i)));
+		if(tempSR->getVal() > inteSR/2.){
+			mean_SR = sigMinMass+i*MassDist;
+			break;
+		}
+	}
+	double fracLCentral = (mean_RSB-mean_SR)/(mean_RSB-mean_LSB);
+	cout<<"mean_LSB: "<<mean_LSB<<endl;
+	cout<<"mean_RSB: "<<mean_RSB<<endl;
+	cout<<"mean_SR: "<<mean_SR<<endl;
+	cout<<"fracLCentral: "<<fracLCentral<<endl;
+
+	return fracLCentral;
+}
+

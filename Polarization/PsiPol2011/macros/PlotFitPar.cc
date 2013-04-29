@@ -238,6 +238,34 @@ void PlotMassPar(int  nState){
 			JpsiMass.setRange("SBL",JpsiMass.getMin(), sbLowMass);
 			JpsiMass.setRange("SBR",sbHighMass, JpsiMass.getMax());
 
+			// create datasets for LSB, RSB and SR
+			std::stringstream cutSR, cutSBL, cutSBR;
+			cutSR << "JpsiMass > " << sigMinMass << " && JpsiMass < " << sigMaxMass;
+			cutSBL << "JpsiMass > " << onia::massMin << " && JpsiMass < " << sbLowMass;
+			cutSBR << "JpsiMass > " << sbHighMass << " && JpsiMass < " << onia::massMax;
+
+			std::stringstream binNameSR, binNameSBL, binNameSBR;
+			binNameSR  << "data_rap" << rapBin << "_pt" << ptBin << "_SR";
+			binNameSBL << "data_rap" << rapBin << "_pt" << ptBin << "_SBL";
+			binNameSBR << "data_rap" << rapBin << "_pt" << ptBin << "_SBR";
+
+			RooAbsData* dataSR, *dataSBL, *dataSBR;
+			dataSR  = data->reduce(Cut(cutSR.str().c_str()));
+			dataSBL = data->reduce(Cut(cutSBL.str().c_str()));
+			dataSBR = data->reduce(Cut(cutSBR.str().c_str()));
+
+			dataSR->SetNameTitle(binNameSR.str().c_str(), "data in signal region");
+			dataSBL->SetNameTitle(binNameSBL.str().c_str(), "data in LSB");
+			dataSBR->SetNameTitle(binNameSBR.str().c_str(), "data in RSB");
+
+			TH1* histSR =  dataSR->createHistogram("histSR", JpsiMass,  Binning(120));
+			TH1* histSBL = dataSBL->createHistogram("histSBL", JpsiMass, Binning(120));
+			TH1* histSBR = dataSBR->createHistogram("histSBR", JpsiMass, Binning(120));
+
+			double meanSR = histSR->GetMean();
+			double meanSBL = histSBL->GetMean();
+			double meanSBR = histSBR->GetMean();
+
 			RooAddPdf *massPdf = (RooAddPdf*)ws->pdf("massModel");
 			RooAbsPdf *bkgMassShape = (RooAbsPdf*)ws->pdf("bkgMassShape");
 			RooAddPdf *sigMassShape = (RooAddPdf*)ws->pdf("sigMassShape");
@@ -293,6 +321,7 @@ void PlotMassPar(int  nState){
 			fracSigInRSBErr[rapBin-1][ptBin-1] = fracBkgInRSBErr[rapBin-1][ptBin-1];
 
 			fracLSB[rapBin-1][ptBin-1]  = calcuFracL(ws, Mean, SigmaWei);
+			//fracLSB[rapBin-1][ptBin-1]  = 1. - (meanSR - meanSBL)/(meanSBR - meanSBL);
 
 			mean[rapBin-1][ptBin-1] = Mean;
 			sigmaWei[rapBin-1][ptBin-1] = SigmaWei*1000;
@@ -1071,7 +1100,7 @@ void PlotMassPar(int  nState){
 		graph_fracSigInRSB[2]->SetMarkerStyle(26);
 		graph_fracSigInRSB[2]->SetMarkerSize(1.2);
 	}
-	graph_fracSigInLSB[0]->GetYaxis()->SetTitle("Bg fraction in L(R)SB");
+	graph_fracSigInLSB[0]->GetYaxis()->SetTitle("signal contamination in L(R)SB");
 	graph_fracSigInLSB[0]->Draw("AP");
 	graph_fracSigInLSB[1]->Draw("P");
 	graph_fracSigInRSB[0]->Draw("P");
@@ -1087,7 +1116,7 @@ void PlotMassPar(int  nState){
 		latex->DrawLatex(left,top,"J/#psi");
 	}
 	c1->SaveAs(Form("%s/fracSigInSB.pdf",savePath.str().c_str()));
-	graph_fracSigInLSB[0]->GetYaxis()->SetTitle("Bg fraction in LSB");
+	graph_fracSigInLSB[0]->GetYaxis()->SetTitle("signal contamination in LSB");
 
 
 	////
@@ -1745,7 +1774,7 @@ void PlotLifePar(int  nState) {
 		graph_bkgTauSSDR[0][rapBin-1]->SetTitle("");
 		graph_bkgTauSSDR[0][rapBin-1]->GetXaxis()->SetTitle("p_{T} (GeV)");
 		graph_bkgTauSSDR[0][rapBin-1]->GetYaxis()->SetTitle("Tau of SSR ");
-		graph_bkgTauSSDR[0][rapBin-1]->GetYaxis()->SetRangeUser(0.25,0.55);
+		graph_bkgTauSSDR[0][rapBin-1]->GetYaxis()->SetRangeUser(0.1,0.8); //0.25,0.55
 		graph_bkgTauSSDR[0][rapBin-1]->GetXaxis()->SetLimits(Xmin, Xmax);
 		graph_bkgTauSSDR[0][rapBin-1]->SetMarkerStyle(onia::marker_rapForPTBins[2]);
 		graph_bkgTauSSDR[0][rapBin-1]->SetMarkerColor(onia::colour_rapForPTBins[2]);

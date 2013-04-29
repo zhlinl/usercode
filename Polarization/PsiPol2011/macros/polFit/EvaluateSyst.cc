@@ -104,7 +104,7 @@ int main(int argc, char* argv[]) {
 	TFile *outfile = new TFile(outfilename.str().c_str(),"RECREATE");
 
 	for(int iLam = 1; iLam < 19; iLam++){
-		for(int rapBin = rapBinMin; rapBin <= rapBinMax; rapBin++){
+		for(int rapBin = rapBinMin; rapBin < rapBinMax+1; rapBin++){
 
 			// get graphs from file
 			std::stringstream graphName;
@@ -178,12 +178,12 @@ int main(int argc, char* argv[]) {
 				ptCentre_[pt]=(ptCentre1_[pt]+ptCentre2_[pt])/2.;
 				ptCentreErr_low[pt]=(ptCentreErr1_low[pt]+ptCentreErr2_low[pt])/2.;
 				ptCentreErr_high[pt]=(ptCentreErr1_high[pt]+ptCentreErr2_high[pt])/2.;
-				cout<<"ptCentre1_: "<<ptCentre1_[pt]<<endl;
-				cout<<"ptCentre2_: "<<ptCentre2_[pt]<<endl;
-				cout<<"ptCentreErr1_low: "<<ptCentreErr1_low[pt]<<endl;
-				cout<<"ptCentreErr2_low: "<<ptCentreErr2_low[pt]<<endl;
-				cout<<"ptCentreErr1_high: "<<ptCentreErr1_high[pt]<<endl;
-				cout<<"ptCentreErr2_high: "<<ptCentreErr2_high[pt]<<endl;
+				//cout<<"ptCentre1_: "<<ptCentre1_[pt]<<endl;
+				//cout<<"ptCentre2_: "<<ptCentre2_[pt]<<endl;
+				//cout<<"ptCentreErr1_low: "<<ptCentreErr1_low[pt]<<endl;
+				//cout<<"ptCentreErr2_low: "<<ptCentreErr2_low[pt]<<endl;
+				//cout<<"ptCentreErr1_high: "<<ptCentreErr1_high[pt]<<endl;
+				//cout<<"ptCentreErr2_high: "<<ptCentreErr2_high[pt]<<endl;
 
 				lmeanErr1_high[pt]=graph1->GetErrorYhigh(pt);
 				lmeanErr1_low[pt]=graph1->GetErrorYlow(pt);
@@ -192,6 +192,9 @@ int main(int argc, char* argv[]) {
 
 				// default setting: build difference
 				lmean[pt]=lmean1[pt]-lmean2[pt];
+				//lmean[pt]=fabs(lmean1[pt]-lmean2[pt])/2.;
+				//lmean[pt]=fabs(lmean1[pt]-lmean2[pt])/TMath::Sqrt(12);
+				//lmean[pt]=fabs(lmean1[pt]-lmean2[pt]);
 				if(TU){
 					double error1 = (lmeanErr1_low[pt] + lmeanErr1_high[pt])/2;
 					double error2 = (lmeanErr2_low[pt] + lmeanErr2_high[pt])/2;

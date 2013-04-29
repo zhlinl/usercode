@@ -7,38 +7,6 @@ using namespace std;
 #include "commonVar.h"
 #include "ToyMC.h"
 
-#include "TSystem.h"
-#include "TCanvas.h"
-#include "TStyle.h"
-#include "TFile.h"
-#include "TFrame.h"
-#include "TGraphErrors.h"
-#include "TGraphAsymmErrors.h"
-#include "TROOT.h"
-
-#include "TH2F.h"
-#include "TTree.h"
-#include "TChain.h"
-#include "TDirectory.h"
-#include "TLegend.h"
-#include "Riostream.h"
-#include "TSystem.h"
-#include "TString.h"
-#include "TFile.h"
-#include "TROOT.h"
-#include "TTree.h"
-#include "TMath.h"
-#include "TVector3.h"
-#include "TLorentzVector.h"
-#include "TRandom3.h"
-#include "TF1.h"
-#include "TF2.h"
-#include "TH1.h"
-#include "TH2.h"
-#include "TH1D.h"
-
-
-
 // calculation of the frame-invariants lambdatheta^star and lambdaphi^star:
 
 void calcLambdastar( double& lthstar, double& lphstar,
@@ -212,6 +180,7 @@ void PlotRapPt(int ptBinMin, int ptBinMax, int rapBin, double yMin, double yMax,
 			if(!hist_mean_pT) cout<<"error"<<endl;
 			mean_pT = hist_mean_pT->GetBinContent(1);
 			//cout<<"rap"<<rapBin<<"_pt"<<ptBin<<" mean_pT: "<<mean_pT<<endl;
+			dataFile->Close();
 		}
 		else
 			mean_pT = ToyMC::ptCentre[rapBin-1][ptBin-1];
@@ -326,6 +295,7 @@ void PlotComparisonRapPt(int ptBinMin, int ptBinMax, int rapBin, double yMin, do
 			if(!hist_mean_pT) cout<<"error"<<endl;
 			mean_pT = hist_mean_pT->GetBinContent(1);
 			//cout<<"rap"<<rapBin<<"_pt"<<ptBin<<" mean_pT: "<<mean_pT<<endl;
+			dataFile->Close();
 		}
 		else
 			mean_pT = ToyMC::ptCentre[rapBin-1][ptBin-1];

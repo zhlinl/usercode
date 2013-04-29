@@ -188,6 +188,7 @@ int main(int argc, char** argv) {
 	bool ShiftXminOVERALL=true;
 
 	double PlotpTMinInitial = 6., PlotpTMaxInitial = 72.;
+	if(PlotFinalData) PlotpTMinInitial = 10.;
 	double PlotpTMin = PlotpTMinInitial, 
 				 PlotpTMax = PlotpTMaxInitial;
 
@@ -582,10 +583,14 @@ int main(int argc, char** argv) {
 			//yMax=1.1;
 			yMin=-1.09;
 			yMax=1.09;
+			//yMin=-1.49; //plot noRho
+			//yMax=1.49; //plot noRho
 
 			if(iLam==2||iLam==8||iLam==14||iLam==3||iLam==9||iLam==15){
 				yMin=-0.35;
 				yMax=0.35;
+				//yMin=-0.55; //plot noRho
+				//yMax=0.55; //plot noRho
 			}
 
 			if(iLam==6||iLam==12||iLam==18){
@@ -703,17 +708,34 @@ int main(int argc, char** argv) {
 			}
 
 			if(PlotSystematics&&PlotSysSquare){
-				yMin=-0.1;
-				yMax=0.1;
+				yMin=-0.15;
+				yMax=0.15;
+				if(nState==5){
+					yMin=-0.1;
+					yMax=0.1;
+					if(iLam==6||iLam==12||iLam==18){
+						yMin=-0.2;
+						yMax=0.2;
+					}
+				}
 				if(iLam==2||iLam==8||iLam==14||iLam==3||iLam==9||iLam==15){
-					yMin=-0.025;
-					yMax=0.025;
+					yMin=-0.02; //-0.025
+					yMax=0.02;  //0.025
+					if(nState==4){
+						yMin=-0.005;
+						yMax=0.005;
+					}
 				} 
 
-				if(iLam==6||iLam==12||iLam==18){
-					yMin=-0.25;
-					yMax=0.25;
+				if(iLam==1||iLam==2||iLam==3){
+					yMin=-0.05;
+					yMax=0.05;
 				}
+
+				//if(iLam==6||iLam==12||iLam==18){
+				//	yMin=-0.25;
+				//	yMax=0.25;
+				//}
 
 			}
 
@@ -797,21 +819,37 @@ int main(int argc, char** argv) {
 			for(int ptBin = ptBinMin; ptBin < ptBinMax+1; ptBin++) {
 
 				graphDefaultRes->GetPoint(ptBin-1,ptCentre_[pt],lmean[pt]);
-				//cout<<"debug: ptCentre_["<<pt<<"]: "<<ptCentre_[pt]<<endl;
+				cout<<"debug: ptCentre_["<<pt<<"]: "<<ptCentre_[pt]<<endl;
 				ptCentreErr_high[pt]=graphDefaultRes->GetErrorXhigh(ptBin-1);
+				cout<<"debug0000"<<endl;
 				ptCentreErr_low[pt]=graphDefaultRes->GetErrorXlow(ptBin-1);
+				cout<<"debug0001"<<endl;
 				lmean_errhigh[pt]=graphDefaultRes->GetErrorYhigh(ptBin-1);
+				cout<<"debug0002"<<endl;
 				lmean_errlow[pt]=graphDefaultRes->GetErrorYlow(ptBin-1);
+				cout<<"debug0003"<<endl;
 				lmean_errmean[pt]=(lmean_errlow[pt]+lmean_errhigh[pt])/2.;
+				cout<<"debug0004"<<endl;
 				lmean_errmean_minus[pt]=-(lmean_errlow[pt]+lmean_errhigh[pt])/2.;
+
+				cout<<"debug000"<<endl;
+				cout<<"lmean_errlow: "<<lmean_errlow[pt]<<endl;
+				cout<<"lmean_errhigh: "<<lmean_errhigh[pt]<<endl;
 
 				lmeanTotal1_errlow[pt]=lmean_errlow[pt];
 				lmeanTotal1_errhigh[pt]=lmean_errhigh[pt];
+				cout<<"debug0001"<<endl;
 				lmeanTotal2_errlow[pt]=graphDefaultRes2sigma->GetErrorYlow(ptBin-1);
+				cout<<"debug0002"<<endl;
 				lmeanTotal2_errhigh[pt]=graphDefaultRes2sigma->GetErrorYhigh(ptBin-1);
+				cout<<"debug0003"<<endl;
 				lmeanTotal3_errlow[pt]=graphDefaultRes3sigma->GetErrorYlow(ptBin-1);
+				cout<<"debug0004"<<endl;
 				lmeanTotal3_errhigh[pt]=graphDefaultRes3sigma->GetErrorYhigh(ptBin-1);
+				cout<<"debug0005"<<endl;
 
+
+				cout<<"debug001"<<endl;
 
 				if(PlotAlteredPPDResults){
 					graphDefaultRes->GetPoint(ptBin-1,ptCentre_[pt],lmeanBuff[pt]);
@@ -822,11 +860,13 @@ int main(int argc, char** argv) {
 				}
 				ptCentre_ForTable[pt]=ptCentre_[pt];
 
+				cout<<"debug002"<<endl;
+
 				if(PlotSystematics&&PlotSysSquare) {
 					lmean_errmean[pt] = TMath::Power(lmean_errmean[pt],2);
 					lmean_errmean_minus[pt] = -TMath::Power(lmean_errmean_minus[pt],2);
 				}
-				//cout<<"debug---lmean_errmean_minus["<<pt<<"]: "<<lmean_errmean_minus[pt]<<endl;
+				cout<<"debug---lmean_errmean_minus["<<pt<<"]: "<<lmean_errmean_minus[pt]<<endl;
 
 				if(nSystematics>0) {graphSyst1->GetPoint(ptBin-1,Buffer[pt],SystError1[pt]);	ErrSystError1[pt]=graphSyst1->GetErrorY(pt);    if(!PlotAsymm) SystError1[pt]=TMath::Abs(SystError1[pt]); }
 				if(nSystematics>1) {graphSyst2->GetPoint(ptBin-1,Buffer[pt],SystError2[pt]);	ErrSystError2[pt]=graphSyst2->GetErrorY(pt);    if(!PlotAsymm) SystError2[pt]=TMath::Abs(SystError2[pt]); }
@@ -970,6 +1010,18 @@ int main(int argc, char** argv) {
 				graphDefaultRes->SetMarkerSize(BG0MarkerSize);
 
 			}
+
+			////plot noRho
+			//graphDefaultRes->RemovePoint(0);
+			//graphDefaultRes->RemovePoint(0);
+			//graphDefaultRes->RemovePoint(0);
+			//graphDefaultRes->RemovePoint(0);
+			//graphDefaultRes->RemovePoint(0);
+			//graphDefaultRes->RemovePoint(0);
+			//graphDefaultRes->RemovePoint(0);
+			//graphDefaultRes->RemovePoint(0);
+			//graphDefaultRes->RemovePoint(0);
+
 			if(!PlotBrazilian&&!SBmSigPlots&&!BGratioFits&&!SteerIndividuals&&!PlotMatt&&!PlotVsComp) graphDefaultRes->Draw(drawGraphStyle);//Comment if PlotBG0plots Low
 
 			if(PlotBrazilian&&!SteerIndividuals&&!PlotVsComp){
@@ -2221,6 +2273,17 @@ int main(int argc, char** argv) {
 
 
 			if(PlotCompare){ //not yet changed 12.12.2012 Linlin
+				////plot noRho
+				//graphCompareFile1->RemovePoint(0);
+				//graphCompareFile1->RemovePoint(0);
+				//graphCompareFile1->RemovePoint(0);
+				//graphCompareFile1->RemovePoint(0);
+				//graphCompareFile1->RemovePoint(0);
+				//graphCompareFile1->RemovePoint(0);
+				//graphCompareFile1->RemovePoint(0);
+				//graphCompareFile1->RemovePoint(0);
+				//graphCompareFile1->RemovePoint(0);
+
 				graphCompareFile1->SetMarkerColor(kRed);
 				graphCompareFile1->SetLineColor(kRed);
 				graphCompareFile1->SetMarkerStyle(28);
@@ -5525,14 +5588,17 @@ int main(int argc, char** argv) {
 			//SystCanvas->SetRightMargin(0.05) ;
 
 			double ParametrizedFontSize[8]={0.05,0.05,0.05,0.05,0.04,0.04,0.03,0.03};
-			double LegendYmin[8]={0.8,0.75,0.7,0.65,0.65,0.6,0.6,0.6};
+			double LegendYmin[8]={0.8,0.75,0.7,0.65,0.65,0.65,0.6,0.6}; //{0.8,0.75,0.7,0.65,0.65,0.6,0.6,0.6};
 
 			double LegendXmin=0.6; // for FrameworkIII: 0.5
 			if(ExtendLegendInX) LegendXmin=0.25;
 
 			TLegend* plotLegend; 
 			plotLegend=new TLegend(LegendXmin,LegendYmin[nSystematics-1],0.98,0.98);
-			if(PlotSystematics&&PlotSysSquare) plotLegend=new TLegend(LegendXmin+0.12,LegendYmin[nSystematics-1],0.98,0.98);
+			if(PlotSystematics&&PlotSysSquare) {
+				plotLegend=new TLegend(LegendXmin+0.12,LegendYmin[nSystematics-1],0.98,0.98);
+				if(nState==4) plotLegend=new TLegend(0.15,0.12,0.45,0.45);
+			}
 			plotLegend->SetFillColor(kWhite);
 			//plotLegend->SetTextFont(72);
 			plotLegend->SetTextSize(ParametrizedFontSize[nSystematics-1]);

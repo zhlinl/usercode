@@ -16,11 +16,16 @@ TH2F *hCosThetaPhiNPBG[onia::kNbRapForPTBins][onia::kNbPTMaxBins][onia::kNbFrame
 TH2F *hTCosThetaPhi[onia::kNbRapForPTBins][onia::kNbPTMaxBins][onia::kNbFrames];
 TH1F *events_SR[onia::kNbRapForPTBins][onia::kNbPTMaxBins];
 TH1F *events_PRSR[onia::kNbRapForPTBins][onia::kNbPTMaxBins];
+TH1F *mean_pT[onia::kNbRapForPTBins][onia::kNbPTMaxBins];
+TH1F *mean_y[onia::kNbRapForPTBins][onia::kNbPTMaxBins];
+
 int evtPinPRSR[onia::kNbRapForPTBins][onia::kNbPTMaxBins],
-			 evtNPinPRSR[onia::kNbRapForPTBins][onia::kNbPTMaxBins],
-			 evtBGinPRSR[onia::kNbRapForPTBins][onia::kNbPTMaxBins];
+		evtNPinPRSR[onia::kNbRapForPTBins][onia::kNbPTMaxBins],
+		evtBGinPRSR[onia::kNbRapForPTBins][onia::kNbPTMaxBins];
 double fracBGinPRSR[onia::kNbRapForPTBins][onia::kNbPTMaxBins],
 			 fracNPinPRSR[onia::kNbRapForPTBins][onia::kNbPTMaxBins];
+double MeanPt[onia::kNbRapForPTBins][onia::kNbPTMaxBins],
+			 MeanRap[onia::kNbRapForPTBins][onia::kNbPTMaxBins];
 
 void LoadHistos(Int_t iRapBin, Int_t iPTBin, Int_t nState);
 void PlotHistos(Int_t iRapBin, Int_t iPTBin, Int_t iFrame, Int_t iWindow);
@@ -103,8 +108,9 @@ int main(int argc, char* argv[]){
 		//}
 
 		char framerap[200];
-
 		char NumFileName[200];
+
+		/// estimated number signal events and Bg fractions 
 		sprintf(NumFileName,"NumEventsFracBG_Psi%dS.tex",nState-3);
 		NumFile = fopen(NumFileName,"w");
 		fprintf(NumFile, "\n");
@@ -114,7 +120,6 @@ int main(int argc, char* argv[]){
 
 		fprintf(NumFile, "\n\n\n\n");
 
-		//fprintf(NumFile, "\\begin{table}[!H]\n\\centering\n \\caption{Estimated number of prompt signal events, non-prompt fraction and background fraction in the PRSR, as a function of $p_{T}$} \n");
 		fprintf(NumFile, "\\begin{table}[!H]\n\\centering\n \\caption{Number of prompt signal events, non-prompt fraction and background fraction in the PRSR, as a function of $p_{T}$ and $y$. The fractions are in \\% . } \n");
 		fprintf(NumFile, "\\begin{tabular}{|c|ccc|ccc|ccc|}\n\\hline\n");
 		fprintf(NumFile, "$p_{T}$ [GeV] & $N_{PR}^{PRSR}$ & $f_{NP}^{PRSR} $ & $f_{BG}^{PRSR} $ & $N_{PR}^{PRSR}$ & $f_{NP}^{PRSR} $ & $f_{BG}^{PRSR} $ & $N_{PR}^{PRSR}$ & $f_{NP}^{PRSR} $ & $f_{BG}^{PRSR} $  \\\\\n");
@@ -157,11 +162,68 @@ int main(int argc, char* argv[]){
 		fprintf(NumFile, "\\end{table}\n");
 		fprintf(NumFile, "\n");
 
+		fprintf(NumFile, "\\end{document}");
+
+		fclose(NumFile);
+
+		//// estimated mean pT and y 
+		sprintf(NumFileName,"meanPt_Psi%dS.tex",nState-3);
+		NumFile = fopen(NumFileName,"w");
+		fprintf(NumFile, "\n");
+		fprintf(NumFile,"\\documentclass{article}\n\\usepackage[applemac]{inputenc}\n\\usepackage{amsmath}\n\\usepackage{textcomp}\n\\pagestyle{plain}\n\\usepackage{graphicx}\n\\usepackage{multicol}\n\\usepackage{geometry}\n\\usepackage{subfigure}\n\\usepackage{booktabs}\n\\usepackage{setspace}\n\n\n\n\\begin{document}\n");
+
+		fprintf(NumFile, "\n\n\n\n");
+
+		fprintf(NumFile, "\n\n\n\n");
+
+		fprintf(NumFile, "\\begin{table}[!H]\n\\centering\n \\caption{Estimated mean $p_{T}$ and $|y|$, for each $\\psi(nS)$ kinematic bin} \n");
+		fprintf(NumFile, "\\begin{tabular}{|c|cc|cc|cc|}\n\\hline\n");
+		fprintf(NumFile, "$p_{T}$ [GeV] & $\\hat{p_{T}}$ [GeV] & $\\hat{|y|}$ & $\\hat{p_{T}}$ [GeV] & $\\hat{|y|}$ & $\\hat{p_{T}}$ [GeV] & $\\hat{|y|}$ \\\\\n");
+
+		if(nState==4){
+			sprintf(framerap,"\\hline \\multicolumn{1}{|c|}{} & \\multicolumn{2}{|c|}{$%1.1f < |y| < %1.1f$ } & \\multicolumn{2}{|c|}{$%1.1f < |y| < %1.1f$ } & \\multicolumn{2}{|c|}{$%1.1f < |y| < %1.1f$ } \\\\\n \\hline \n",0.0, 0.6, 0.6, 1.2, 1.2, 1.5);
+			fprintf(NumFile,framerap);
+			fprintf(NumFile, "\\multicolumn{7}{|c|}{$\\Psi(1S)$} \\\\\n \\hline \n \\rule{0pt}{4mm} \n");
+			int pt=0;
+			for(int ptBin = 1; ptBin < onia::kNbPTBins[1]+1; ptBin++) {
+
+				fprintf(NumFile, "%1.0f--%1.0f & $%1.3f$ & $%1.3f$ & $%1.3f$ & $%1.3f$ & -- & -- \\\\\n", 
+						onia::pTRange[1][ptBin-1], onia::pTRange[1][ptBin],
+						MeanPt[0][ptBin-1], MeanRap[0][ptBin-1],
+						MeanPt[1][ptBin-1], MeanRap[1][ptBin-1]);
+				pt++;
+			}
+		}
+
+		if(nState==5){
+			sprintf(framerap,"\\hline \\multicolumn{1}{|c|}{} & \\multicolumn{2}{|c|}{$%1.1f < |y| < %1.1f$ } & \\multicolumn{2}{|c|}{$%1.1f < |y| < %1.1f$} & \\multicolumn{2}{|c|}{$%1.1f < |y| < %1.1f$} \\\\\n \\hline \n",onia::rapForPTRange[0],onia::rapForPTRange[1], onia::rapForPTRange[1], onia::rapForPTRange[2], onia::rapForPTRange[2], onia::rapForPTRange[3]); 
+			fprintf(NumFile,framerap);
+			fprintf(NumFile, "\\multicolumn{7}{|c|}{$\\Psi(2S)$} \\\\\n \\hline \n \\rule{0pt}{4mm} \n");
+
+			int pt=0;
+			for(int ptBin = 1; ptBin < onia::kNbPTBins[1]+1; ptBin++) {
+
+				fprintf(NumFile, "%1.0f--%1.0f & $%1.3f$ & $%1.3f$ & $%1.3f$ & $%1.3f$ & $%1.3f$ & $%1.3f$ \\\\\n", 
+						onia::pTRange[1][ptBin-1], onia::pTRange[1][ptBin],
+						MeanPt[0][ptBin-1], MeanRap[0][ptBin-1],
+						MeanPt[1][ptBin-1], MeanRap[1][ptBin-1],
+						MeanPt[2][ptBin-1], MeanRap[2][ptBin-1]);
+				pt++;
+			}
+		}
+
+		fprintf(NumFile, "\\hline\n");
+		fprintf(NumFile, "\\end{tabular}\n");
+		fprintf(NumFile, "\\label{tab:NumEventsFracBG}\n");
+		fprintf(NumFile, "\\end{table}\n");
+		fprintf(NumFile, "\n");
+
+		fprintf(NumFile, "\\end{document}");
+
+		fclose(NumFile);
+
+
 	}
-
-	fprintf(NumFile, "\\end{document}");
-
-	fclose(NumFile);
 
 	return 1;
 }
@@ -280,6 +342,11 @@ void LoadHistos(Int_t iRapBin, Int_t iPTBin, Int_t nState){
 	sprintf(name, "tmpFiles/data_Psi%dS_rap%d_pT%d.root", nState-3, iRapBin+1, iPTBin+1);
 
 	TFile *fIn = new TFile(name);
+
+	sprintf(name, "mean_pT"); mean_pT[iRapBin][iPTBin] = (TH1F*) fIn->Get(name);
+	sprintf(name, "mean_y");  mean_y [iRapBin][iPTBin] = (TH1F*) fIn->Get(name);
+	MeanPt [iRapBin][iPTBin] = mean_pT[iRapBin][iPTBin]->GetBinContent(1);
+	MeanRap[iRapBin][iPTBin] = mean_y [iRapBin][iPTBin]->GetBinContent(1);
 
 	sprintf(name, "events_SR");
 	events_SR[iRapBin][iPTBin] = (TH1F*) fIn->Get(name);

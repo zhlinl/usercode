@@ -28,7 +28,7 @@ Plotting=2   #plotting macro: 1 = plot all, 2 = plot mass, 3 = plot lifetime sid
 rejectCowboys=true
 RequestTrigger=true
 MC=false
-correctCtau=true   #correct pseudo-proper lifetime to l_new = l * MpsiPDG / Mpsi, with l = Lxy * Mpsi / pT
+correctCtau=false   #correct pseudo-proper lifetime to l_new = l * MpsiPDG / Mpsi, with l = Lxy * Mpsi / pT
 drawRapPt2D=false  #draw Rap-Pt 2D map of Psi
 
 doCtauUncer=true
