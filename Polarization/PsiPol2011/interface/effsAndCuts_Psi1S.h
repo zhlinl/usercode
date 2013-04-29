@@ -209,7 +209,8 @@ double EvaluateRhoFactor( double& costh, double& phi, int nEff, TFile* fInRhoFac
 	double eff=1;
 	if(nEff==1) return eff;
 
-	if(pT<30.) return eff;
+	//if(pT<30.) return eff;
+	if(pT<35.) return eff; // for pT > 35, apply rho correction
 
 	int pTbin;
 	int rapBin;

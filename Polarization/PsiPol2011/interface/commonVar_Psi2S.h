@@ -8,6 +8,7 @@ namespace onia{
   // masses
   const double Mprot = 0.9382720;
   const double muMass = 0.105658;
+	const double MpsiPDG = 3.68609;
   const double Ebeam = sqrt( pbeam*pbeam + Mprot*Mprot );
   const TLorentzVector beam1_LAB( 0., 0., pbeam, Ebeam );
   const TLorentzVector beam2_LAB( 0., 0., -pbeam, Ebeam );	
@@ -43,10 +44,10 @@ namespace onia{
   const int kNbPolVar = 2; //cosTheta, phi
   enum {cosThPol,phiPol};
   //cosTheta
-  const int kNbBinsCosT = 15;
+  const int kNbBinsCosT = 16;
   double cosTMin = -1., cosTMax = 1.;
   //phi for pol. 
-  const int kNbBinsPhiPol = 15;
+  const int kNbBinsPhiPol = 16;
   double phiPolMin = -180., phiPolMax = 180.;
 
   //phase space limiting cuts:

@@ -3,8 +3,7 @@
 
 using namespace RooFit;
 
-void massFit(const std::string &infilename, int rapBin, int ptBin, int nState){
-
+void massFit(const std::string &infilename, int rapBin, int ptBin, int nState, bool fitMassPR, bool fitMassNP){
 	TFile *infile = new TFile(infilename.c_str(), "UPDATE");
 	if(!infile){
 		std::cout << "Error: failed to open file with dataset" << std::endl;
@@ -93,6 +92,40 @@ void massFit(const std::string &infilename, int rapBin, int ptBin, int nState){
 
 	data->Print("v");
 
+	////////////////////////////////////////////////////////////////
+	RooRealVar *JpsiPt = ws->var("JpsiPt");
+	TH1* histPt = data->createHistogram("histPt", *JpsiPt, Binning(120));
+	double meanPt = histPt->GetMean();
+
+	//// define sigma of prompt p.d.f., got from fit the trend
+	//// define function y = a + b * pT
+	double a = 0.073, b = 0.0027;
+	//proper decay length
+	double L_decay = a + b * meanPt;
+	//pseudo-proper decay length
+	double l_pdecay = L_decay * onia::MpsiPDG / meanPt ;
+	double nSigma = 0.;
+	if(nState==4) nSigma = 2.5;
+	if(nState==5) nSigma = 2.0;
+	double ctauCut = nSigma*l_pdecay;
+	double ctCutMinPR = -ctauCut, ctCutMaxPR = ctauCut;
+	double ctCutMinNP =  ctauCut, ctCutMaxNP = 6.;
+
+	std::stringstream cutlife;
+	if(fitMassPR){
+		cout << " fitting mass in prompt lifetime region " << endl;
+		cutlife << "Jpsict > " << ctCutMinPR << " && Jpsict < " << ctCutMaxPR ;
+		data = (RooDataSet*)data -> reduce(cutlife.str().c_str());
+	}
+	else if(fitMassNP){
+		cout << " fitting mass in non-prompt lifetime region " << endl;
+		cutlife << "Jpsict > " << ctCutMinNP << " && Jpsict < " << ctCutMaxNP ;
+		data = (RooDataSet*)data -> reduce(cutlife.str().c_str());
+	}
+	////////////////////////////////////////////////////////////////
+
+	data->Print("v");
+
 	RooArgSet *NLLs = new RooArgSet();
 	RooAbsReal *MassNLL = NULL; 
 
@@ -124,5 +157,4 @@ void massFit(const std::string &infilename, int rapBin, int ptBin, int nState){
 
 	ws->Write();
 	infile->Close();
-
 }

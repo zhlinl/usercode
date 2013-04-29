@@ -3,9 +3,9 @@
 #source /afs/cern.ch/user/z/zhlinl/rootset.sh
 source /afs/ihep.ac.cn/users/z/zhangll/fs/rootset.sh
 
-# Define JobID
-#JobID=FrameworkTest_5Dec2012
 
+#homedir=HOMEDIR
+#cd ${homedir}
 Cdir=$PWD
 
 cd ..
@@ -20,13 +20,17 @@ cd $Cdir
 
 rapMin=1     #takes bins, not actual values
 rapMax=1     #if you only want to process 1 y bin, rapMax = rapMin
-ptMin=5     #takes bins, not acutal values
-ptMax=5     #if you only want to process 1 pt bin, ptMax = ptMin
-Plotting=3   #plotting macro: 1 = plot all, 2 = plot mass, 3 = plot lifetime sidebands, 4 = plot lifetime singal region
+ptMin=1      #takes bins, not acutal values
+ptMax=1     #if you only want to process 1 pt bin, ptMax = ptMin
+Plotting=2   #plotting macro: 1 = plot all, 2 = plot mass, 3 = plot lifetime sidebands, 4 = plot lifetime singal region, 
+	           # 5 = sidebands, separate pull and distribution, 6 = signal region, separate pull and distribution
 
 rejectCowboys=true
 RequestTrigger=true
 MC=false
+correctCtau=true   #correct pseudo-proper lifetime to l_new = l * MpsiPDG / Mpsi, with l = Lxy * Mpsi / pT
+drawRapPt2D=false  #draw Rap-Pt 2D map of Psi
+
 doCtauUncer=true
 PolLSB=false       #measure polarization of the left sideband
 PolRSB=false       #measure polarization of the right sideband
@@ -34,22 +38,21 @@ PolNP=false        #measure polarization of the non prompt events
 forceBinning=true  #set binning of Psi1S consistently to non prompt binning and Psi2S consistently to background binning
 folding=true       #folding is applied to all background histograms
 normApproach=false #normalization 
-ctauScen=0         #0:default(1s:2.5,2s:2.0), 1:(1s:3.5,2s:3.0), 2:(1s:1.5,2s:1.0)
+ctauScen=3         #0:default(1s:2.5,2s:2.0), 1:(1s:3.5,2s:3.0), 2:(1s:1.5,2s:1.0), 3:100mm 1S and 2S, 
 FracLSB=-1         #-1:defalut, 0, 100
 scaleFracBg=false
+fitMassPR=false
+fitMassNP=false
 
 DataID=Psi$[nState-3]S_ctauScen0_FracLSB-1_16Mar2013
 polDataPath=${basedir}/Psi/Data/${DataID}
 
 #Define JobID
-#JobID=FrameworkTest_5Dec2012
-#JobID=ctauScen${ctauScen}_FracLSB${FracLSB}
-#JobID=ctauScen${ctauScen}_FracLSB${FracLSB}_25Feb2013
-#JobID=ctauScen${ctauScen}_FracLSB${FracLSB}_26Feb2013_BgNoRebin
-#JobID=ctauScen${ctauScen}_FracLSB${FracLSB}_25Feb2013_Bin20_2_2
-#JobID=ctauScen${ctauScen}_FracLSB${FracLSB}_25Feb2013_Bin5_8_8
-#JobID=ctauScen${ctauScen}_FracLSB${FracLSB}_newMLfit_4Mar2013
-JobID=ctauScen${ctauScen}_FracLSB${FracLSB}_newMLfit_4Mar2013_scaleFracBg
+#JobID=ctauScen${ctauScen}_FracLSB${FracLSB}_newMLfit_4Mar2013_NP
+JobID=ctauScen${ctauScen}_FracLSB${FracLSB}_newMLfit_4Mar2013
+#JobID=ctauScen${ctauScen}_FracLSB${FracLSB}_newMLfit_4Mar2013_0fracBg
+#JobID=ctauScen${ctauScen}_FracLSB${FracLSB}_newMLfit_4Mar2013_1sigMass
+#JobID=ctauScen${ctauScen}_FracLSB${FracLSB}_newMLfit_correctCtau_11April2013
 
 # input files
 # In case of more input Files: define inputTreeX and adapt the line starting with inputTrees, at the moment up to 4 files implemented
@@ -158,7 +161,7 @@ fi
 
 if [ ${execute_runWorkspace} -eq 1 ]
 then
-./runWorkspace nState=${nState}
+./runWorkspace nState=${nState} correctCtau=${correctCtau} drawRapPt2D=${drawRapPt2D}
 fi
 
 if [ ${execute_runMassFit} -eq 1 ]
@@ -166,7 +169,7 @@ then
 rootfile=fit_Psi$[nState-3]S_rap${rapMin}_pt${ptMin}.root
 cp tmpFiles/backupWorkSpace/${rootfile} tmpFiles/${rootfile}
 cp runMassFit runMassFit_$[nState-3]S_rap${rapMin}_pt${ptMin}
-./runMassFit_$[nState-3]S_rap${rapMin}_pt${ptMin} rapMin=${rapMin} rapMax=${rapMax} ptMin=${ptMin} ptMax=${ptMax} nState=${nState}
+./runMassFit_$[nState-3]S_rap${rapMin}_pt${ptMin} rapMin=${rapMin} rapMax=${rapMax} ptMin=${ptMin} ptMax=${ptMax} nState=${nState} fitMassPR=${fitMassPR} fitMassNP=${fitMassNP}
 rm runMassFit_$[nState-3]S_rap${rapMin}_pt${ptMin}
 fi
 
@@ -182,22 +185,22 @@ then
 cp runPlotMassLifetime runPlotMassLifetime_$[nState-3]S_rap${rapMin}_pt${ptMin}
 ./runPlotMassLifetime_$[nState-3]S_rap${rapMin}_pt${ptMin} rapMin=${rapMin} rapMax=${rapMax} ptMin=${ptMin} ptMax=${ptMax} nState=${nState} Plotting=${Plotting}
 rm runPlotMassLifetime_$[nState-3]S_rap${rapMin}_pt${ptMin}
-pdflatex MassLifetime_Psi$[nState-3]S.tex
-mv MassLifetime_Psi$[nState-3]S.pdf PDF/MassLifetime_Psi$[nState-3]S.pdf
+#pdflatex MassLifetime_Psi$[nState-3]S.tex
+#mv MassLifetime_Psi$[nState-3]S.pdf PDF/MassLifetime_Psi$[nState-3]S.pdf
 fi
 
 if [ ${execut_PlotFitPar} -eq 1 ]
 then
 ./PlotFitPar nState=${nState} doCtauUncer=${doCtauUncer}
 #pdflatex Lifetime_fitParameter.tex
-#pdflatex Mass_fitParameter.tex
-pdflatex evaluateCtau.tex
-pdflatex evaluateCtau.tex
+pdflatex Mass_fitParameter.tex
+#pdflatex evaluateCtau.tex
+#pdflatex evaluateCtau.tex
 #pdflatex NumEvents.tex
 #pdflatex NumEvents.tex
 #mv Lifetime_fitParameter.pdf PDF/Lifetime_fitParameter.pdf
-#mv Mass_fitParameter.pdf PDF/Mass_fitParameter.pdf
-mv evaluateCtau.pdf PDF/evaluateCtau.pdf
+mv Mass_fitParameter.pdf PDF/Mass_fitParameter.pdf
+#mv evaluateCtau.pdf PDF/evaluateCtau.pdf
 #mv NumEvents.pdf PDF/NumEvents.pdf
 fi
 
@@ -237,7 +240,7 @@ fi
 #rm PlotFitPar
 #rm PlotCosThetaPhiBG
 #rm PlotCosThetaPhiDistribution
-##rm *.tex
+#rm *.tex
 rm *.aux
 rm *.log
 rm *.so

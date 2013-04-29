@@ -53,12 +53,15 @@ void fromSplit(const std::string& key, const std::string &arg, std::string &out)
 int main(int argc, char* argv[]){
 
   // Set defaults
-    int
-      rapMin = 999,
-      rapMax = 999,
-      ptMin = 999,
-      ptMax = 999,
-      nState = 999;
+    int rapMin = 999,
+			 	rapMax = 999,
+			 	ptMin = 999,
+			 	ptMax = 999,
+			 	nState = 999;
+
+		bool fitMassPR = false,
+				 fitMassNP = false;
+	
 
     // Loop over argument list
     for (int i=1; i < argc; i++)
@@ -69,6 +72,8 @@ int main(int argc, char* argv[]){
         fromSplit("ptMin", arg, ptMin);
         fromSplit("ptMax", arg, ptMax);
         fromSplit("nState", arg, nState);
+        fromSplit("fitMassPR", arg, fitMassPR);
+        fromSplit("fitMassNP", arg, fitMassNP);
       }
 
     std::cout << "-----------------------\n"
@@ -84,7 +89,7 @@ int main(int argc, char* argv[]){
 	temp << "tmpFiles/fit_Psi" << nState-3 << "S_rap" << iRap << "_pt" << iPT << ".root";
 	const std::string infilename = temp.str().c_str();
 
-	massFit(infilename.c_str(), iRap, iPT, nState);
+	massFit(infilename.c_str(), iRap, iPT, nState, fitMassPR, fitMassNP);
 
       }
     }
