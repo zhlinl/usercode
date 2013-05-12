@@ -199,6 +199,8 @@ int main(int argc, char** argv) {
 	int TwoSigColor=400;//858,898
 	int ThreeSigColor=423;//423
 
+	int CL1sigmaColor=kGreen;
+
 	char filename[200];
 	sprintf(filename,"%s/%s/TGraphResults_Psi%dS.root",storagedir,DefaultID,nState-3);
 	if(CompareSyst)sprintf(filename,"%s/macros/polFit/Systematics/%s/%s/TGraphResults_Psi%dS.root",basedir,SystID1Base,SystID1Specify,nState-3);
@@ -3207,6 +3209,10 @@ int main(int argc, char** argv) {
 
 							graphMP1_1sig->SetFillColor(kGreen);
 							graphMP1_1sig->SetFillStyle(1001);
+							if(PlotCL1sigma) {
+								graphMP1_1sig->SetLineColor(CL1sigmaColor);
+								graphMP1_1sig->SetFillColor(CL1sigmaColor);
+							}
 							graphMP1_2sig->SetFillColor(kYellow);
 							graphMP1_2sig->SetFillStyle(1001);
 							graphMP1_3sig->SetFillColor(kCyan-9);
@@ -3214,6 +3220,10 @@ int main(int argc, char** argv) {
 
 							graphMP2_1sig->SetFillColor(kGreen);
 							graphMP2_1sig->SetFillStyle(1001);
+							if(PlotCL1sigma) {
+								graphMP2_1sig->SetLineColor(CL1sigmaColor);
+								graphMP2_1sig->SetFillColor(CL1sigmaColor);
+							}
 							graphMP2_2sig->SetFillColor(kYellow);
 							graphMP2_2sig->SetFillStyle(1001);
 							graphMP2_3sig->SetFillColor(kCyan-9);
