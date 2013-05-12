@@ -419,12 +419,23 @@ void plotMassLog(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 	int ndof_Mass=nBins_Mass-parsFit;  //num of degree of freedom
 	double chi2_Mass=chi2Pre_Mass*ndof_Mass;
 
+	TH1F* pull = new TH1F("pull","pull distribution", 100,-10.,10.);
+	gSystem->mkdir("Fit/pull",kTRUE);
+	TFile *pullFile = new TFile(Form("Fit/pull/pull_rap%d_pt%d_Mass.root",rapBin,ptBin),"RECREATE");
+
 	RooHist* hpull_mass = massFrame->pullHist() ;
 	hpull_mass->SetMarkerSize(0.8);
 	for(int i=0;i<hpull_mass->GetN();i++){
 		hpull_mass->SetPointEYlow(i,0.);
 		hpull_mass->SetPointEYhigh(i,0.);
+		double x,y;
+		hpull_mass->GetPoint(i,x,y);
+		pull->Fill(y);
 	}
+	pullFile->cd();
+	pull->Write();
+	pullFile->Close();
+
 	massFramePull->addPlotable(hpull_mass,"P");
 
 	massPdf->plotOn(massFrame,
@@ -749,13 +760,23 @@ void plotLifeBg(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 	int ndof_LSBL=nBins_LSBL-parsFit;  //num of degree of freedom
 	double chi2_LSBL=chi2Pre_LSBL*ndof_LSBL;
 
+	TH1F* pull = new TH1F("pull","pull distribution", 100,-10.,10.);
+	gSystem->mkdir("Fit/pull",kTRUE);
+	TFile *pullFile_LSB = new TFile(Form("Fit/pull/pull_rap%d_pt%d_LSB.root",rapBin,ptBin),"RECREATE");
+
 	RooHist* hpull_ctauBkgSBL = ctauFrameBkgSBL->pullHist() ;
 	hpull_ctauBkgSBL->SetMarkerSize(0.8);
 	for(int i=0;i<hpull_ctauBkgSBL->GetN();i++){
 		hpull_ctauBkgSBL->SetPointEYlow(i,0.);
 		hpull_ctauBkgSBL->SetPointEYhigh(i,0.);
+		double x,y;
+		hpull_ctauBkgSBL->GetPoint(i,x,y);
+		pull->Fill(y);
 	}
 	cout<<"hpull_ctauBkgSBL->GetN(): "<<hpull_ctauBkgSBL->GetN()<<endl;
+	pullFile_LSB->cd();
+	pull->Write();
+	pullFile_LSB->Close();
 
 	ctauFrameBkgSBLPull->addPlotable(hpull_ctauBkgSBL,"P");
 
@@ -808,12 +829,24 @@ void plotLifeBg(RooWorkspace *ws, int rapBin, int ptBin, int nState){
 	int ndof_LSBR=nBins_LSBR-parsFit;  //num of degree of freedom
 	double chi2_LSBR=chi2Pre_LSBR*ndof_LSBR;
 
+	pull = new TH1F("pull","pull distribution", 100,-10.,10.);
+	gSystem->mkdir("Fit/pull",kTRUE);
+	TFile *pullFile_RSB = new TFile(Form("Fit/pull/pull_rap%d_pt%d_RSB.root",rapBin,ptBin),"RECREATE");
+
 	RooHist* hpull_ctauBkgSBR = ctauFrameBkgSBR->pullHist() ;
 	hpull_ctauBkgSBR->SetMarkerSize(0.8);
 	for(int i=0;i<hpull_ctauBkgSBR->GetN();i++){
 		hpull_ctauBkgSBR->SetPointEYlow(i,0.);
 		hpull_ctauBkgSBR->SetPointEYhigh(i,0.);
+		double x,y;
+		hpull_ctauBkgSBR->GetPoint(i,x,y);
+		pull->Fill(y);
 	}
+
+	pullFile_RSB->cd();
+	pull->Write();
+	pullFile_RSB->Close();
+
 	ctauFrameBkgSBRPull->addPlotable(hpull_ctauBkgSBR,"P");
 
 	backgroundSSD_SBR->plotOn(ctauFrameBkgSBR,

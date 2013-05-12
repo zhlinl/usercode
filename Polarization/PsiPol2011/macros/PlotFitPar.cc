@@ -75,18 +75,19 @@ int main(int argc, char* argv[]){
 		fromSplit("doCtauUncer", arg, doCtauUncer);
 	}
 
-	PlotMassPar(nState);
+	//PlotMassPar(nState);
 	//PlotLifePar(nState);
 	//if(nState==4)
 	//	PlotBFrac_1S(nState);
 	//if(nState==5)
 	//	PlotBFrac_2S(nState);
 
-	//double nSigma=2.5;
-	//if(nState==4) nSigma=2.5;
-	//if(nState==5) nSigma=2.0;
+	double nSigma=3.0;
+	if(nState==4) nSigma=3.0; //2.5
+	if(nState==5) nSigma=3.0; //2.0
+	//nSigma = -1;
 	//evaluateCtauCut(nSigma, nState, 0, doCtauUncer);
-	//evaluateCtauCut(nSigma, nState, 1, doCtauUncer);
+	evaluateCtauCut(nSigma, nState, 1, doCtauUncer);
 
 	return 0;
 }
@@ -320,8 +321,8 @@ void PlotMassPar(int  nState){
 			fracSigInLSBErr[rapBin-1][ptBin-1] = fracBkgInLSBErr[rapBin-1][ptBin-1];
 			fracSigInRSBErr[rapBin-1][ptBin-1] = fracBkgInRSBErr[rapBin-1][ptBin-1];
 
-			fracLSB[rapBin-1][ptBin-1]  = calcuFracL(ws, Mean, SigmaWei);
-			//fracLSB[rapBin-1][ptBin-1]  = 1. - (meanSR - meanSBL)/(meanSBR - meanSBL);
+			//fracLSB[rapBin-1][ptBin-1]  = calcuFracL(ws, Mean, SigmaWei);
+			fracLSB[rapBin-1][ptBin-1]  = 1. - (meanSR - meanSBL)/(meanSBR - meanSBL);
 
 			mean[rapBin-1][ptBin-1] = Mean;
 			sigmaWei[rapBin-1][ptBin-1] = SigmaWei*1000;
@@ -3391,6 +3392,7 @@ void evaluate(double nSigma, int nState, int type, bool doCtauUncer){ // type=0:
 
 			//ctCut define as nSigma * sigma
 			double ctCut = nSigma*l_pdecay;
+			if(nSigma==-1) ctCut = 0.1; //mm
 
 			double ctCutMin=0., ctCutMax=0.;
 			if(type==0) {ctCutMin = -ctCut; ctCutMax = ctCut;}
@@ -3935,6 +3937,8 @@ void plotEval(double nSigma, int nState, int type){
 			//graph_evtBG[rapBin-1] -> RemovePoint(0);
 		}
 
+		//graph_FracNP[rapBin-1] -> SetMarkerColor(kRed+1);
+
 		graph_FracPRRelativeErr[rapBin-1] ->GetYaxis() -> SetRangeUser(0.,50.);
 		graph_FracNPRelativeErr[rapBin-1] ->GetYaxis() -> SetRangeUser(0.,50.);
 		graph_FracBGRelativeErr[rapBin-1] ->GetYaxis() -> SetRangeUser(0.,50.);
@@ -3990,9 +3994,9 @@ void plotEval(double nSigma, int nState, int type){
 	legend_rap1->SetTextFont(42);
 	legend_rap1->SetTextSize(legendsize);
 	legend_rap1->SetBorderSize(0.);
-	legend_rap1->AddEntry(graph_FracPR[0],"P","lp");
-	legend_rap1->AddEntry(graph_FracNP[0],"NP","lp");
-	legend_rap1->AddEntry(graph_FracBG[0],"Bg","lp");
+	legend_rap1->AddEntry(graph_FracPR[0],"Prompt","p");
+	legend_rap1->AddEntry(graph_FracNP[0],"Nonprompt","p");
+	legend_rap1->AddEntry(graph_FracBG[0],"Background","p");
 	//legend_rap1->AddEntry(graph_FracBGNP[0],"Bg+NP","lp");
 
 	TLegend* legend_rap2=new TLegend(blX,blY,trX,trY);
@@ -4001,9 +4005,9 @@ void plotEval(double nSigma, int nState, int type){
 	legend_rap2->SetTextFont(42);
 	legend_rap2->SetTextSize(legendsize);
 	legend_rap2->SetBorderSize(0.);
-	legend_rap2->AddEntry(graph_FracPR[1],"P","lp");
-	legend_rap2->AddEntry(graph_FracNP[1],"NP","lp");
-	legend_rap2->AddEntry(graph_FracBG[1],"Bg","lp");
+	legend_rap2->AddEntry(graph_FracPR[1],"Prompt","p");
+	legend_rap2->AddEntry(graph_FracNP[1],"Nonprompt","p");
+	legend_rap2->AddEntry(graph_FracBG[1],"Nonprompt","p");
 	//legend_rap2->AddEntry(graph_FracBGNP[1],"Bg+NP","lp");
 
 	TLegend* legend_rap3=new TLegend(blX,blY,trX,trY);
@@ -4012,9 +4016,9 @@ void plotEval(double nSigma, int nState, int type){
 	legend_rap3->SetTextSize(legendsize);
 	legend_rap3->SetBorderSize(0.);
 	if(nState==5){
-		legend_rap3->AddEntry(graph_FracPR[2],"P","lp");
-		legend_rap3->AddEntry(graph_FracNP[2],"NP","lp");
-		legend_rap3->AddEntry(graph_FracBG[2],"Bg","lp");
+		legend_rap3->AddEntry(graph_FracPR[2],"Prompt","p");
+		legend_rap3->AddEntry(graph_FracNP[2],"Nonprompt","p");
+		legend_rap3->AddEntry(graph_FracBG[2],"Nonprompt","p");
 		//legend_rap3->AddEntry(graph_FracBGNP[2],"Bg+NP","lp");
 	}
 

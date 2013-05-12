@@ -109,9 +109,10 @@ void createWorkspace(const std::string &infilename, int nState, bool correctCtau
 
 
 	//------------------------------------------------------------------------------------------------------------------
-	//// Define workspace and import datasets
+	// Define workspace and import datasets
 
-	// Get datasets binned in pT an y
+	////Get datasets binned in pT an y
+
 	for(int iRap = 1; iRap <= onia::kNbRapForPTBins; iRap++){ 
 
 		Double_t yMin;
@@ -164,7 +165,7 @@ void createWorkspace(const std::string &infilename, int nState, bool correctCtau
 	////---------------------------------------------------------------
 	if(drawRapPt2D){
 		double yMin = onia::rapForPTRange[0];
-		double yMax = onia::rapForPTRange[onia::kNbRapForPTBins];
+		double yMax = 1.6;//onia::rapForPTRange[onia::kNbRapForPTBins];
 		double ptMin =  onia::pTRange[0][0];
 		double ptMax =  onia::pTRange[0][onia::kNbPTBins[0]];
 

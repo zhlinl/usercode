@@ -199,6 +199,8 @@ void EvaluateEffFileName(int nEff, char EffFileName [200], bool singleLeptonEff)
 		//if(nEff==306 || nEff==316 || nEff==326) sprintf(EffFileName,"rhoFactor_Psi1S_newMC_Luca_21Feb2013.root");
 		//if(nEff==306 || nEff==316 || nEff==326) sprintf(EffFileName,"rhoFactor_Psi1S_combinedMC_Luca_27Feb2013.root");
 		if(nEff==306 || nEff==316 || nEff==326) sprintf(EffFileName,"rhoFactor_Psi1S_combinedMC_leptons_Luca_4March2013.root");
+		if(nEff==307 || nEff==317 || nEff==327) sprintf(EffFileName,"rhoFactor_Psi1S_changedCuts_combinedMC_leptons_Luca_2May2013.root");
+		if(nEff==308 || nEff==318 || nEff==328) sprintf(EffFileName,"rhoFactor_Psi1S_changedCuts_dREllDpt0p18_combinedMC_leptons_Luca_2May2013.root");
 	}
 
 
@@ -246,8 +248,8 @@ double EvaluateRhoFactor( double& costh, double& phi, int nEff, TFile* fInRhoFac
 		Int_t binY = hEff->GetYaxis()->FindBin(phi);
 		eff = hEff->GetBinContent(binX, binY);
 		double effErr = hEff->GetBinError(binX, binY);
-		//cout<<"eff: "<<eff<<endl;
-		//cout<<"effErr: "<<effErr<<endl;
+		//cout<<"0eff: "<<eff<<endl;
+		//cout<<"0effErr: "<<effErr<<endl;
 
 		//apply statistical fluctuations on rho factor
 		if(StatVarRho && eff>0.){
@@ -259,8 +261,8 @@ double EvaluateRhoFactor( double& costh, double& phi, int nEff, TFile* fInRhoFac
 			delete gRandom;
 		}
 
-		//cout<<"eff: "<<eff<<endl;
-		//cout<<"effErr: "<<effErr<<endl;
+		//cout<<"1eff: "<<eff<<endl;
+		//cout<<"1effErr: "<<effErr<<endl;
 		return eff;
 	}
 
@@ -438,6 +440,13 @@ double singleLeptonEfficiency( double& pT, double& eta, int nEff, TFile* fInEff,
 
 
 	if(nEff > 1000){//linear interpolated efficiencies: 1XXnEff (1D) 1XXXnEff (2D)
+
+		////remove 0.2<|eta|<0.3 slice for test
+		//if(TMath::Abs(eta) > 0.2 && TMath::Abs(eta) < 0.3){
+		//	//cout << "|eta|: " << TMath::Abs(eta) << endl;
+		//	//cout << "remove 0.2<|eta|<0.3 slice for test" << endl;
+		//	return 0.;
+		//}
 
 		int binX = hEvalEff->GetXaxis()->FindBin(TMath::Abs(eta));
 		int binY = hEvalEff->GetYaxis()->FindBin(pT);

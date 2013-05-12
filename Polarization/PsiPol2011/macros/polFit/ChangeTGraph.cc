@@ -332,9 +332,9 @@ int main(int argc, char** argv) {
 						//lmean[pt]=lamtildeHX[rapBin-1][pt]-lamtildePX[rapBin-1][pt];
 						//lmean[pt]=lamtildePX[rapBin-1][pt]-lamtildeCS[rapBin-1][pt];
 
-						lmean[pt]=DltildeCS_lmean[pt]-DltildeHX_lmean[pt];
+						//lmean[pt]=DltildeCS_lmean[pt]-DltildeHX_lmean[pt];
 						//lmean[pt]=DltildeHX_lmean[pt]-DltildePX_lmean[pt];
-						//lmean[pt]=DltildePX_lmean[pt]-DltildeCS_lmean[pt];
+						lmean[pt]=DltildePX_lmean[pt]-DltildeCS_lmean[pt];
 
 
 					}
@@ -374,8 +374,6 @@ int main(int argc, char** argv) {
 
 	} //iFrame
 	cout<<"Switching frame"<<endl;
-
-
 
 
 

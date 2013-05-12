@@ -101,13 +101,13 @@ void BinExamplePlots(){
 	int pTmax=10;
 	int rapmin=1;
 	int rapmax=2;
-	int nStatemin=4;
-	int nStatemax=4;
+	int nStatemin=5;
+	int nStatemax=5;
 
 	for(int iState=nStatemin;iState<nStatemax+1;iState++){
 
-		if(iState==4) {pTmin=1; pTmax=12; rapmin=1; rapmax=2;}
-		if(iState==5) {pTmin=1; pTmax=5; rapmin=1; rapmax=3;}
+		if(iState==4) {pTmin=3; pTmax=12; rapmin=1; rapmax=2;}
+		if(iState==5) {pTmin=2; pTmax=5; rapmin=1; rapmax=3;}
 
 		//sprintf(DataID,Form("Psi%dS_3.00Sigma_11Dec2012",iState-3));
 		//sprintf(DataID,Form("Psi%dS_ctauScen0_FracLSB-1_rho_25Feb2013",iState-3));
@@ -122,7 +122,10 @@ void BinExamplePlots(){
 		//sprintf(DataID,Form("Psi%dS_ctauScen0_FracLSB-1_19Mar2013_0FracBg_1BgModel_0Rho",iState-3));
 		//sprintf(DataID,Form("Psi%dS_ctauScen0_FracLSB-1_19Mar2013_1FracBg_0BgModel_0Rho",iState-3));
 		//sprintf(DataID,Form("Psi%dS_ctauScen0_FracLSB-1_19Mar2013_1FracBg_1BgModel_1Rho",iState-3));
-		sprintf(DataID,Form("Psi%dS_ctauScen0_FracLSB-1_19Mar2013_1FracBg_1BgModel_1Rho_AlteredPPD_BKGlinPLUSRestSquaredGauss_5nRand_Apr5",iState-3));
+		//sprintf(DataID,Form("Psi%dS_ctauScen0_FracLSB-1_19Mar2013_1FracBg_1BgModel_1Rho_AlteredPPD_BKGlinPLUSRestSquaredGauss_5nRand_Apr5",iState-3));
+		//sprintf(DataID,Form("Psi%dS_ctauScen3_FracLSB-1_29Apr2013_1FracBg_1BgModel_noRhoPt35",iState-3));
+		///sprintf(DataID,Form("Psi%dS_ctauScen1_FracLSB-1_29Apr2013_1FracBg_1BgModel_noRhoPt35",iState-3));
+		sprintf(DataID,Form("Psi%dS_ctauScen4_FracLSB-1_7May2013_1FracBg_1BgModel",iState-3));
 
 		sprintf(Fig_directory,"FigBuffer/BinExamplePlots/%s",DataID);
 		gSystem->mkdir(Fig_directory,true);

@@ -11,6 +11,7 @@ using namespace std;
 int order(int n);
 int findEvenNum(double number);
 vector<double> calculateInte(RooWorkspace *ws, RooDataSet *dataJpsictErr, double ctCutMin, double ctCutMax);
+vector<double> calculateInteSB(RooWorkspace *ws, RooDataSet *dataJpsictErr, double ctCutMin, double ctCutMax);
 TH2D *subtract2D(TH2D* hist1, TH2D* hist2);
 TH3D *subtract3D(TH3D* hist1, TH3D* hist2);
 TH2D* ReSetBin(TH2D* hist, int nBinX, int nBinY, const std::stringstream& name, const std::stringstream& title);
@@ -240,7 +241,7 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 	double mean_LSB = mean_LSB_ws->getVal();
 	RooRealVar *mean_RSB_ws = (RooRealVar*)ws->var("MeanSBR");
 	double mean_RSB = mean_RSB_ws->getVal();
-	//double fracLSB = 1. - (mean - mean_LSB)/(mean_RSB - mean_LSB);
+	//double fracLSB = 1. - (mean - mean_LSB)/(mean_RSB - mean_LSB); // using the mean value
 	double fracLSB = calcuFracL(ws, mass, sigma); // using the median value
 	if(FracLSB!=-1) fracLSB = double(FracLSB)/100.;
 
@@ -307,6 +308,8 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 	//pseudo-proper decay length
 	double l_pdecay = L_decay * mass / meanPt ;
 
+	cout<<"l_pdecay: "<<l_pdecay<<endl;
+
 	// used before new lifetime model
 	//double l_pdecay = 0., scale = 1.;
 	//if(nState==4) l_pdecay = L_decay * mass / meanPt ;
@@ -322,18 +325,42 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 	if(ctauScen==0){ //default values
 		if(nState==4) nSigma = 2.5;
 		if(nState==5) nSigma = 2.0;
+		cout<<"nSigma: "<<nSigma<<endl;
 	}
 	else if(ctauScen==1){
 		if(nState==4) nSigma = 3.5;
 		if(nState==5) nSigma = 3.0;
+		cout<<"nSigma: "<<nSigma<<endl;
 	}
 	else if(ctauScen==2){
 		if(nState==4) nSigma = 1.5;
 		if(nState==5) nSigma = 1.0;
+		cout<<"nSigma: "<<nSigma<<endl;
+	}
+	else if(ctauScen==4){
+		if(nState==4) nSigma = 1.0;
+		if(nState==5) nSigma = 1.0;
+		cout<<"nSigma: "<<nSigma<<endl;
+	}
+	else if(ctauScen==5){
+		if(nState==4) nSigma = 3.0;
+		if(nState==5) nSigma = 3.0;
+		cout<<"nSigma: "<<nSigma<<endl;
+	}
+	else if(ctauScen==6){
+		if(nState==4) nSigma = 2.0;
+		if(nState==5) nSigma = 2.0;
+		cout<<"nSigma: "<<nSigma<<endl;
+	}
+	else if(ctauScen==7){
+		if(nState==4) nSigma = 3.0;
+		if(nState==5) nSigma = 3.0;
+		cout<<"nSigma: "<<nSigma<<endl;
 	}
 	else{ //default values
 		if(nState==4) nSigma = 2.5;
 		if(nState==5) nSigma = 2.0;
+		cout<<"nSigma: "<<nSigma<<endl;
 	} //more can be added if need
 
 	double ctauCut = nSigma*l_pdecay;
@@ -346,6 +373,7 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 
 	double ctCutMinPR = -ctauCut, ctCutMaxPR = ctauCut;
 	double ctCutMinNP =  ctauCut, ctCutMaxNP = 6.;
+	if(ctauScen==7){ ctCutMinNP = 5. * l_pdecay; }
 
 
 	// histogram method
@@ -354,6 +382,14 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 	//double fPinP  = InteRltsPR[0];
 	//double fNPinP = InteRltsPR[1];
 	//double fBGinP = InteRltsPR[2];
+
+	//vector<double> InteRltsSB = calculateInteSB(ws,dataJpsictErr,ctCutMinPR,ctCutMaxPR);
+  //double fBkgLSBtotInP = InteRltsSB[2];
+	//double fBkgLSBinP    = InteRltsSB[0];
+	//double fBkgRSBtotInP = InteRltsSB[3];
+	//double fBkgRSBinP    = InteRltsSB[1];
+	//double fSRinPLSB = 1 - (fBkgLSBinP * fBkgLSB)/fBkgLSBtotInP;
+	//double fSRinPRSB = 1 - (fBkgRSBinP * fBkgRSB)/fBkgRSBtotInP;
 
 	// integral method
 	// calculate fractions in the prompt signal region
@@ -1648,6 +1684,78 @@ vector<double> calculateInte(RooWorkspace *ws, RooDataSet *dataJpsictErr, double
 	return InteRlts;
 }
 
+vector<double> calculateInteSB(RooWorkspace *ws, RooDataSet *dataJpsictErr, double ctCutMin, double ctCutMax){
+
+	double ctMin = -2., ctMax = 6.;
+	int fineBins = 8000;
+
+	RooAbsPdf *BGpdfLSB = (RooAbsPdf*)ws->pdf("backgroundlifetimeLpre");
+	RooAbsPdf *LSBpdf = (RooAbsPdf*)ws->pdf("backgroundlifetimeL");
+	RooAbsPdf *BGpdfRSB = (RooAbsPdf*)ws->pdf("backgroundlifetimeRpre");
+	RooAbsPdf *RSBpdf = (RooAbsPdf*)ws->pdf("backgroundlifetimeR");
+
+	RooRealVar *Jpsict = ws->var("Jpsict");
+	RooRealVar *JpsictErr = ws->var("JpsictErr");
+	Jpsict->setMin(ctMin);
+	Jpsict->setMax(ctMax);
+
+	RooDataSet *genDataBGLSB = BGpdfLSB->generate(*Jpsict,ProtoData(*dataJpsictErr));
+	RooDataSet *genDataBGRSB = BGpdfRSB->generate(*Jpsict,ProtoData(*dataJpsictErr));
+	RooDataSet *genDataLSB   = LSBpdf  ->generate(*Jpsict,ProtoData(*dataJpsictErr));
+	RooDataSet *genDataRSB   = RSBpdf  ->generate(*Jpsict,ProtoData(*dataJpsictErr));
+	
+	TH2F* histBGLSB2D = (TH2F*)genDataBGLSB->createHistogram("histBGLSB2D",*Jpsict,Binning(fineBins),
+			YVar(*JpsictErr,Binning(fineBins/10)));
+	TH1F* histBGLSB   = (TH1F*)histBGLSB2D->ProjectionX();
+	TH2F* histBGRSB2D = (TH2F*)genDataBGRSB->createHistogram("histBGRSB2D",*Jpsict,Binning(fineBins),
+			YVar(*JpsictErr,Binning(fineBins/10)));
+	TH1F* histBGRSB   = (TH1F*)histBGRSB2D->ProjectionX();
+	TH2F* histLSB2D = (TH2F*)genDataLSB->createHistogram("histLSB2D",*Jpsict,Binning(fineBins),
+			YVar(*JpsictErr,Binning(fineBins/10)));
+	TH1F* histLSB   = (TH1F*)histLSB2D->ProjectionX();
+	TH2F* histRSB2D = (TH2F*)genDataRSB->createHistogram("histRSB2D",*Jpsict,Binning(fineBins),
+			YVar(*JpsictErr,Binning(fineBins/10)));
+	TH1F* histRSB   = (TH1F*)histRSB2D->ProjectionX();
+
+	histBGLSB->Scale(1./(1.*histBGLSB->Integral()));
+	histBGRSB->Scale(1./(1.*histBGRSB->Integral()));
+	histLSB->Scale(1./(1.*histLSB->Integral()));
+	histRSB->Scale(1./(1.*histRSB->Integral()));
+
+	int BinLow = 0, BinHigh = 0;
+	bool getLow = false, getHigh = false;
+	for(int bin = 0; bin < fineBins; bin++){
+		if(ctCutMin > histBGLSB->GetBinLowEdge(bin) && ctCutMin < histBGLSB->GetBinLowEdge(bin+1)){
+			BinLow = bin; getLow = true;}
+		if(ctCutMax > histBGLSB->GetBinLowEdge(bin) && ctCutMax < histBGLSB->GetBinLowEdge(bin+1)){
+			BinHigh = bin; getHigh = true;}
+		if(getLow && getHigh) break;
+	}
+
+	double InteBGLSB  = histBGLSB->Integral(BinLow,BinHigh);
+	double InteBGRSB  = histBGRSB->Integral(BinLow,BinHigh);
+	double InteLSB    = histLSB  ->Integral(BinLow,BinHigh);
+	double InteRSB    = histRSB  ->Integral(BinLow,BinHigh);
+
+	vector<double> InteRlts;
+	InteRlts.push_back(InteBGLSB);
+	InteRlts.push_back(InteBGRSB);
+	InteRlts.push_back(InteLSB);
+	InteRlts.push_back(InteRSB);
+
+	delete histBGLSB;
+	delete histBGRSB;
+	delete histLSB;
+	delete histRSB;
+	delete histBGLSB2D;
+	delete histBGRSB2D;
+	delete histLSB2D;
+	delete histRSB2D;
+
+	return InteRlts;
+}
+
+//=================================================
 //=================================================
 // manual subtraction
 TH3D *subtract3D(TH3D* hist1, TH3D* hist2){

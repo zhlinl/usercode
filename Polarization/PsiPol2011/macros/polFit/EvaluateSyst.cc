@@ -103,7 +103,16 @@ int main(int argc, char* argv[]) {
 	outfilename << basedir.c_str() << "/macros/polFit/" << SystDir.c_str() << "/TGraphResults_Psi" << nState-3 << "S.root";
 	TFile *outfile = new TFile(outfilename.str().c_str(),"RECREATE");
 
+	//select the largest difference of RellCut to Default in 3 pT and 2 y bin, for each parameter(6) and framea(3)
+	double lambdaHighest[18];
+	double lambdaHighestVal[18] = {
+		0.0712449 , 0.0414536 , 0.0212121 , 0.473577 , 0.0698799 , 0.0878234 , 
+		0.0748523 , 0.021685 ,  0.0225437 , 0.878433 , 0.0601865 , 0.0896022 , 
+		0.076699 ,  0.0226398 , 0.0230012 , 0.876299 , 0.0595996 , 0.105166
+	};
+
 	for(int iLam = 1; iLam < 19; iLam++){
+
 		for(int rapBin = rapBinMin; rapBin < rapBinMax+1; rapBin++){
 
 			// get graphs from file
@@ -195,6 +204,12 @@ int main(int argc, char* argv[]) {
 				//lmean[pt]=fabs(lmean1[pt]-lmean2[pt])/2.;
 				//lmean[pt]=fabs(lmean1[pt]-lmean2[pt])/TMath::Sqrt(12);
 				//lmean[pt]=fabs(lmean1[pt]-lmean2[pt]);
+
+				if(pt>8){
+					if(lambdaHighest[iLam-1]<lmean[pt]) lambdaHighest[iLam-1]=lmean[pt];
+					//lmean[pt]=lambdaHighestVal[iLam-1];
+				}
+
 				if(TU){
 					double error1 = (lmeanErr1_low[pt] + lmeanErr1_high[pt])/2;
 					double error2 = (lmeanErr2_low[pt] + lmeanErr2_high[pt])/2;
@@ -264,6 +279,9 @@ int main(int argc, char* argv[]) {
 		}// iRap
 	} // iLam
 
+	for(int iLam=1; iLam<19; iLam++){
+		cout<<"lambdaHighest["<<iLam<<"]: "<<lambdaHighest[iLam-1]<<endl;
+	}
 	outfile->Write();
 	std::cout << "new TGraphResults written" << std::endl;
 	outfile->Close();

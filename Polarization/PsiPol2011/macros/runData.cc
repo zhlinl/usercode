@@ -78,7 +78,9 @@ int main(int argc, char* argv[]){
     bool
         rejectCowboys = true,
         MC=false,
-        RequestTrigger=false;
+        RequestTrigger=false,
+				removeEta0p2_0p3=false,
+				cutDeltaREllDpt=false;
     std::vector<std::string> inputTrees;
     int
         FidCuts = 999,
@@ -91,6 +93,8 @@ int main(int argc, char* argv[]){
         fromSplit("rejectCowboys", arg, rejectCowboys);
         fromSplit("MC", arg, MC);                
         fromSplit("RequestTrigger", arg, RequestTrigger);
+        fromSplit("removeEta0p2_0p3", arg, removeEta0p2_0p3);
+        fromSplit("cutDeltaREllDpt", arg, cutDeltaREllDpt);
         fromSplit("FidCuts", arg, FidCuts);
         fromSplit("nState", arg, nState);
         std::string str;
@@ -118,7 +122,7 @@ int main(int argc, char* argv[]){
   PolData treeReco(tree);
   BookHistosReco(nState);
   printf("after booking of histo\n");
-  treeReco.Loop(nState, rejectCowboys, FidCuts, MC, RequestTrigger);
+  treeReco.Loop(nState, rejectCowboys, FidCuts, MC, RequestTrigger, removeEta0p2_0p3, cutDeltaREllDpt);
   printf("writing out the histograms\n");
   WriteHistosReco(fNameOut.c_str());
 

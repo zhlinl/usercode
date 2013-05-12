@@ -233,13 +233,16 @@ void polFit(int n_sampledPoints=1,
 		int nDenominatorAmap=999,
 		bool StatVarTotBGfraction=false,
 		bool StatVarTotBGmodel=false,
-		bool StatVarRho=false){
+		bool StatVarRho=false,
+		bool cutDeltaREllDpt=false){
 
 	cout<<"/////////////////////////////////"<<endl;
 	cout<<"running polFit.C ........////////"<<endl;
 	cout<<"/////////////////////////////////"<<endl;
 
   gROOT->Reset();
+
+	double DeltaREllDptValue = 0.18;
 
   delete gRandom;
 
@@ -855,8 +858,29 @@ void polFit(int n_sampledPoints=1,
 //    cout<<"costh_HX = "<<costh_HX<<", phi_HX = "<<phi_HX<<endl;
 //    cout<<"costh_PX = "<<costh_PX<<", phi_PX = "<<phi_PX<<endl;
 
-    bool isEventAccepted = isMuonInAcceptance( FidCuts-1, lepP_pT, lepP_eta )
-                         * isMuonInAcceptance( FidCuts-1, lepN_pT, lepN_eta );
+    //bool isEventAccepted = isMuonInAcceptance( FidCuts-1, lepP_pT, lepP_eta )
+    //                    * isMuonInAcceptance( FidCuts-1, lepN_pT, lepN_eta ); 
+
+		double deltaPhi = lepN.Phi() - lepP.Phi();
+		if(deltaPhi > TMath::Pi()) deltaPhi -= 2.*TMath::Pi();
+		else if(deltaPhi < -TMath::Pi()) deltaPhi += 2.*TMath::Pi();
+		double deltaEta = lepN_eta - lepP_eta; 
+		double deltaPT  = lepN_pT  - lepP_pT ;
+		double deltaREll = TMath::Sqrt(deltaEta*deltaEta + TMath::Power(1.2*deltaPhi,2));
+		double deltaREllDpt = TMath::Sqrt(deltaREll*deltaREll + TMath::Power(0.00157*deltaPT,2));
+
+		bool accept = isMuonInAcceptance( FidCuts-1, lepP_pT, lepP_eta )
+		 	* isMuonInAcceptance( FidCuts-1, lepN_pT, lepN_eta );
+		bool isEventAccepted = false;
+		if(accept && (!cutDeltaREllDpt || (cutDeltaREllDpt && deltaREllDpt > DeltaREllDptValue) )) isEventAccepted = true;
+
+		//if(deltaREllDpt<DeltaREllDptValue)
+		// 	cout<<"1: deltaREllDpt: "<<deltaREllDpt<<endl;
+		//if(accept && !isEventAccepted){
+		//	cout<<"accept: "<<accept<<endl;
+		//	cout<<"isEventAccepted: "<<isEventAccepted<<endl;
+		//}
+
 
     double epsilon = singleLeptonEfficiency( lepP_pT, lepP_eta, nEff, fInEff, hEvalEff, MCeff, TEff)
                    * singleLeptonEfficiency( lepN_pT, lepN_eta, nEff, fInEff, hEvalEff, MCeff, TEff);
@@ -1122,8 +1146,28 @@ void polFit(int n_sampledPoints=1,
 
     // acceptance:
 
-    bool isEventAccepted = isMuonInAcceptance( FidCuts-1, lepP_pT, lepP_eta )
-                         * isMuonInAcceptance( FidCuts-1, lepN_pT, lepN_eta );
+    //bool isEventAccepted = isMuonInAcceptance( FidCuts-1, lepP_pT, lepP_eta )
+    //                     * isMuonInAcceptance( FidCuts-1, lepN_pT, lepN_eta );
+		
+		double deltaPhi = lepN->Phi() - lepP->Phi();
+		if(deltaPhi > TMath::Pi()) deltaPhi -= 2.*TMath::Pi();
+		else if(deltaPhi < -TMath::Pi()) deltaPhi += 2.*TMath::Pi();
+		double deltaEta = lepN_eta - lepP_eta; 
+		double deltaPT  = lepN_pT  - lepP_pT ;
+		double deltaREll = TMath::Sqrt(deltaEta*deltaEta + TMath::Power(1.2*deltaPhi,2));
+		double deltaREllDpt = TMath::Sqrt(deltaREll*deltaREll + TMath::Power(0.00157*deltaPT,2));
+
+		bool accept = isMuonInAcceptance( FidCuts-1, lepP_pT, lepP_eta )
+		 	* isMuonInAcceptance( FidCuts-1, lepN_pT, lepN_eta );
+		bool isEventAccepted = false;
+		if(accept && (!cutDeltaREllDpt || (cutDeltaREllDpt && deltaREllDpt > DeltaREllDptValue) )) isEventAccepted = true;
+
+		//if(deltaREllDpt<DeltaREllDptValue)
+		// 	cout<<"2: deltaREllDpt: "<<deltaREllDpt<<endl;
+		//if(accept && !isEventAccepted){
+		//	cout<<"accept: "<<accept<<endl;
+		//	cout<<"isEventAccepted: "<<isEventAccepted<<endl;
+		//}
 
     if ( epsilon > min_dileptonEff && isEventAccepted ) {
 
@@ -1414,17 +1458,17 @@ void polFit(int n_sampledPoints=1,
 			double binError_costhphiPX  = background_costhphiPX->GetBinError  ( ibin_costhPX, ibin_phiPX );
 			double binContent_pTrapMass = background_pTrapMass->GetBinContent( ibin_pT, ibin_rap, ibin_mass );
 			double binError_pTrapMass   = background_pTrapMass->GetBinError   ( ibin_pT, ibin_rap, ibin_mass );
-			cout << "binContent_costhphiPX:" << binContent_costhphiPX << " binError_costhphiPX:" << binError_costhphiPX << endl;
-			cout << "binContent_pTrapMass:" << binContent_pTrapMass << " binError_pTrapMass:" << binError_pTrapMass << endl;
+			//cout << "binContent_costhphiPX:" << binContent_costhphiPX << " binError_costhphiPX:" << binError_costhphiPX << endl;
+			//cout << "binContent_pTrapMass:" << binContent_pTrapMass << " binError_pTrapMass:" << binError_pTrapMass << endl;
 
 
 			double nPoisson_costhphiPX  = TMath::Power( binContent_costhphiPX / binError_costhphiPX , 2 );
 			double nPoisson_pTrapMass   = TMath::Power( binContent_pTrapMass  / binError_pTrapMass  , 2 );
-			cout << "nPoisson_costhphiPX: " << nPoisson_costhphiPX << " nPoisson_pTrapMass:" << nPoisson_pTrapMass << endl;
+			//cout << "nPoisson_costhphiPX: " << nPoisson_costhphiPX << " nPoisson_pTrapMass:" << nPoisson_pTrapMass << endl;
 
 			double rnd_costhphiPX = gRandom -> Poisson( nPoisson_costhphiPX );
 			double rnd_pTrapMass  = gRandom -> Poisson( nPoisson_pTrapMass  );
-			cout << "rnd_costhphiPX: " << rnd_costhphiPX << " rnd_pTrapMass:" << rnd_pTrapMass << endl;
+			//cout << "rnd_costhphiPX: " << rnd_costhphiPX << " rnd_pTrapMass:" << rnd_pTrapMass << endl;
 
 			likelihood_BG = likelihood_BG * rnd_costhphiPX * rnd_pTrapMass / ( nPoisson_costhphiPX * nPoisson_pTrapMass ) ;
 
@@ -1491,8 +1535,28 @@ void polFit(int n_sampledPoints=1,
 
     // acceptance:
 
-    bool isEventAccepted = isMuonInAcceptance( FidCuts-1, lepP_pT, lepP_eta )
-                         * isMuonInAcceptance( FidCuts-1, lepN_pT, lepN_eta );
+    //bool isEventAccepted = isMuonInAcceptance( FidCuts-1, lepP_pT, lepP_eta )
+    //                     * isMuonInAcceptance( FidCuts-1, lepN_pT, lepN_eta );
+
+		double deltaPhi = lepN->Phi() - lepP->Phi();
+		if(deltaPhi > TMath::Pi()) deltaPhi -= 2.*TMath::Pi();
+		else if(deltaPhi < -TMath::Pi()) deltaPhi += 2.*TMath::Pi();
+		double deltaEta = lepN_eta - lepP_eta; 
+		double deltaPT  = lepN_pT  - lepP_pT ;
+		double deltaREll = TMath::Sqrt(deltaEta*deltaEta + TMath::Power(1.2*deltaPhi,2));
+		double deltaREllDpt = TMath::Sqrt(deltaREll*deltaREll + TMath::Power(0.00157*deltaPT,2));
+
+		bool accept = isMuonInAcceptance( FidCuts-1, lepP_pT, lepP_eta )
+		 	* isMuonInAcceptance( FidCuts-1, lepN_pT, lepN_eta );
+		bool isEventAccepted = false;
+		if(accept && (!cutDeltaREllDpt || (cutDeltaREllDpt && deltaREllDpt > DeltaREllDptValue) )) isEventAccepted = true;
+
+		//if(deltaREllDpt<DeltaREllDptValue)
+		// 	cout<<"3: deltaREllDpt: "<<deltaREllDpt<<endl;
+		//if(accept && !isEventAccepted){
+		//	cout<<"accept: "<<accept<<endl;
+		//	cout<<"isEventAccepted: "<<isEventAccepted<<endl;
+		//}
 
 //    double additionalPtCut=0;
 //    if( lepP_pT < additionalPtCut || lepN_pT < additionalPtCut ) continue;
@@ -1850,8 +1914,28 @@ void polFit(int n_sampledPoints=1,
     double lepP_eta = lepP->PseudoRapidity();
     double lepN_eta = lepN->PseudoRapidity();
 
-    bool isEventAccepted = isMuonInAcceptance( FidCuts-1, lepP_pT, lepP_eta )
-                         * isMuonInAcceptance( FidCuts-1, lepN_pT, lepN_eta );
+    //bool isEventAccepted = isMuonInAcceptance( FidCuts-1, lepP_pT, lepP_eta )
+    //                     * isMuonInAcceptance( FidCuts-1, lepN_pT, lepN_eta );
+
+		double deltaPhi = lepN->Phi() - lepP->Phi();
+		if(deltaPhi > TMath::Pi()) deltaPhi -= 2.*TMath::Pi();
+		else if(deltaPhi < -TMath::Pi()) deltaPhi += 2.*TMath::Pi();
+		double deltaEta = lepN_eta - lepP_eta; 
+		double deltaPT  = lepN_pT  - lepP_pT ;
+		double deltaREll = TMath::Sqrt(deltaEta*deltaEta + TMath::Power(1.2*deltaPhi,2));
+		double deltaREllDpt = TMath::Sqrt(deltaREll*deltaREll + TMath::Power(0.00157*deltaPT,2));
+
+		bool accept = isMuonInAcceptance( FidCuts-1, lepP_pT, lepP_eta )
+		 	* isMuonInAcceptance( FidCuts-1, lepN_pT, lepN_eta );
+		bool isEventAccepted = false;
+		if(accept && (!cutDeltaREllDpt || (cutDeltaREllDpt && deltaREllDpt > DeltaREllDptValue) )) isEventAccepted = true;
+
+		//if(deltaREllDpt<DeltaREllDptValue)
+		// 	cout<<"4: deltaREllDpt: "<<deltaREllDpt<<endl;
+		//if(accept && !isEventAccepted){
+		//	cout<<"accept: "<<accept<<endl;
+		//	cout<<"isEventAccepted: "<<isEventAccepted<<endl;
+		//}
 
     double epsilon = singleLeptonEfficiency( lepP_pT, lepP_eta, nEff, fInEff, hEvalEff, MCeff, TEff)
                    * singleLeptonEfficiency( lepN_pT, lepN_eta, nEff, fInEff, hEvalEff, MCeff, TEff);

@@ -17,7 +17,7 @@ TTree *treeOut;
 TLorentzVector *lepP, *lepN, *jpsi;
 
 
-void PolData::Loop(int nState, bool rejectCowboys, int FidCuts, bool MC, bool RequestTrigger)
+void PolData::Loop(int nState, bool rejectCowboys, int FidCuts, bool MC, bool RequestTrigger, bool removeEta0p2_0p3, bool cutDeltaREllDpt)
 {
 	if (fChain == 0) return;
 
@@ -189,7 +189,7 @@ void PolData::Loop(int nState, bool rejectCowboys, int FidCuts, bool MC, bool Re
 		massMax = onia::massMax;
 		if(onia_mass < massMin || onia_mass > massMax) continue;   
 		// count events after restriction in mass
-		Reco_StatEv->Fill(5.5);
+		Reco_StatEv->Fill(4.5);
 
 		//apply fiducial cuts
 		bool muonsInAcc = kFALSE;
@@ -200,6 +200,27 @@ void PolData::Loop(int nState, bool rejectCowboys, int FidCuts, bool MC, bool Re
 		if(!muonsInAcc) continue;
 		// count events after fiducial cuts
 		Reco_StatEv->Fill(5.5);
+
+		if(removeEta0p2_0p3)
+			if( (TMath::Abs(etaMuPos) > 0.2 && TMath::Abs(etaMuPos) < 0.3) || 
+					(TMath::Abs(etaMuNeg) > 0.2 && TMath::Abs(etaMuNeg) < 0.3) )
+				continue;
+
+		Reco_StatEv->Fill(6.5);
+
+
+		double deltaEta = etaMuNeg - etaMuPos;
+		double deltaPT = pTMuNeg - pTMuPos;
+		double deltaREll = TMath::Sqrt(deltaEta*deltaEta + TMath::Power(1.2*deltaPhi,2));
+		double deltaREllDpt = TMath::Sqrt(deltaREll*deltaREll + TMath::Power(0.00157*deltaPT,2));
+
+		if(cutDeltaREllDpt){
+			if(onia_pt>35. && onia_pt<40. && deltaREllDpt<0.18) continue;
+			if(onia_pt>40. && onia_pt<50. && deltaREllDpt<0.16) continue;
+			if(onia_pt>50. && onia_pt<70. && deltaREllDpt<0.14) continue;
+		}
+
+		Reco_StatEv->Fill(7.5);
 
 		// filling mass, pt and y histograms
 		// indices [0] contain all events while [1], etc. show events according to the pt and y bin
