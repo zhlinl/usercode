@@ -61,16 +61,18 @@ void ScaleMCtruth(){
 	char EffFileData[200];
 	char graphName[200];
 
-	sprintf(EffFile,"EffFiles/singleMuTruthEff_7March2012_40GeVrap1_TnPBins.root");
+	sprintf(EffFile,"EffFiles/singleMuTruthEff_30April2013_40GeVrap1_startFromTracks_noKinemCuts_Dimuon0JpsiNoVertexing_GENvariables.root");
+	//sprintf(EffFile,"EffFiles/singleMuTruthEff_7March2012_40GeVrap1_TnPBins.root");
 	sprintf(EffFileData,"EffFiles/EfficiencyFactorized_Dimuon0Jpsi_combined_DATA_MC_Trk80Cuts_14Mar2012.root");
-	//	  sprintf(EffFileData,"EffFiles/EfficiencyFactorized_Dimuon0Jpsi_combinedMC_DATA_run1_Trk80Cuts_scaled_14June2012.root");
-	//	  sprintf(EffFileData,"EffFiles/EfficiencyFactorized_Dimuon0Jpsi_combinedMC_DATA_run1_Trk80Cuts_scaled_sanity_drM1_newFactor_21June2012.root");
-	//	  sprintf(EffFileData,"EffFiles/EfficiencyFactorized_Dimuon0Jpsi_combinedMC_DATA_run1_Trk80Cuts_scaled_sanity_Mixed_24June2012.root");
+	//sprintf(EffFileData,"EffFiles/EfficiencyFactorized_Dimuon0Jpsi_combinedMC_DATA_run1_Trk80Cuts_scaled_14June2012.root");
+	//sprintf(EffFileData,"EffFiles/EfficiencyFactorized_Dimuon0Jpsi_combinedMC_DATA_run1_Trk80Cuts_scaled_sanity_drM1_newFactor_21June2012.root");
+	//sprintf(EffFileData,"EffFiles/EfficiencyFactorized_Dimuon0Jpsi_combinedMC_DATA_run1_Trk80Cuts_scaled_sanity_Mixed_24June2012.root");
 
 	char Date[100];
 	sprintf(Date,"May20");
 	char JobID[200];
-	sprintf(JobID,"June27_SOFT_Approval_changedScaling");
+	sprintf(JobID,"May20_GENvariables");
+	//sprintf(JobID,"June27_SOFT_Approval_changedScaling");
 	char filename[200];
 	sprintf(filename,"Scaling/%s",JobID);
 	gSystem->mkdir("Scaling");
@@ -155,14 +157,14 @@ void ScaleMCtruth(){
 		}
 
 		ptCentre[nBinspT-1]=100;
-		//			  effMean[nBinspT-1] = meanEffAbove20GeV;
+		//effMean[nBinspT-1] = meanEffAbove20GeV;
 		effMean[nBinspT-1] = effMean[nBinspT-2];
 		err_effMean_low[nBinspT-1] = 0;
 		err_effMean_high[nBinspT-1] = 0;
 
 
 		TGraphAsymmErrors *graphMC = new TGraphAsymmErrors(nBinspT,ptCentre,effMean,0,0,err_effMean_low,err_effMean_high);
-		//		 	graphMC->SaveAs("graphMC.root");
+		//graphMC->SaveAs("graphMC.root");
 
 		bool removeStrangePoints=false;
 		if(removeStrangePoints){

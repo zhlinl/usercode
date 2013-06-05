@@ -101,7 +101,7 @@ void BinExamplePlots(){
 	int pTmax=10;
 	int rapmin=1;
 	int rapmax=2;
-	int nStatemin=5;
+	int nStatemin=4;
 	int nStatemax=5;
 
 	for(int iState=nStatemin;iState<nStatemax+1;iState++){
@@ -125,7 +125,11 @@ void BinExamplePlots(){
 		//sprintf(DataID,Form("Psi%dS_ctauScen0_FracLSB-1_19Mar2013_1FracBg_1BgModel_1Rho_AlteredPPD_BKGlinPLUSRestSquaredGauss_5nRand_Apr5",iState-3));
 		//sprintf(DataID,Form("Psi%dS_ctauScen3_FracLSB-1_29Apr2013_1FracBg_1BgModel_noRhoPt35",iState-3));
 		///sprintf(DataID,Form("Psi%dS_ctauScen1_FracLSB-1_29Apr2013_1FracBg_1BgModel_noRhoPt35",iState-3));
-		sprintf(DataID,Form("Psi%dS_ctauScen4_FracLSB-1_7May2013_1FracBg_1BgModel",iState-3));
+		//sprintf(DataID,Form("Psi%dS_ctauScen5_FracLSB-1_7May2013_1FracBg_1BgModel",iState-3));
+		//sprintf(DataID,Form("Psi%dS_ctauScen0_FracLSB75_19Mar2013_1FracBg_1BgModel_1Rho",iState-3));
+		//sprintf(DataID,Form("Psi%dS_ctauScen5_FracLSB25_7May2013_1FracBg_1BgModel",iState-3));
+		//sprintf(DataID,Form("Psi%dS_ctauScen5_FracLSB-1_22May2013_1FracBg_1BgModel_newEff",iState-3));
+		sprintf(DataID,Form("Psi%dS_ctauScen5_FracLSB-1_26May2013_1FracBg_1BgModel_1RhoAll",iState-3));
 
 		sprintf(Fig_directory,"FigBuffer/BinExamplePlots/%s",DataID);
 		gSystem->mkdir(Fig_directory,true);

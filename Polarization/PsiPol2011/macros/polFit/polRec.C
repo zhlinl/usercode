@@ -49,6 +49,7 @@ void polRec(double rapdilepton_min = 1,
 		bool useAmapApproach=false,
 		int nAmap=999,
 		int nDenominatorAmap=999,
+		bool StatVarTotBGfraction=false,
 		bool StatVarRho=false){
 
 	cout<<"/////////////////////////////////"<<endl;
@@ -511,6 +512,10 @@ void polRec(double rapdilepton_min = 1,
 
 
 	background_fraction->SetBinContent( 1, f_BG );
+	if(StatVarTotBGfraction)
+		background_fraction->SetBinError( 1,  ToyMC::fracBackgrounderr[rapBin-1][pTbin-1]);
+	else
+		background_fraction->SetBinError( 1,  0.);
 
 	double effFrac=(double(numEvts-rejected))/double(numEvts);
 

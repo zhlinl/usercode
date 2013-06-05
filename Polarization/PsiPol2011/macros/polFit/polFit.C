@@ -240,6 +240,8 @@ void polFit(int n_sampledPoints=1,
 	cout<<"running polFit.C ........////////"<<endl;
 	cout<<"/////////////////////////////////"<<endl;
 
+	bool PhiHX_test = true;
+
   gROOT->Reset();
 
 	double DeltaREllDptValue = 0.18;
@@ -358,6 +360,7 @@ void polFit(int n_sampledPoints=1,
 				if(hEvalEff1D->GetXaxis()->GetBinCenter(etaBin+1)>etaBinningParametrized[etaSearch] && hEvalEff1D->GetXaxis()->GetBinCenter(etaBin+1)<etaBinningParametrized[etaSearch+1])
 					currentEtaBin=etaSearch+1;
 			}
+			//cout<<"debug--currentEtaBin: "<<currentEtaBin<<endl;
 			sprintf(graphName,"gEff_DATA_PT_AETA%d",currentEtaBin-1);
 			TGraphAsymmErrors *graph = new TGraphAsymmErrors(*((TGraphAsymmErrors *) fInEff->Get(graphName)));
 
@@ -554,6 +557,7 @@ void polFit(int n_sampledPoints=1,
 	if(StatVarTotBGfraction && f_background>0.){
 		double  f_backgroundPre    = background_fraction->GetBinContent( 1 );
 		double  f_backgroundPreErr = background_fraction->GetBinError(1);
+		cout << "f_backgroundErr: " << f_backgroundPreErr << endl;
 
 		do {
 			f_background = gRandom->Gaus( f_backgroundPre, f_backgroundPreErr );
@@ -834,6 +838,8 @@ void polFit(int n_sampledPoints=1,
     if ( costh_HX > 0. ) phith_HX = phi_HX - 45.;
     if ( phith_HX < -180. ) phith_HX = 360. + phith_HX;
 
+		//PhiHX test
+		//if(PhiHX_test) { if(phi_HX>80. || phi_HX<91.) continue; }
 
     // PERPENDICULAR HELICITY frame angles:
 
@@ -1087,6 +1093,8 @@ void polFit(int n_sampledPoints=1,
     if ( costh_HX > 0. ) phith_HX = phi_HX - 45.;
     if ( phith_HX < -180. ) phith_HX = 360. + phith_HX;
 
+		//PhiHX test
+		//if(PhiHX_test) { if(phi_HX>80. || phi_HX<91.) continue; }
 
     // PERPENDICULAR HELICITY frame angles:
 
@@ -1412,6 +1420,8 @@ void polFit(int n_sampledPoints=1,
     if ( costh_HX > 0. ) phith_HX = phi_HX - 45.;
     if ( phith_HX < -180. ) phith_HX = 360. + phith_HX;
 
+		//PhiHX test
+		//if(PhiHX_test) { if(phi_HX>80. || phi_HX<91.) continue; }
 
     // PERPENDICULAR HELICITY frame angles:
 
@@ -1870,6 +1880,8 @@ void polFit(int n_sampledPoints=1,
     if ( costh_HX > 0. ) phith_HX = phi_HX - 45.;
     if ( phith_HX < -180. ) phith_HX = 360. + phith_HX;
 
+		//PhiHX test
+		//if(PhiHX_test) { if(phi_HX>80. || phi_HX<91.) continue; }
 
     // PERPENDICULAR HELICITY frame
 

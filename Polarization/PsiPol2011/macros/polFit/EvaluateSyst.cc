@@ -103,13 +103,23 @@ int main(int argc, char* argv[]) {
 	outfilename << basedir.c_str() << "/macros/polFit/" << SystDir.c_str() << "/TGraphResults_Psi" << nState-3 << "S.root";
 	TFile *outfile = new TFile(outfilename.str().c_str(),"RECREATE");
 
-	//select the largest difference of RellCut to Default in 3 pT and 2 y bin, for each parameter(6) and framea(3)
+	//high pT rho uncertainty ( pT > 35 GeV ): 
+	/////select the largest difference of RellCut to Default in 3 pT and 2 y bin, for each parameter(6) and frame(3)
 	double lambdaHighest[18];
 	double lambdaHighestVal[18] = {
 		0.0712449 , 0.0414536 , 0.0212121 , 0.473577 , 0.0698799 , 0.0878234 , 
 		0.0748523 , 0.021685 ,  0.0225437 , 0.878433 , 0.0601865 , 0.0896022 , 
 		0.076699 ,  0.0226398 , 0.0230012 , 0.876299 , 0.0595996 , 0.105166
 	};
+
+	//low pT rho uncertainty ( 1S: pT < 35 GeV, 2S: all pT ): 
+	////select the 1*rms of histogram integrating 7 pt x 2 rap bins of 1S, 4 pt x 3 rap bins of 2S
+	double lambdaLowPt[18] = {
+		0.0293649 , 0.0252533  , 0.0139001 , 0.04012   , 0.00448195 , 0.0482119 ,
+		0.0443217 , 0.0120432  , 0.0149671 , 0.0390512 , 0.00464494 , 0.0463249 ,
+		0.0465078 , 0.00993849 , 0.0137137 , 0.0391363 , 0.00473978 , 0.0470386
+	};
+
 
 	for(int iLam = 1; iLam < 19; iLam++){
 
@@ -204,11 +214,15 @@ int main(int argc, char* argv[]) {
 				//lmean[pt]=fabs(lmean1[pt]-lmean2[pt])/2.;
 				//lmean[pt]=fabs(lmean1[pt]-lmean2[pt])/TMath::Sqrt(12);
 				//lmean[pt]=fabs(lmean1[pt]-lmean2[pt]);
+				//lmean[pt] = lmean[pt] * lmean[pt] ;
 
+				//lmean[pt] = lambdaLowPt[iLam-1] ;
 				if(pt>8){
-					if(lambdaHighest[iLam-1]<lmean[pt]) lambdaHighest[iLam-1]=lmean[pt];
-					//lmean[pt]=lambdaHighestVal[iLam-1];
+					if(lambdaHighest[iLam-1] < lmean[pt]) lambdaHighest[iLam-1] = lmean[pt];
+					//lmean[pt] = lambdaHighestVal[iLam-1];
 				}
+
+				//lmean[pt] = lmean[pt] * lmean[pt] ;
 
 				if(TU){
 					double error1 = (lmeanErr1_low[pt] + lmeanErr1_high[pt])/2;

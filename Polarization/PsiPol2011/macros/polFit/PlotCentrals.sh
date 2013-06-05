@@ -12,15 +12,21 @@ storagedir=$basedir/Psi/Data
 ########## INPUTS ##########
 NSigma=3.00 #needed in 2 decimal accuracy (x.yz)
 
-for nState in 5;do
+for nState in 4;do
 
 cp ../../interface/ToyMC_Psi$[nState-3]S.h       ToyMC.h
 cp ../../interface/effsAndCuts_Psi$[nState-3]S.h effsAndCuts.h
 cp ../../interface/rootIncludes.inc              rootIncludes.inc
 cp ../../interface/commonVar_Psi$[nState-3]S.h   commonVar.h
 
+#JobID=CentralsApr8_CentralsFromAlteredPPDApr5_1SigmaStatError
+#JobID=CentralsApr16_CentralsFromAlteredPPDApr5_1SigmaStatError
+#JobID=CentralsApr22_CentralsFromAlteredPPDApr5_1SigmaStatError_fLSB75_25
+#JobID=CentralsApr23_CentralsFromAlteredPPDApr23_1SigmaStatError_fLSB75_25_noRhoPt35_Pt12_52
+#JobID=CentralsMay3_CentralsFromAlteredPPDMay3_1SigmaStatError_correctfLSB_noRhoPt35
 #JobID=CentralsMay9_CentralsFromAlteredPPDMay9_1SigmaStatError_ctauScen5
-JobID=CentralsMay9_CentralsFromAlteredPPDMay9_1SigmaStatError_ctauScen5_CL1sigma
+#JobID=CentralsMay9_CentralsFromAlteredPPDMay9_1SigmaStatError_ctauScen5_CL1sigma
+JobID=CentralsMay28_CentralsFromAlteredPPDMay26_1SigmaStatError_ctauScen5_RhoAll
 
 additionalName=_Psi$[nState-3]S
 
@@ -37,9 +43,14 @@ FitGraph=0
 DrawLatexStuff=1
 DrawPreliminary=1
 MultiPanelPlots=1
-MPCentralsWithTotalSystID=CentralsMay9_CentralsFromAlteredPPDMay9_1SigmaStatError_ctauScen5
+MPCentralsWithTotalSystID=CentralsMay28_CentralsFromAlteredPPDMay26_1SigmaStatError_ctauScen5_RhoAll
+#CentralsMay9_CentralsFromAlteredPPDMay9_1SigmaStatError_ctauScen5
+#MPCentralsWithTotalSystID=CentralsMay3_CentralsFromAlteredPPDMay3_1SigmaStatError_correctfLSB_noRhoPt35
+#MPCentralsWithTotalSystID=CentralsApr23_CentralsFromAlteredPPDApr23_1SigmaStatError_fLSB75_25_noRhoPt35
+#CentralsApr22_CentralsFromAlteredPPDApr5_1SigmaStatError_fLSB75_25 
+#CentralsApr16_CentralsFromAlteredPPDApr5_1SigmaStatError
 PlotAlteredPPDResults=1
-PlotCL1sigma=1
+PlotCL1sigma=0
 
 #UncommentIFplotSystOverview
 #PlotFinalData=0
@@ -62,7 +73,13 @@ PlotCL1sigma=1
 #DrawLatexStuff=1
 #MultiPanelPlots=1
 
-DefaultID=ctauScen5_FracLSB-1_7May2013_1FracBg_1BgModel_AlteredPPD_BKGlinPLUSRestSquaredGauss_5nRand_May9
+DefaultID=ctauScen5_FracLSB-1_26May2013_1FracBg_1BgModel_1RhoAll_AlteredPPD_BKGlinPLUSRestSquaredGauss_5nRand_May28
+#DefaultID=ctauScen5_FracLSB-1_7May2013_1FracBg_1BgModel_AlteredPPD_BKGlinPLUSRestSquaredGauss_5nRand_May9
+#DefaultID=ctauScen0_FracLSB-1_30Apr2013_1FracBg_1BgModel_noRhoPt35_correctfLSB_AlteredPPD_BKGAndRholinPLUSRestSquaredGauss_5nRand_May3
+#DefaultID=ctauScen0_FracLSB-1_23Apr2013_1FracBg_1BgModel_noRhoPt35_AlteredPPD_BKGAndRholinPLUSRestSquaredGauss_5nRand_Apr23
+#DefaultID=ctauScen0_FracLSB-1_19Mar2013_1FracBg_1BgModel_1Rho_AlteredPPD_BKGlinPLUSRestSquaredGauss_5nRand_Apr22
+#DefaultID=ctauScen0_FracLSB-1_19Mar2013_1FracBg_1BgModel_1Rho_AlteredPPD_BKGlinPLUSRestSquaredGauss_5nRand_Apr16
+#DefaultID=ctauScen0_FracLSB-1_19Mar2013_1FracBg_1BgModel_1Rho_AlteredPPD_BKGlinPLUSRestSquaredGauss_5nRand_Apr5
 CompareID1=Psi$[nState-3]S_${NSigma}Sigma_11Dec2012_noRhoFactor
 CompareID2=Data_TheGreatRun_10B_May11_NewestCentrals_AlteredPPD_May17_BKGlinPLUSRestSquaredGauss_10nRand
 CompareID3=BG0_Mar19_HighCtauSigCheck3p25

@@ -2546,7 +2546,7 @@ void polPlot(Char_t *dirstruct = "OutputDirectory_Default",
 	}
 
 
-	double lth_phiplots=0.5;
+	double lth_phiplots=0.0; //0.5;
 	double lth_phithplots=0.5;
 	//double lthplot_zeroLine=0.5;
 	double lthplot_zeroLine=0.; // for Fiducial-test
@@ -2629,8 +2629,9 @@ void polPlot(Char_t *dirstruct = "OutputDirectory_Default",
 	PDF_cth_CS_m1->SetLineWidth(2);
 	PDF_cth_CS_m1->Draw("L same");
 
-	PDF_cth_CS_0->SetLineColor(kRed);
+	PDF_cth_CS_0->SetLineColor(kBlue); //(kRed);
 	PDF_cth_CS_0->SetLineStyle(10);
+	PDF_cth_CS_0->SetLineWidth(2);
 	if(plotZeros) PDF_cth_CS_0->Draw("L same");
 
 	DATA_cth_CS->SetLineColor(kBlack);
@@ -2720,8 +2721,9 @@ void polPlot(Char_t *dirstruct = "OutputDirectory_Default",
 	PDF_ph_CS_m1->SetLineWidth(2);
 	PDF_ph_CS_m1->Draw("L same");
 
-	PDF_ph_CS_0->SetLineColor(kRed);
+	PDF_ph_CS_0->SetLineColor(kBlue); //(kRed);
 	PDF_ph_CS_0->SetLineStyle(10);
+	PDF_ph_CS_0->SetLineWidth(2);
 	if(plotZeros) PDF_ph_CS_0->Draw("L same");
 
 	DATA_ph_CS->SetLineColor(kBlack);
@@ -2735,9 +2737,11 @@ void polPlot(Char_t *dirstruct = "OutputDirectory_Default",
 
 	sprintf(legendentry,"Best fit curve");
 	plotLegend2->AddEntry(PDF_ph_CS,legendentry,"l");
-	sprintf(legendentry,"#lambda_{#theta} = +0.5,  #lambda_{#phi} = +0.5,  #lambda_{#theta#phi} = 0");
+	//sprintf(legendentry,"#lambda_{#theta} = +0.5,  #lambda_{#phi} = +0.5,  #lambda_{#theta#phi} = 0");
+	sprintf(legendentry,"#lambda_{#theta} = 0,  #lambda_{#phi} = +0.5,  #lambda_{#theta#phi} = 0");
 	plotLegend2->AddEntry(PDF_ph_CS_p1,legendentry,"l");
-	sprintf(legendentry,"#lambda_{#theta} = +0.5,  #lambda_{#phi} = -0.5,  #lambda_{#theta#phi} = 0");
+	//sprintf(legendentry,"#lambda_{#theta} = +0.5,  #lambda_{#phi} = -0.5,  #lambda_{#theta#phi} = 0");
+	sprintf(legendentry,"#lambda_{#theta} = 0,  #lambda_{#phi} = -0.5,  #lambda_{#theta#phi} = 0");
 	plotLegend2->AddEntry(PDF_ph_CS_m1,legendentry,"l");
 	if(plotZeros){
 		sprintf(legendentry,"#lambda_{#theta} = 0,  #lambda_{#phi} = 0,  #lambda_{#theta#phi} = 0");
@@ -2809,8 +2813,9 @@ void polPlot(Char_t *dirstruct = "OutputDirectory_Default",
 	PDF_phth_CS_p1->SetLineWidth(2);
 	PDF_phth_CS_m1->Draw("L same");
 
-	PDF_phth_CS_0->SetLineColor(kRed);
+	PDF_phth_CS_0->SetLineColor(kBlue); //(kRed);
 	PDF_phth_CS_0->SetLineStyle(10);
+	PDF_phth_CS_0->SetLineWidth(2);
 	if(plotZeros) PDF_phth_CS_0->Draw("L same");
 
 	DATA_phth_CS->SetLineColor(kBlack);
@@ -2895,8 +2900,9 @@ void polPlot(Char_t *dirstruct = "OutputDirectory_Default",
 	PDF_cth_HX_m1->SetLineWidth(2);
 	PDF_cth_HX_m1->Draw("L same");
 
-	PDF_cth_HX_0->SetLineColor(kRed);
+	PDF_cth_HX_0->SetLineColor(kBlue); //(kRed);
 	PDF_cth_HX_0->SetLineStyle(10);
+	PDF_cth_HX_0->SetLineWidth(2);
 	if(plotZeros) PDF_cth_HX_0->Draw("L same");
 
 	DATA_cth_HX->SetLineColor(kBlack);
@@ -2985,8 +2991,9 @@ void polPlot(Char_t *dirstruct = "OutputDirectory_Default",
 	PDF_ph_HX_m1->SetLineWidth(2);
 	PDF_ph_HX_m1->Draw("L same");
 
-	PDF_ph_HX_0->SetLineColor(kRed);
+	PDF_ph_HX_0->SetLineColor(kBlue); //(kRed);
 	PDF_ph_HX_0->SetLineStyle(10);
+	PDF_ph_HX_0->SetLineWidth(2);
 	if(plotZeros) PDF_ph_HX_0->Draw("L same");
 
 	DATA_ph_HX->SetLineColor(kBlack);
@@ -3000,9 +3007,11 @@ void polPlot(Char_t *dirstruct = "OutputDirectory_Default",
 
 	sprintf(legendentry,"Best fit curve");
 	plotLegend2->AddEntry(PDF_ph_HX,legendentry,"l");
-	sprintf(legendentry,"#lambda_{#theta} = +0.5,  #lambda_{#phi} = +0.5,  #lambda_{#theta#phi} = 0");
+	//sprintf(legendentry,"#lambda_{#theta} = +0.5,  #lambda_{#phi} = +0.5,  #lambda_{#theta#phi} = 0");
+	sprintf(legendentry,"#lambda_{#theta} = 0,  #lambda_{#phi} = +0.5,  #lambda_{#theta#phi} = 0");
 	plotLegend2->AddEntry(PDF_ph_HX_p1,legendentry,"l");
-	sprintf(legendentry,"#lambda_{#theta} = +0.5,  #lambda_{#phi} = -0.5,  #lambda_{#theta#phi} = 0");
+	//sprintf(legendentry,"#lambda_{#theta} = +0.5,  #lambda_{#phi} = -0.5,  #lambda_{#theta#phi} = 0");
+	sprintf(legendentry,"#lambda_{#theta} = 0,  #lambda_{#phi} = -0.5,  #lambda_{#theta#phi} = 0");
 	plotLegend2->AddEntry(PDF_ph_HX_m1,legendentry,"l");
 	if(plotZeros){
 		sprintf(legendentry,"#lambda_{#theta} = 0,  #lambda_{#phi} = 0,  #lambda_{#theta#phi} = 0");
@@ -3075,8 +3084,9 @@ void polPlot(Char_t *dirstruct = "OutputDirectory_Default",
 	PDF_phth_HX_m1->SetLineWidth(2);
 	PDF_phth_HX_m1->Draw("L same");
 
-	PDF_phth_HX_0->SetLineColor(kRed);
+	PDF_phth_HX_0->SetLineColor(kBlue); //kRed);
 	PDF_phth_HX_0->SetLineStyle(10);
+	PDF_phth_HX_0->SetLineWidth(2);
 	if(plotZeros) PDF_phth_HX_0->Draw("L same");
 
 	DATA_phth_HX->SetLineColor(kBlack);
@@ -3162,8 +3172,9 @@ void polPlot(Char_t *dirstruct = "OutputDirectory_Default",
 	PDF_cth_PX_m1->SetLineWidth(2);
 	PDF_cth_PX_m1->Draw("L same");
 
-	PDF_cth_PX_0->SetLineColor(kRed);
+	PDF_cth_PX_0->SetLineColor(kBlue); //(kRed);
 	PDF_cth_PX_0->SetLineStyle(10);
+	PDF_cth_PX_0->SetLineWidth(2);
 	if(plotZeros) PDF_cth_PX_0->Draw("L same");
 
 	DATA_cth_PX->SetLineColor(kBlack);
@@ -3251,8 +3262,9 @@ void polPlot(Char_t *dirstruct = "OutputDirectory_Default",
 	PDF_ph_PX_m1->SetLineWidth(2);
 	PDF_ph_PX_m1->Draw("L same");
 
-	PDF_ph_PX_0->SetLineColor(kRed);
+	PDF_ph_PX_0->SetLineColor(kBlue); //(kRed);
 	PDF_ph_PX_0->SetLineStyle(10);
+	PDF_ph_PX_0->SetLineWidth(2);
 	if(plotZeros) PDF_ph_PX_0->Draw("L same");
 
 	DATA_ph_PX->SetLineColor(kBlack);
@@ -3266,9 +3278,11 @@ void polPlot(Char_t *dirstruct = "OutputDirectory_Default",
 
 	sprintf(legendentry,"Best fit curve");
 	plotLegend2->AddEntry(PDF_ph_PX,legendentry,"l");
-	sprintf(legendentry,"#lambda_{#theta} = +0.5,  #lambda_{#phi} = +0.5,  #lambda_{#theta#phi} = 0");
+	//sprintf(legendentry,"#lambda_{#theta} = +0.5,  #lambda_{#phi} = +0.5,  #lambda_{#theta#phi} = 0");
+	sprintf(legendentry,"#lambda_{#theta} = 0,  #lambda_{#phi} = +0.5,  #lambda_{#theta#phi} = 0");
 	plotLegend2->AddEntry(PDF_ph_PX_p1,legendentry,"l");
-	sprintf(legendentry,"#lambda_{#theta} = +0.5,  #lambda_{#phi} = -0.5,  #lambda_{#theta#phi} = 0");
+	//sprintf(legendentry,"#lambda_{#theta} = +0.5,  #lambda_{#phi} = -0.5,  #lambda_{#theta#phi} = 0");
+	sprintf(legendentry,"#lambda_{#theta} = 0,  #lambda_{#phi} = -0.5,  #lambda_{#theta#phi} = 0");
 	plotLegend2->AddEntry(PDF_ph_PX_m1,legendentry,"l");
 	if(plotZeros){
 		sprintf(legendentry,"#lambda_{#theta} = 0,  #lambda_{#phi} = 0,  #lambda_{#theta#phi} = 0");
@@ -3340,8 +3354,9 @@ void polPlot(Char_t *dirstruct = "OutputDirectory_Default",
 	PDF_phth_PX_m1->SetLineWidth(2);
 	PDF_phth_PX_m1->Draw("L same");
 
-	PDF_phth_PX_0->SetLineColor(kRed);
+	PDF_phth_PX_0->SetLineColor(kBlue); //(kRed);
 	PDF_phth_PX_0->SetLineStyle(10);
+	PDF_phth_PX_0->SetLineWidth(2);
 	if(plotZeros) PDF_phth_PX_0->Draw("L same");
 
 	DATA_phth_PX->SetLineColor(kBlack);

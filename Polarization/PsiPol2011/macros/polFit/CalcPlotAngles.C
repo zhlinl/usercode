@@ -37,21 +37,22 @@ void CalcPlotAngles(){
 	char FileID[200];
 
 
-	int StateMin=2;
-	int StateMax=2;
+	int StateMin=4;
+	int StateMax=4;
 
-	int pTBinMin=3;
-	int pTBinMax=3;
+	int pTBinMin=9;
+	int pTBinMax=9;
 
 	int RapBinMin=1;
 	int RapBinMax=1;
 
 	bool debug=false;
-	bool plotToyMC=true;
+	bool plotToyMC=false;
 
-	sprintf(JobID,"Feb25_toyMC_Fiducial");
-	sprintf(BaseID,"/afs/hephy.at/scratch/i/ikratsch/CMSSW_4_2_3/src/PsiPol2011/macros/DataFiles");
-	sprintf(DataID,"SetOfCuts0_genNewMC_7Feb2013");
+	sprintf(BaseID,"/afs/ihep.ac.cn/users/z/zhangll/fs/work/polarization/PsiPol2011/macros/DataFiles");
+	sprintf(DataID,"SetOfCuts11_ctauScen5_FracLSB-1_newMLfit_30Apr2013_correctfLSB_test");
+	//sprintf(DataID,"SetOfCuts11_ctauScen5_MC");
+	sprintf(JobID,"%s_May29",DataID);
 
 	if(plotToyMC){
 		sprintf(BaseID,"/afs/ihep.ac.cn/users/z/zhangll/fs/work/polarization/PsiPol2011/Psi/ToyMC");
@@ -77,10 +78,14 @@ void CalcPlotAngles(){
 
 
 	for( int nState  = StateMin; nState  < StateMax+1; nState++ ){
-		for( int irap  = RapBinMin; irap  < RapBinMax+1; irap++ ){ if(nState==1&&irap==3) continue;
-			for( int ipT   = pTBinMin; ipT   < pTBinMax+1;  ipT++  ){ if(nState==2&&(ipT>6||ipT<2)) continue;
+		for( int irap  = RapBinMin; irap  < RapBinMax+1; irap++ ){ 
+			if(nState==4&&irap==3) continue;
+			for( int ipT   = pTBinMin; ipT   < pTBinMax+1;  ipT++  ){ 
+				if(nState==5&&(ipT>6||ipT<2)) continue;
 
-				sprintf(DataID,"ToyMC_Psi%dS_22Feb2013_FiducialTest/Sig_frame3scen3_Bkg_frame3scen3",nState);
+				//sprintf(DataID,"ToyMC_Psi%dS_22Feb2013_FiducialTest/Sig_frame3scen3_Bkg_frame3scen3",nState-3);
+	      sprintf(DataID,"SetOfCuts11_ctauScen5_FracLSB-1_newMLfit_30Apr2013_correctfLSB_test");
+	      //sprintf(DataID,"SetOfCuts11_ctauScen5_MC");
 				sprintf(FileID,"%s/%s", BaseID, DataID);
 
 				////////// HISTOS ///////////
@@ -94,7 +99,7 @@ void CalcPlotAngles(){
 				int nBinsCosth1D=32;
 				int nBinsPhi1D=32;
 
-				TH2D* costhphiPX   = new TH2D( "costhphiPX", "costhphiPX", nBinsCosth2D, -1,1, nBinsCosth2D,  -180, 180);
+				TH2D* costhphiPX   = new TH2D( "costhphiPX", "costhphiPX", nBinsCosth2D, -1,1, nBinsPhi2D,  -180, 180);
 				TH1D* costhPX   = new TH1D( "costhPX", "costhPX", nBinsCosth1D, -1,1);
 				TH1D* phiPX   = new TH1D( "phiPX", "phiPX", nBinsPhi1D,  -180, 180);
 
@@ -114,9 +119,10 @@ void CalcPlotAngles(){
 				phiPX->SetTitle(0);
 				phiPX->SetMarkerStyle(MarkStyle);
 
-				TH2D* costhphiHX   = new TH2D( "costhphiHX", "costhphiHX", nBinsCosth2D, -1,1, nBinsCosth2D,  -180, 180);
+				TH2D* costhphiHX   = new TH2D( "costhphiHX", "costhphiHX", nBinsCosth2D, -1,1, nBinsPhi2D,  -180, 180);
 				TH1D* costhHX   = new TH1D( "costhHX", "costhHX", nBinsCosth1D, -1,1);
 				TH1D* phiHX   = new TH1D( "phiHX", "phiHX", nBinsPhi1D,  -180, 180);
+				//TH1D* phiHX   = new TH1D( "phiHX", "phiHX", nBinsPhi1D,  70, 100);
 
 				costhphiHX->GetYaxis()->SetTitleOffset(yOffset);
 				costhphiHX->GetXaxis()->SetTitle("cos#vartheta");
@@ -134,7 +140,7 @@ void CalcPlotAngles(){
 				phiHX->SetTitle(0);
 				phiHX->SetMarkerStyle(MarkStyle);
 
-				TH2D* costhphiCS   = new TH2D( "costhphiCS", "costhphiCS", nBinsCosth2D, -1,1, nBinsCosth2D,  -180, 180);
+				TH2D* costhphiCS   = new TH2D( "costhphiCS", "costhphiCS", nBinsCosth2D, -1,1, nBinsPhi2D,  -180, 180);
 				TH1D* costhCS   = new TH1D( "costhCS", "costhCS", nBinsCosth1D, -1,1);
 				TH1D* phiCS   = new TH1D( "phiCS", "phiCS", nBinsPhi1D,  -180, 180);
 
@@ -154,10 +160,15 @@ void CalcPlotAngles(){
 				phiCS->SetTitle(0);
 				phiCS->SetMarkerStyle(MarkStyle);
 
+				//TH2D* costhCSphiHX   = new TH2D( "costhCSphiHX", "costhCSphiHX", nBinsCosth2D, -1,1, nBinsPhi2D,  -180, 180);
+				TH2D* costhCSphiHX   = new TH2D( "costhCSphiHX", "costhCSphiHX", nBinsCosth2D/0.5, -0.4,0.4, nBinsPhi2D*2,  70., 110.);
+				costhCSphiHX->GetYaxis()->SetTitleOffset(yOffset);
+				costhCSphiHX->GetXaxis()->SetTitle("cos#vartheta");
+				costhCSphiHX->GetYaxis()->SetTitle("#varphi [deg.]");
+				costhCSphiHX->SetStats(0);
+				costhCSphiHX->SetTitle(0);
 
-
-
-				int nBinsMass=50; double MassMin=2.9; double MassMax=3.3; if(nState==2) {MassMin=3.5; MassMax=3.9;}
+				int nBinsMass=50; double MassMin=2.9; double MassMax=3.3; if(nState==5) {MassMin=3.5; MassMax=3.9;}
 				int nBinspT=300; double pTMin=10; double pTMax=70;
 				int nBinsrap=50; double rapMin=-2; double rapMax=2;
 
@@ -167,6 +178,7 @@ void CalcPlotAngles(){
 				TH1D* dimuonMass   = new TH1D( "dimuonMass", "dimuonMass", nBinsMass, MassMin, MassMax);
 				TH1D* dimuonpT   = new TH1D( "dimuonpT", "dimuonpT", nBinspT, pTMin, pTMax);
 				TH1D* dimuonrap   = new TH1D( "dimuonrap", "dimuonrap", nBinsrap, rapMin, rapMax);
+				//TH1D* dimuonrap   = new TH1D( "dimuonrap", "dimuonrap", nBinsrap, -0.65,0.65);
 				TH1D* muonpT   = new TH1D( "muonpT", "muonpT", nBinsmuonpT, muonpTMin, muonpTMax);
 				TH1D* muoneta   = new TH1D( "muoneta", "muoneta", nBinsrap, rapMin, rapMax);
 
@@ -184,6 +196,7 @@ void CalcPlotAngles(){
 				dimuonrap->GetXaxis()->SetTitle("dimuon rapidity [GeV]");
 				dimuonrap->SetStats(0);
 				dimuonrap->SetTitle(0);
+				//dimuonrap->SetTitle("phi_HX>75. && phi_HX<100. && costh_CS>-0.2 && costh_CS<0.2");
 				dimuonrap->SetMarkerStyle(MarkStyle);
 
 				muonpT->GetXaxis()->SetTitle("muon pT [GeV]");
@@ -199,22 +212,36 @@ void CalcPlotAngles(){
 
 				////////////////////////////////
 
-
-
 				char InFileName[200];
-				sprintf(InFileName,"%s/Psi%dS/tmpFiles/data_Psi%dS_rap%d_pT%d.root",FileID, nState, nState, irap, ipT);
+				sprintf(InFileName,"%s/Psi%dS/tmpFiles/data_Psi%dS_rap%d_pT%d.root",FileID, nState-3, nState-3, irap, ipT);
 				//if(plotToyMC) sprintf(InFileName,"%s/rap%d_pT%d/Generation1/data.root",FileID, irap, ipT);
 				if(plotToyMC) sprintf(InFileName,"%s/rap%d_pT%d/data.root",FileID, irap, ipT);
 
 
-				TFile* inFile = new TFile(InFileName);
+				TFile* inFile = new TFile(InFileName,"R"); //"UPDATE");
 
-				TTree* data               = (TTree*)inFile->Get("selectedData");
+				TTree* data = (TTree*)inFile->Get("selectedData");
 
-				TLorentzVector* lepP = 0;  data->SetBranchAddress( "lepP",  &lepP );  // lepton 4-vectors
-				TLorentzVector* lepN = 0;  data->SetBranchAddress( "lepN",  &lepN );
+				char OutFileName[200];
+				sprintf(OutFileName,"%s/Psi%dS/tmpFiles/data_Psi%dS_rap%d_pT%d_reduced.root",FileID, nState-3, nState-3, irap, ipT);
+				TFile* outFile = new TFile(OutFileName,"RECREATE");
+				TTree *reducedData = new TTree ("selectedData", "selected events");
 
+				TLorentzVector* lepP  = new TLorentzVector();  data->SetBranchAddress( "lepP",   &lepP );  // lepton 4-vectors
+				TLorentzVector* lepN  = new TLorentzVector();  data->SetBranchAddress( "lepN",   &lepN );
+				TLorentzVector* JpsiP = new TLorentzVector();  data->SetBranchAddress( "JpsiP",  &JpsiP );
+				double Jpsict = 0;                             data->SetBranchAddress( "Jpsict", &Jpsict );
+				double JpsictErr = 0;                          data->SetBranchAddress( "JpsictErr", &JpsictErr );
+				double JpsiMassErr = 0;                        data->SetBranchAddress( "JpsiMassErr", &JpsiMassErr );
+				double JpsiVprob = 0;                          data->SetBranchAddress( "JpsiVprob", &JpsiVprob );
 
+				reducedData->Branch("lepP", "TLorentzVector", &lepP);
+				reducedData->Branch("lepN", "TLorentzVector", &lepN);
+				reducedData->Branch("JpsiP", "TLorentzVector", &JpsiP);
+				reducedData->Branch("Jpsict", &Jpsict, "Jpsict/D");
+				reducedData->Branch("JpsictErr", &JpsictErr, "JpsictErr/D");
+				reducedData->Branch("JpsiMassErr", &JpsiMassErr, "JpsiMassErr/D");
+				reducedData->Branch("JpsiVprob", &JpsiVprob, "JpsiVprob/D");
 
 				int n_events=data->GetEntries();
 
@@ -228,6 +255,10 @@ void CalcPlotAngles(){
 					if(debug&&i_event>n_events/100) continue;
 
 					data->GetEvent( i_event-1 );
+
+					//if( JpsiP->Pt() < 30. || JpsiP->Pt() > 35. ) cout << "JpsiP->Pt() " << JpsiP->Pt() << endl;
+
+					//if( !(JpsiP->Pt() >= 34. && JpsiP->Pt() <= 35.) ) continue;
 
 					double lepP_pT  = lepP->Pt();
 					double lepN_pT  = lepN->Pt();
@@ -344,20 +375,37 @@ void CalcPlotAngles(){
 					phiPX->Fill( phi_PX, 1. );
 					costhphiHX->Fill( costh_HX, phi_HX, 1. );
 					costhHX->Fill( costh_HX, 1. );
-					phiHX->Fill( phi_HX, 1. );
+					//if(phi_HX>70. && phi_HX<100.) 
+						phiHX->Fill( phi_HX, 1. );
 					costhphiCS->Fill( costh_CS, phi_CS, 1. );
-					costhCS->Fill( costh_CS, 1. );
+					//if(phi_HX<80. || phi_HX>91.) 
+						costhCS->Fill( costh_CS, 1. );
 					phiCS->Fill( phi_CS, 1. );
+
+					if(costh_CS>-0.4 && costh_CS<0.4 && phi_HX>70. && phi_HX<110.) 
+						costhCSphiHX->Fill( costh_CS, phi_HX, 1. );
 
 					dimuonMass->Fill( mass, 1. );
 					dimuonpT->Fill( pT, 1. );
-					dimuonrap->Fill( rap, 1. );
+					//dimuonrap->Fill( rap, 1. );
+					//if(phi_HX>75. && phi_HX<100. && costh_CS>-0.2 && costh_CS<0.2) 
+						dimuonrap->Fill( rap, 1. );
 					muonpT->Fill( lepP_pT, 1. );
 					muoneta->Fill( lepP_eta, 1. );
 					muonpT->Fill( lepN_pT, 1. );
 					muoneta->Fill( lepN_eta, 1. );
 
+					if(phi_HX<80. || phi_HX>91.)  reducedData->Fill();
+
 				}
+
+				//inFile->cd();
+				//reducedData->Write();
+				//inFile->Close();
+
+				outFile->cd();
+				reducedData->Write();
+				outFile->Close();
 
 
 				//Plot
@@ -374,7 +422,7 @@ void CalcPlotAngles(){
 				c3->SetLeftMargin(0.13);
 				c3->SetRightMargin(0.13); //
 				costhphiPX->Draw("colz");
-				sprintf(plotname, "%s/Psi%dS_costhphiPX_rap%d_pT%d.pdf", FileDir, nState, irap, ipT);
+				sprintf(plotname, "%s/Psi%dS_costhphiPX_rap%d_pT%d.pdf", FileDir, nState-3, irap, ipT);
 				c3->SaveAs(plotname);
 
 				c3 = new TCanvas(plotname, plotname, 700, 500);
@@ -383,7 +431,7 @@ void CalcPlotAngles(){
 				c3->SetLeftMargin(0.13);
 				c3->SetRightMargin(0.05);
 				costhPX->Draw("e");
-				sprintf(plotname, "%s/Psi%dS_costhPX_rap%d_pT%d.pdf", FileDir, nState, irap, ipT);
+				sprintf(plotname, "%s/Psi%dS_costhPX_rap%d_pT%d.pdf", FileDir, nState-3, irap, ipT);
 				c3->SaveAs(plotname);
 
 				c3 = new TCanvas(plotname, plotname, 700, 500);
@@ -391,8 +439,9 @@ void CalcPlotAngles(){
 				c3->SetTopMargin(0.05);
 				c3->SetLeftMargin(0.13);
 				c3->SetRightMargin(0.05);
+				phiPX->GetYaxis()->SetRangeUser(0., phiPX->GetMaximum()*2.);
 				phiPX->Draw("e");
-				sprintf(plotname, "%s/Psi%dS_phiPX_rap%d_pT%d.pdf", FileDir, nState, irap, ipT);
+				sprintf(plotname, "%s/Psi%dS_phiPX_rap%d_pT%d.pdf", FileDir, nState-3, irap, ipT);
 				c3->SaveAs(plotname);
 
 
@@ -402,7 +451,7 @@ void CalcPlotAngles(){
 				c3->SetLeftMargin(0.13);
 				c3->SetRightMargin(0.13); //
 				costhphiHX->Draw("colz");
-				sprintf(plotname, "%s/Psi%dS_costhphiHX_rap%d_pT%d.pdf", FileDir, nState, irap, ipT);
+				sprintf(plotname, "%s/Psi%dS_costhphiHX_rap%d_pT%d.pdf", FileDir, nState-3, irap, ipT);
 				c3->SaveAs(plotname);
 
 				c3 = new TCanvas(plotname, plotname, 700, 500);
@@ -411,7 +460,7 @@ void CalcPlotAngles(){
 				c3->SetLeftMargin(0.13);
 				c3->SetRightMargin(0.05);
 				costhHX->Draw("e");
-				sprintf(plotname, "%s/Psi%dS_costhHX_rap%d_pT%d.pdf", FileDir, nState, irap, ipT);
+				sprintf(plotname, "%s/Psi%dS_costhHX_rap%d_pT%d.pdf", FileDir, nState-3, irap, ipT);
 				c3->SaveAs(plotname);
 
 				c3 = new TCanvas(plotname, plotname, 700, 500);
@@ -419,8 +468,9 @@ void CalcPlotAngles(){
 				c3->SetTopMargin(0.05);
 				c3->SetLeftMargin(0.13);
 				c3->SetRightMargin(0.05);
+				phiHX->GetYaxis()->SetRangeUser(0., phiHX->GetMaximum()*2.);
 				phiHX->Draw("e");
-				sprintf(plotname, "%s/Psi%dS_phiHX_rap%d_pT%d.pdf", FileDir, nState, irap, ipT);
+				sprintf(plotname, "%s/Psi%dS_phiHX_rap%d_pT%d.pdf", FileDir, nState-3, irap, ipT);
 				c3->SaveAs(plotname);
 
 
@@ -430,7 +480,7 @@ void CalcPlotAngles(){
 				c3->SetLeftMargin(0.13);
 				c3->SetRightMargin(0.13); //
 				costhphiCS->Draw("colz");
-				sprintf(plotname, "%s/Psi%dS_costhphiCS_rap%d_pT%d.pdf", FileDir, nState, irap, ipT);
+				sprintf(plotname, "%s/Psi%dS_costhphiCS_rap%d_pT%d.pdf", FileDir, nState-3, irap, ipT);
 				c3->SaveAs(plotname);
 
 				c3 = new TCanvas(plotname, plotname, 700, 500);
@@ -439,7 +489,7 @@ void CalcPlotAngles(){
 				c3->SetLeftMargin(0.13);
 				c3->SetRightMargin(0.05);
 				costhCS->Draw("e");
-				sprintf(plotname, "%s/Psi%dS_costhCS_rap%d_pT%d.pdf", FileDir, nState, irap, ipT);
+				sprintf(plotname, "%s/Psi%dS_costhCS_rap%d_pT%d.pdf", FileDir, nState-3, irap, ipT);
 				c3->SaveAs(plotname);
 
 				c3 = new TCanvas(plotname, plotname, 700, 500);
@@ -447,10 +497,20 @@ void CalcPlotAngles(){
 				c3->SetTopMargin(0.05);
 				c3->SetLeftMargin(0.13);
 				c3->SetRightMargin(0.05);
+				//phiCS->GetYaxis()->SetRangeUser(0., phiCS->GetMaximum()*2.);
 				phiCS->Draw("e");
-				sprintf(plotname, "%s/Psi%dS_phiCS_rap%d_pT%d.pdf", FileDir, nState, irap, ipT);
+				sprintf(plotname, "%s/Psi%dS_phiCS_rap%d_pT%d.pdf", FileDir, nState-3, irap, ipT);
 				c3->SaveAs(plotname);
 
+				//
+				c3 = new TCanvas(plotname, plotname, 500, 500);
+				c3->SetFillColor(kWhite);
+				c3->SetTopMargin(0.05);
+				c3->SetLeftMargin(0.13);
+				c3->SetRightMargin(0.13); //
+				costhCSphiHX->Draw("colz");
+				sprintf(plotname, "%s/Psi%dS_costhCSphiHX_rap%d_pT%d.pdf", FileDir, nState-3, irap, ipT);
+				c3->SaveAs(plotname);
 
 				c3 = new TCanvas(plotname, plotname, 700, 500);
 				c3->SetFillColor(kWhite);
@@ -458,7 +518,7 @@ void CalcPlotAngles(){
 				c3->SetLeftMargin(0.13);
 				c3->SetRightMargin(0.05);
 				dimuonMass->Draw("e");
-				sprintf(plotname, "%s/Psi%dS_dimuonMass_rap%d_pT%d.pdf", FileDir, nState, irap, ipT);
+				sprintf(plotname, "%s/Psi%dS_dimuonMass_rap%d_pT%d.pdf", FileDir, nState-3, irap, ipT);
 				c3->SaveAs(plotname);
 
 				c3 = new TCanvas(plotname, plotname, 1700, 500);
@@ -467,7 +527,7 @@ void CalcPlotAngles(){
 				c3->SetLeftMargin(0.13);
 				c3->SetRightMargin(0.05);
 				dimuonpT->Draw("e");
-				sprintf(plotname, "%s/Psi%dS_dimuonpT_rap%d_pT%d.pdf", FileDir, nState, irap, ipT);
+				sprintf(plotname, "%s/Psi%dS_dimuonpT_rap%d_pT%d.pdf", FileDir, nState-3, irap, ipT);
 				c3->SaveAs(plotname);
 
 				c3 = new TCanvas(plotname, plotname, 700, 500);
@@ -476,7 +536,7 @@ void CalcPlotAngles(){
 				c3->SetLeftMargin(0.13);
 				c3->SetRightMargin(0.05);
 				dimuonrap->Draw("e");
-				sprintf(plotname, "%s/Psi%dS_dimuonrap_rap%d_pT%d.pdf", FileDir, nState, irap, ipT);
+				sprintf(plotname, "%s/Psi%dS_dimuonrap_rap%d_pT%d.pdf", FileDir, nState-3, irap, ipT);
 				c3->SaveAs(plotname);
 
 				c3 = new TCanvas(plotname, plotname, 1700, 500);
@@ -485,7 +545,7 @@ void CalcPlotAngles(){
 				c3->SetLeftMargin(0.13);
 				c3->SetRightMargin(0.05);
 				muonpT->Draw("e");
-				sprintf(plotname, "%s/Psi%dS_muonpT_rap%d_pT%d.pdf", FileDir, nState, irap, ipT);
+				sprintf(plotname, "%s/Psi%dS_muonpT_rap%d_pT%d.pdf", FileDir, nState-3, irap, ipT);
 				c3->SaveAs(plotname);
 
 				c3 = new TCanvas(plotname, plotname, 700, 500);
@@ -494,7 +554,7 @@ void CalcPlotAngles(){
 				c3->SetLeftMargin(0.13);
 				c3->SetRightMargin(0.05);
 				muoneta->Draw("e");
-				sprintf(plotname, "%s/Psi%dS_muoneta_rap%d_pT%d.pdf", FileDir, nState, irap, ipT);
+				sprintf(plotname, "%s/Psi%dS_muoneta_rap%d_pT%d.pdf", FileDir, nState-3, irap, ipT);
 				c3->SaveAs(plotname);
 
 
