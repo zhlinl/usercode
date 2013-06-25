@@ -52,7 +52,7 @@ void CalcPlotAngles(){
 	sprintf(BaseID,"/afs/ihep.ac.cn/users/z/zhangll/fs/work/polarization/PsiPol2011/macros/DataFiles");
 	sprintf(DataID,"SetOfCuts11_ctauScen5_FracLSB-1_newMLfit_30Apr2013_correctfLSB_test");
 	//sprintf(DataID,"SetOfCuts11_ctauScen5_MC");
-	sprintf(JobID,"%s_May29",DataID);
+	sprintf(JobID,"%s_June13",DataID);
 
 	if(plotToyMC){
 		sprintf(BaseID,"/afs/ihep.ac.cn/users/z/zhangll/fs/work/polarization/PsiPol2011/Psi/ToyMC");
@@ -121,6 +121,7 @@ void CalcPlotAngles(){
 
 				TH2D* costhphiHX   = new TH2D( "costhphiHX", "costhphiHX", nBinsCosth2D, -1,1, nBinsPhi2D,  -180, 180);
 				TH1D* costhHX   = new TH1D( "costhHX", "costhHX", nBinsCosth1D, -1,1);
+				TH1D* costhHX_1   = new TH1D( "costhHX_1", "costhHX_1", nBinsCosth1D, -1,1);
 				TH1D* phiHX   = new TH1D( "phiHX", "phiHX", nBinsPhi1D,  -180, 180);
 				//TH1D* phiHX   = new TH1D( "phiHX", "phiHX", nBinsPhi1D,  70, 100);
 
@@ -134,6 +135,14 @@ void CalcPlotAngles(){
 				costhHX->SetStats(0);
 				costhHX->SetTitle(0);
 				costhHX->SetMarkerStyle(MarkStyle);
+
+				costhHX_1->GetXaxis()->SetTitle("cos#vartheta");
+				costhHX_1->SetStats(0);
+				costhHX_1->SetTitle(0);
+				costhHX_1->SetMarkerStyle(MarkStyle);
+				costhHX_1->SetMarkerSize(0.8);
+				costhHX_1->SetMarkerColor(kRed);
+				costhHX_1->SetLineColor(kRed);
 
 				phiHX->GetXaxis()->SetTitle("#varphi [deg.]");
 				phiHX->SetStats(0);
@@ -375,6 +384,7 @@ void CalcPlotAngles(){
 					phiPX->Fill( phi_PX, 1. );
 					costhphiHX->Fill( costh_HX, phi_HX, 1. );
 					costhHX->Fill( costh_HX, 1. );
+					if(!(phi_HX>80. && phi_HX<95.)) costhHX_1->Fill( costh_HX, 1. ); 
 					//if(phi_HX>70. && phi_HX<100.) 
 						phiHX->Fill( phi_HX, 1. );
 					costhphiCS->Fill( costh_CS, phi_CS, 1. );
@@ -387,7 +397,6 @@ void CalcPlotAngles(){
 
 					dimuonMass->Fill( mass, 1. );
 					dimuonpT->Fill( pT, 1. );
-					//dimuonrap->Fill( rap, 1. );
 					//if(phi_HX>75. && phi_HX<100. && costh_CS>-0.2 && costh_CS<0.2) 
 						dimuonrap->Fill( rap, 1. );
 					muonpT->Fill( lepP_pT, 1. );
@@ -395,7 +404,8 @@ void CalcPlotAngles(){
 					muonpT->Fill( lepN_pT, 1. );
 					muoneta->Fill( lepN_eta, 1. );
 
-					if(phi_HX<80. || phi_HX>91.)  reducedData->Fill();
+					//if(phi_HX<80. || phi_HX>91.)  reducedData->Fill();
+					if(phi_HX>85. && phi_HX<95.)  reducedData->Fill();
 
 				}
 
@@ -460,7 +470,14 @@ void CalcPlotAngles(){
 				c3->SetLeftMargin(0.13);
 				c3->SetRightMargin(0.05);
 				costhHX->Draw("e");
+				costhHX_1->Draw("esame");
 				sprintf(plotname, "%s/Psi%dS_costhHX_rap%d_pT%d.pdf", FileDir, nState-3, irap, ipT);
+				c3->SaveAs(plotname);
+				costhHX->Scale(1./costhHX->Integral());
+				costhHX_1->Scale(1./costhHX_1->Integral());
+				costhHX->Draw("e");
+				costhHX_1->Draw("esame");
+				sprintf(plotname, "%s/Psi%dS_costhHX_rap%d_pT%d_Norm.pdf", FileDir, nState-3, irap, ipT);
 				c3->SaveAs(plotname);
 
 				c3 = new TCanvas(plotname, plotname, 700, 500);

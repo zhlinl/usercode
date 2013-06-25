@@ -100,6 +100,7 @@ int main(int argc, char** argv) {
 	bool PlotMattForICHEP(false);
 	bool ExtendLegendInX(false);
 	bool ShiftInX(true);
+	bool ShiftCompareInX(false);
 	bool PlotVsComp(false);
 	bool PlotSysSquare(false);
 	bool PlotCL1sigma(false);
@@ -177,6 +178,7 @@ int main(int argc, char** argv) {
 		if(std::string(argv[i]).find("PlotMattForICHEP=1") != std::string::npos) {PlotMattForICHEP=true; cout<<"PlotMattForICHEP"<<endl;}
 		if(std::string(argv[i]).find("ExtendLegendInX=1") != std::string::npos) {ExtendLegendInX=true; cout<<"ExtendLegendInX"<<endl;}
 		if(std::string(argv[i]).find("ShiftInX=0") != std::string::npos) {ShiftInX=false; cout<<"ShiftInX false"<<endl;}
+		if(std::string(argv[i]).find("ShiftCompareInX=1") != std::string::npos) {ShiftCompareInX=true; cout<<"ShiftCompareInX"<<endl;}
 		if(std::string(argv[i]).find("PlotVsComp=1") != std::string::npos) {PlotVsComp=true; cout<<"PlotVsComp"<<endl;}
 		if(std::string(argv[i]).find("PlotSysSquare=1") != std::string::npos) {PlotSysSquare=true; cout<<"PlotSysSquare"<<endl;}
 		if(std::string(argv[i]).find("PlotCL1sigma=1") != std::string::npos) {PlotCL1sigma=true; cout<<"PlotCL1sigma"<<endl;}
@@ -189,6 +191,9 @@ int main(int argc, char** argv) {
 	double DeltaXminOVERALL=0.;//0.9999;
 	if(ShiftInX) DeltaXminOVERALL=0.9999;
 	bool ShiftXminOVERALL=true;
+
+	double DeltaXCompare=0.;
+	if(ShiftCompareInX) DeltaXCompare=0.5;//0.9999
 
 	double PlotpTMinInitial = 6., PlotpTMaxInitial = 72.;
 	if(PlotFinalData) PlotpTMinInitial = 10.;
@@ -2339,25 +2344,116 @@ int main(int argc, char** argv) {
 				extreme0->SetLineColor( kBlack );
 				extreme0->Draw( "same" );
 
+
+				int nBinspT=ptBinMax-ptBinMin+1;
+				double ptCentre[nBinspT];
+				double ptCentreErr_low[nBinspT];
+				double ptCentreErr_high[nBinspT];
+				double lmean[nBinspT];
+				double lmean_errlow[nBinspT];
+				double lmean_errhigh[nBinspT];
+
+				int pt=0;
+
 				if(nComp>0){//FindLegend
+					pt=0;
+					for(int ptBin = ptBinMin; ptBin < ptBinMax+1; ptBin++) {
+						graphCompareFile1->GetPoint(ptBin-1,ptCentre[pt],lmean[pt]);
+						ptCentreErr_high[pt]=graphCompareFile1->GetErrorXhigh(ptBin-1);
+						ptCentreErr_low[pt]=graphCompareFile1->GetErrorXlow(ptBin-1);
+						lmean_errhigh[pt]=graphCompareFile1->GetErrorYhigh(ptBin-1);
+						lmean_errlow[pt]=graphCompareFile1->GetErrorYlow(ptBin-1);
+						if(ShiftCompareInX){
+							ptCentre[pt] = ptCentre[pt] - DeltaXCompare;
+							ptCentreErr_high[pt] = ptCentreErr_high[pt]+DeltaXCompare; //0.
+							ptCentreErr_low[pt] = ptCentreErr_low[pt]-DeltaXCompare; //0.
+						}
+						pt++;
+					}
+					graphCompareFile1 = new TGraphAsymmErrors(nBinspT,ptCentre,lmean,ptCentreErr_low,ptCentreErr_high,lmean_errlow,lmean_errhigh);
+					graphCompareFile1->SetMarkerColor(kRed);
+					graphCompareFile1->SetLineColor(kRed);
+					graphCompareFile1->SetMarkerStyle(28);
+					graphCompareFile1->SetMarkerSize(2.75);
+
 					graphCompareFile1->Draw(drawGraphStyle);
 					sprintf(complegendentry,"#lambda(LSB)-#lambda(sig. region)");
 					sprintf(complegendentry,"%s",LegendEntryCompID1);
 					plotcompLegend->AddEntry(graphCompareFile1,complegendentry,"lp");
 				}
 				if(nComp>1){
+					pt=0;
+					for(int ptBin = ptBinMin; ptBin < ptBinMax+1; ptBin++) {
+						graphCompareFile2->GetPoint(ptBin-1,ptCentre[pt],lmean[pt]);
+						ptCentreErr_high[pt]=graphCompareFile2->GetErrorXhigh(ptBin-1);
+						ptCentreErr_low[pt]=graphCompareFile2->GetErrorXlow(ptBin-1);
+						lmean_errhigh[pt]=graphCompareFile2->GetErrorYhigh(ptBin-1);
+						lmean_errlow[pt]=graphCompareFile2->GetErrorYlow(ptBin-1);
+						if(ShiftCompareInX){
+							ptCentre[pt] = ptCentre[pt] + DeltaXCompare;
+							ptCentreErr_high[pt] = ptCentreErr_high[pt]-DeltaXCompare; //0.
+							ptCentreErr_low[pt] = ptCentreErr_low[pt]+DeltaXCompare; //0.
+						} 
+						pt++;
+					}
+					graphCompareFile2 = new TGraphAsymmErrors(nBinspT,ptCentre,lmean,ptCentreErr_low,ptCentreErr_high,lmean_errlow,lmean_errhigh);
+					graphCompareFile2->SetMarkerColor(kBlue);
+					graphCompareFile2->SetLineColor(kBlue);
+					graphCompareFile2->SetMarkerStyle(30);
+					graphCompareFile2->SetMarkerSize(2.75);
+
 					graphCompareFile2->Draw(drawGraphStyle);
 					sprintf(complegendentry,"#lambda(RSB)-#lambda(sig. region)");
 					sprintf(complegendentry,"%s",LegendEntryCompID2);
 					plotcompLegend->AddEntry(graphCompareFile2,complegendentry,"lp");
 				}
 				if(nComp>2){
+					pt=0;
+					for(int ptBin = ptBinMin; ptBin < ptBinMax+1; ptBin++) {
+						graphCompareFile3->GetPoint(ptBin-1,ptCentre[pt],lmean[pt]);
+						ptCentreErr_high[pt]=graphCompareFile3->GetErrorXhigh(ptBin-1);
+						ptCentreErr_low[pt]=graphCompareFile3->GetErrorXlow(ptBin-1);
+						lmean_errhigh[pt]=graphCompareFile3->GetErrorYhigh(ptBin-1);
+						lmean_errlow[pt]=graphCompareFile3->GetErrorYlow(ptBin-1);
+						if(ShiftCompareInX){
+							ptCentre[pt] = ptCentre[pt] - 2*DeltaXCompare;
+							ptCentreErr_high[pt] = ptCentreErr_high[pt]+2*DeltaXCompare; //0.
+							ptCentreErr_low[pt] = ptCentreErr_low[pt]-2*DeltaXCompare; //0.
+						}
+						pt++;
+					}
+					graphCompareFile3 = new TGraphAsymmErrors(nBinspT,ptCentre,lmean,ptCentreErr_low,ptCentreErr_high,lmean_errlow,lmean_errhigh);
+					graphCompareFile3->SetMarkerColor(kGreen-2);
+					graphCompareFile3->SetLineColor(kGreen-2);
+					graphCompareFile3->SetMarkerStyle(3);
+					graphCompareFile3->SetMarkerSize(2.75);
+
 					graphCompareFile3->Draw(drawGraphStyle);
 					sprintf(complegendentry,"Right sided 1.5 sigma");
 					sprintf(complegendentry,"%s",LegendEntryCompID3);
 					plotcompLegend->AddEntry(graphCompareFile3,complegendentry,"lp");
 				}
 				if(nComp>3){
+					pt=0;
+					for(int ptBin = ptBinMin; ptBin < ptBinMax+1; ptBin++) {
+						graphCompareFile4->GetPoint(ptBin-1,ptCentre[pt],lmean[pt]);
+						ptCentreErr_high[pt]=graphCompareFile4->GetErrorXhigh(ptBin-1);
+						ptCentreErr_low[pt]=graphCompareFile4->GetErrorXlow(ptBin-1);
+						lmean_errhigh[pt]=graphCompareFile4->GetErrorYhigh(ptBin-1);
+						lmean_errlow[pt]=graphCompareFile4->GetErrorYlow(ptBin-1);
+						if(ShiftCompareInX){
+							ptCentre[pt] = ptCentre[pt] + 2*DeltaXCompare;
+							ptCentreErr_high[pt] = ptCentreErr_high[pt]-2*DeltaXCompare; //0.
+							ptCentreErr_low[pt] = ptCentreErr_low[pt]+2*DeltaXCompare; //0.
+						} 
+						pt++;
+					}
+					graphCompareFile4 = new TGraphAsymmErrors(nBinspT,ptCentre,lmean,ptCentreErr_low,ptCentreErr_high,lmean_errlow,lmean_errhigh);
+					graphCompareFile4->SetMarkerColor(kOrange);
+					graphCompareFile4->SetLineColor(kOrange);
+					graphCompareFile4->SetMarkerStyle(5);
+					graphCompareFile4->SetMarkerSize(2.75);
+
 					graphCompareFile4->Draw(drawGraphStyle);
 					sprintf(complegendentry,"%s",LegendEntryCompID4);
 					plotcompLegend->AddEntry(graphCompareFile4,complegendentry,"lp");
@@ -3463,10 +3559,10 @@ int main(int argc, char** argv) {
 
 					if(iLam!=6&&iLam!=12&&iLam!=18&&rapBin==1){
 
-						yMinMP = -0.99; yMaxMP = 0.99; 	
-						if(iLam==2||iLam==3||iLam==8||iLam==9||iLam==14||iLam==15){
-							yMinMP = -0.33; yMaxMP = 0.33;
-						}
+						//yMinMP = -0.99; yMaxMP = 0.99; 	
+						//if(iLam==2||iLam==3||iLam==8||iLam==9||iLam==14||iLam==15){
+						//	yMinMP = -0.33; yMaxMP = 0.33;
+						//}
 
 						if(iLam>0&&iLam<7) MPframe=1;
 						if(iLam>6&&iLam<13) MPframe=2;
@@ -3922,15 +4018,21 @@ int main(int argc, char** argv) {
 						if(iLam==3){  
 							sprintf(filename,"%s/FinalResultsCS.pdf",FigDir);
 							if(PlotFinalData) MPcanvasCS_New->SaveAs(filename);
+							sprintf(filename,"%s/FinalResultsCS.C",FigDir);
+							if(PlotFinalData) MPcanvasCS_New->SaveAs(filename);
 							MPcanvasCS_New->Close();
 						}
 						if(iLam==9){
 							sprintf(filename,"%s/FinalResultsHX.pdf",FigDir);
 							if(PlotFinalData) MPcanvasHX_New->SaveAs(filename);
+							sprintf(filename,"%s/FinalResultsHX.C",FigDir);
+							if(PlotFinalData) MPcanvasHX_New->SaveAs(filename);
 							MPcanvasHX_New->Close();
 						}
 						if(iLam==15){
 							sprintf(filename,"%s/FinalResultsPX.pdf",FigDir);
+							if(PlotFinalData) MPcanvasPX_New->SaveAs(filename);
+							sprintf(filename,"%s/FinalResultsPX.C",FigDir);
 							if(PlotFinalData) MPcanvasPX_New->SaveAs(filename);
 							MPcanvasPX_New->Close();
 						}
@@ -4286,6 +4388,18 @@ int main(int argc, char** argv) {
 								if(rapBin==1) MPcanvasTilde_rap1->SaveAs(filename); 
 								if(rapBin==2) MPcanvasTilde_rap2->SaveAs(filename); 
 							}
+
+							if(mainframe==1&&rapBin==1) sprintf(filename,"%s/FinalResultsTildeCS_rap1.C",FigDir);
+							if(mainframe==2&&rapBin==1) sprintf(filename,"%s/FinalResultsTildeHX_rap1.C",FigDir);
+							if(mainframe==3&&rapBin==1) sprintf(filename,"%s/FinalResultsTildePX_rap1.C",FigDir);
+							if(mainframe==1&&rapBin==2) sprintf(filename,"%s/FinalResultsTildeCS_rap2.C",FigDir);
+							if(mainframe==2&&rapBin==2) sprintf(filename,"%s/FinalResultsTildeHX_rap2.C",FigDir);
+							if(mainframe==3&&rapBin==2) sprintf(filename,"%s/FinalResultsTildePX_rap2.C",FigDir);
+							if(PlotFinalData) { 
+								if(rapBin==1) MPcanvasTilde_rap1->SaveAs(filename); 
+								if(rapBin==2) MPcanvasTilde_rap2->SaveAs(filename); 
+							}
+
 							if(rapBin==1)MPcanvasTilde_rap1->Close();
 							if(rapBin==2)MPcanvasTilde_rap2->Close();
 						}
@@ -6511,6 +6625,7 @@ int main(int argc, char** argv) {
 
 			TLegend* plotLegend; 
 			plotLegend=new TLegend(LegendXmin,LegendYmin[nSystematics-1],0.98,0.98);
+			//plotLegend=new TLegend(0.12,0.12,0.45,0.45);
 			if(PlotSystematics&&PlotSysSquare) {
 				plotLegend=new TLegend(LegendXmin+0.12,LegendYmin[nSystematics-1],0.98,0.98);
 				if(nState==4) plotLegend=new TLegend(0.15,0.12,0.45,0.45);

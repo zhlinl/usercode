@@ -636,6 +636,9 @@ void polFit(int n_sampledPoints=1,
   double mass_min = background_mass->GetXaxis()->GetXmin();
   double mass_max = background_mass->GetXaxis()->GetXmax();
 
+	cout << "rapdilepton_min " << rapdilepton_min << endl;
+	cout << "rapdilepton_max " << rapdilepton_max << endl;
+
   sprintf(filename,"%s/results.root",dirstruct);
   if(RealData) sprintf(filename,"%s/results_%s.root",dirstruct,TreeBinID);
   TFile* resultsFile = new TFile(filename, "RECREATE", "results");

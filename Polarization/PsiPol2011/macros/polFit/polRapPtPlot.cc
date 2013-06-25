@@ -650,6 +650,10 @@ int main(int argc, char** argv) {
 
 			///////////////////// Extraction of mean injected parameters from GenResults.root //////////////////////////////////////////////////
 
+			////2013-6-21
+			//MPValgo = 3;
+			//if(iPt==12) MPValgo = 1;
+
 			l_min = -1.4;
 			l_max =  1.4;
 			l_step_1D = 0.02;
