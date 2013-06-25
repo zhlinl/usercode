@@ -633,6 +633,7 @@ void bkgHistos(const std::string infilename, int rapBin, int ptBin, int nState, 
 	}
 	output->cd();
 	hFracTBG->SetBinContent(1, fTBGsig);
+	//hFracTBG->SetBinContent(1, fTBGsig*2.);
 	hFracTBG->SetBinError(1, fTBGerr);
 	hFracTBG->Write();
 

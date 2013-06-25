@@ -75,12 +75,12 @@ int main(int argc, char* argv[]){
 		fromSplit("doCtauUncer", arg, doCtauUncer);
 	}
 
-	//PlotMassPar(nState);
-	//PlotLifePar(nState);
-	//if(nState==4)
-	//	PlotBFrac_1S(nState);
-	//if(nState==5)
-	//	PlotBFrac_2S(nState);
+	PlotMassPar(nState);
+	PlotLifePar(nState);
+	if(nState==4)
+		PlotBFrac_1S(nState);
+	if(nState==5)
+		PlotBFrac_2S(nState);
 
 	double nSigma=3.0;
 	if(nState==4) nSigma=3.0; //2.5

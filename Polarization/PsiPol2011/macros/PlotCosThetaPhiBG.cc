@@ -87,8 +87,8 @@ int main(int argc, char* argv[]){
 		for(int iPT = 0; iPT < onia::kNbPTBins[iRap+1]; iPT++){
 			LoadHistos(iRap, iPT, nState);
 			for(int iFrame = 0; iFrame < onia::kNbFrames; iFrame++){
-				PlotHistos(iRap, iPT, iFrame, L);
-				PlotHistos(iRap, iPT, iFrame, R);
+				if(iFrame<3) PlotHistos(iRap, iPT, iFrame, L);
+				if(iFrame<3) PlotHistos(iRap, iPT, iFrame, R);
 			}
 		}
 	}

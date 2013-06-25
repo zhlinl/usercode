@@ -60,9 +60,11 @@ void createWorkspace(const std::string &infilename, int nState, bool correctCtau
 	RooDataSet* fullData = new RooDataSet("fullData","The Full Data From the Input ROOT Trees",dataVars);
 
 	int entries = tree->GetEntries();
+	cout << "entries " << entries << endl;
 
 	// loop through events in tree and save them to dataset
 	for (int ientries = 0; ientries < entries; ientries++) {
+	
 		if (ientries%100000==0) std::cout << "event " << ientries << " of " << entries <<  std::endl;
 
 		tree->GetEntry(ientries);
@@ -70,6 +72,7 @@ void createWorkspace(const std::string &infilename, int nState, bool correctCtau
 		double M =jpsi->M();
 		double y=jpsi->Rapidity();
 		double pt=jpsi->Pt();
+
 
 		if (M > JpsiMass->getMin() && M < JpsiMass->getMax()
 				&& massErr > JpsiMassErr->getMin() && massErr < JpsiMassErr->getMax()
@@ -147,6 +150,8 @@ void createWorkspace(const std::string &infilename, int nState, bool correctCtau
 			std::stringstream cutString;
 			cutString << "(JpsiPt >= " << ptMin << " && JpsiPt < "<< ptMax << ") && "
 				<< "(TMath::Abs(JpsiRap) >= " << yMin << " && TMath::Abs(JpsiRap) < " << yMax << ")";
+
+			cout << "cutString: " << cutString.str().c_str() << endl;
 
 			// get the dataset for the fit
 			RooDataSet* binData = (RooDataSet*)fullData->reduce(cutString.str().c_str());

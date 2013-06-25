@@ -105,8 +105,8 @@ void massFit(const std::string &infilename, int rapBin, int ptBin, int nState, b
 	//pseudo-proper decay length
 	double l_pdecay = L_decay * onia::MpsiPDG / meanPt ;
 	double nSigma = 0.;
-	if(nState==4) nSigma = 2.5;
-	if(nState==5) nSigma = 2.0;
+	if(nState==4) nSigma = 3.0;
+	if(nState==5) nSigma = 3.0;
 	double ctauCut = nSigma*l_pdecay;
 	double ctCutMinPR = -ctauCut, ctCutMaxPR = ctauCut;
 	double ctCutMinNP =  ctauCut, ctCutMaxNP = 6.;

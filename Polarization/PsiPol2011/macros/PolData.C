@@ -7,6 +7,10 @@
 #include <TH2.h>
 #include <TCanvas.h>
 
+#include <string>
+#include <iostream>
+#include <sstream>
+
 TH1F *Reco_StatEv;
 TH1F *Reco_Onia_mass[onia::kNbPTMaxBins+1][onia::kNbRapForPTBins+1];
 TH2F *Reco_Onia_rap_pT;
@@ -17,8 +21,8 @@ TTree *treeOut;
 TLorentzVector *lepP, *lepN, *jpsi;
 
 
-void PolData::Loop(int nState, bool rejectCowboys, int FidCuts, bool MC, bool RequestTrigger, bool removeEta0p2_0p3, bool cutDeltaREllDpt)
-{
+void PolData::Loop(int nState, bool rejectCowboys, int FidCuts, bool MC, bool RequestTrigger, bool removeEta0p2_0p3, bool cutDeltaREllDpt) {
+
 	if (fChain == 0) return;
 
 	Long64_t nentries = fChain->GetEntries();
@@ -39,14 +43,39 @@ void PolData::Loop(int nState, bool rejectCowboys, int FidCuts, bool MC, bool Re
 	treeOut->Branch("JpsiMassErr", &jpsiMassErr, "JpsiMassErr/D");
 	treeOut->Branch("JpsiVprob", &jpsiVprob, "JpsiVprob/D");
 
-	//loop over the events
-	for (Long64_t jentry=0; jentry<nentries;jentry++) {
+  //double rndNumber;
+  //ifstream rndFile; rndFile.open("/afs/ihep.ac.cn/users/z/zhangll/fs/work/polarization/PsiPol2011/macros/random.txt");
 
-		if(jentry % 100000 == 0) std::cout << "event " << jentry << std::endl;
+	//loop over the events
+	for (Long64_t jentry=0; jentry<nentries; jentry++) {
+
+	//for (Long64_t jentry=0; jentry<nentries/2; jentry++) {  // first half
+	//for (Long64_t jentry=nentries/2; jentry<nentries; jentry++) {  // second half
+	
+	//for (Long64_t jentry=0; jentry<nentries/4; jentry++) {  //  one quarter
+	//for (Long64_t jentry=nentries/4; jentry<2*nentries/4; jentry++) {  //  two quarter
+	//for (Long64_t jentry=2*nentries/4; jentry<3*nentries/4; jentry++) {  //  three quarter
+	//for (Long64_t jentry=3*nentries/4; jentry<nentries; jentry++) {  //  four quarter
+
+
+		if(jentry % 100000 == 0) std::cout << "event " << jentry << " of " << nentries << std::endl;
 
 		Long64_t ientry = LoadTree(jentry);
 		if (ientry < 0) break;
 		nb = fChain->GetEntry(jentry);
+
+		//if( !(onia->Rapidity() < 0.) ) continue;
+		//if( !(onia->Rapidity() > 0.) ) continue;
+		//if( !(onia->Rapidity() > -0.6 && onia->Rapidity() < -0.3) ) continue;
+		//if( !(onia->Rapidity() > -0.3 && onia->Rapidity() < 0.) ) continue;
+		//if( !(onia->Rapidity() > 0. && onia->Rapidity() < 0.3) ) continue;
+		//if( !(onia->Rapidity() > 0.3 && onia->Rapidity() < 0.6) ) continue;
+		
+		//rndFile>>rndNumber;
+		//cout << "rndNumber " << rndNumber << endl;
+		//if( !(rndNumber > 0.5) )  continue; // rndUp0p5
+		//if( !(rndNumber < 0.5) )  continue; // rndLow0p5
+		
 
 		//if we process MC, we must ensure that we only consider reconstructed events
 		if(onia->Pt() > 990.) continue;
